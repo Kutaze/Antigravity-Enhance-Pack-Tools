@@ -709,10 +709,13 @@ namespace AntigravityInstaller
                 : new SolidColorBrush(Color.FromRgb(203, 213, 225)));
             boxBorder.SetValue(Border.SnapsToDevicePixelsProperty, true);
 
-            // Modern Rounded Checkmark Vector Icon
+            // Modern Rounded Checkmark Vector Icon (Perfect Center & Golden Ratio)
             var checkPath = new FrameworkElementFactory(typeof(System.Windows.Shapes.Path));
             checkPath.Name = "checkMark";
-            checkPath.SetValue(System.Windows.Shapes.Path.DataProperty, Geometry.Parse("M 3.5,8.5 L 6.8,12 L 13.5,4.5"));
+            checkPath.SetValue(System.Windows.Shapes.Path.DataProperty, Geometry.Parse("M 1.5,5.5 L 4.5,8.5 L 10.5,1.5"));
+            checkPath.SetValue(System.Windows.Shapes.Path.WidthProperty, 9.5);
+            checkPath.SetValue(System.Windows.Shapes.Path.HeightProperty, 7.5);
+            checkPath.SetValue(System.Windows.Shapes.Path.StretchProperty, Stretch.Uniform);
             checkPath.SetValue(System.Windows.Shapes.Path.StrokeProperty, Brushes.White);
             checkPath.SetValue(System.Windows.Shapes.Path.StrokeThicknessProperty, 1.8);
             checkPath.SetValue(System.Windows.Shapes.Path.StrokeStartLineCapProperty, PenLineCap.Round);
