@@ -28,3 +28,9 @@ Desktop.ini
 dist/
 *.zip
 *.tar.gz
+
+# Local desktop utility scripts and study notes
+Fix_Antigravity.bat
+启动_AIG汉化.bat
+Antigravity汉化_最佳实践.py
+Antigravity汉化技能学习笔记.md
