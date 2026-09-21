@@ -7,7 +7,7 @@
 
 **让 Google Antigravity 桌面客户端获得全界面原生深度汉化、真实上下文动态遥测、4 挡思考调节滑块、实时额度看板与现代沉浸式原生视觉增强**
 
-[![Release](https://img.shields.io/badge/Release-v2.5_Pro-6366f1?style=for-the-badge)](https://github.com/)
+[![Release](https://img.shields.io/badge/Release-v0.1.2-6366f1?style=for-the-badge)](https://github.com/)
 [![License](https://img.shields.io/badge/License-MIT-emerald?style=for-the-badge)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Windows_10%2F11-blue?style=for-the-badge)](https://github.com/)
 [![UI](https://img.shields.io/badge/UI-Dual_Theme_GUI-purple?style=for-the-badge)](https://github.com/)
