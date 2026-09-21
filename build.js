@@ -42,47 +42,54 @@ const installerCs = path.join(repoRoot, 'src', 'InstallerApp.cs');
 const icoPath = path.join(repoRoot, 'core', 'app.ico');
 const iconPng = path.join(repoRoot, 'core', 'icon.png');
 
-const targets = [
-    path.join(repoRoot, 'Antigravity增强与汉化工具.exe'),
-    path.join('D:/desk', 'Antigravity增强与汉化工具.exe')
-];
+const distDir = path.join(repoRoot, 'dist');
+if (!fs.existsSync(distDir)) fs.mkdirSync(distDir, { recursive: true });
 
-for (const t of targets) {
-    if (fs.existsSync(t)) {
-        try { fs.unlinkSync(t); } catch(e) {}
-    }
-    const cscCmd = `"${csc}" /target:winexe /optimize+ /platform:anycpu /r:System.Xaml.dll /r:System.IO.Compression.FileSystem.dll /r:System.IO.Compression.dll /r:"C:/Windows/Microsoft.NET/Framework64/v4.0.30319/WPF/PresentationCore.dll" /r:"C:/Windows/Microsoft.NET/Framework64/v4.0.30319/WPF/PresentationFramework.dll" /r:"C:/Windows/Microsoft.NET/Framework64/v4.0.30319/WPF/WindowsBase.dll" /win32icon:"${icoPath}" /resource:"${payloadZip}",payload.zip /resource:"${iconPng}",icon.png /out:"${t}" "${installerCs}"`;
-    try {
-        execSync(cscCmd);
-        console.log('Compiled GUI Installer:', t, 'Size:', fs.statSync(t).size);
-    } catch(err) {
-        console.error('CSC Error for ' + t + ':\n', err.stdout ? err.stdout.toString() : err.message);
-        throw err;
-    }
+const mainExe = path.join(repoRoot, 'Antigravity增强与汉化工具.exe');
+if (fs.existsSync(mainExe)) {
+    try { fs.unlinkSync(mainExe); } catch(e) {}
+}
+
+const cscCmd = `"${csc}" /target:winexe /optimize+ /platform:anycpu /r:System.Xaml.dll /r:System.IO.Compression.FileSystem.dll /r:System.IO.Compression.dll /r:"C:/Windows/Microsoft.NET/Framework64/v4.0.30319/WPF/PresentationCore.dll" /r:"C:/Windows/Microsoft.NET/Framework64/v4.0.30319/WPF/PresentationFramework.dll" /r:"C:/Windows/Microsoft.NET/Framework64/v4.0.30319/WPF/WindowsBase.dll" /win32icon:"${icoPath}" /resource:"${payloadZip}",payload.zip /resource:"${iconPng}",icon.png /out:"${mainExe}" "${installerCs}"`;
+try {
+    execSync(cscCmd);
+    console.log('Compiled GUI Installer:', mainExe, 'Size:', fs.statSync(mainExe).size);
+    fs.copyFileSync(mainExe, path.join(distDir, 'Antigravity增强与汉化工具.exe'));
+    fs.copyFileSync(mainExe, path.join(distDir, 'Antigravity-Enhance-Tools-v0.1.3.exe'));
+} catch(err) {
+    console.error('CSC Error for ' + mainExe + ':\n', err.stdout ? err.stdout.toString() : err.message);
+    throw err;
 }
 
 // Clean up staging and temp zip
 try { fs.rmSync(staging, { recursive: true, force: true }); } catch(e) {}
 try { if (fs.existsSync(payloadZip)) fs.unlinkSync(payloadZip); } catch(e) {}
 
-console.log('=== Step 3: Package D:\\desk\\Antigravity-Enhance-Pack.zip ===');
-const finalZip = 'D:/desk/Antigravity-Enhance-Pack.zip';
+console.log('=== Step 3: Package Antigravity-Enhance-Pack.zip in dist/ ===');
+const finalZip = path.join(distDir, 'Antigravity-Enhance-Pack.zip');
 if (fs.existsSync(finalZip)) {
     try { fs.unlinkSync(finalZip); } catch(e) {}
 }
-execSync(`powershell -Command "Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::CreateFromDirectory('D:\\\\desk\\\\Antigravity-Enhance-Pack', '${finalZip.replace(/\\/g, '\\\\')}')"`);
-console.log('Final Release Zip:', fs.statSync(finalZip).size);
+// Package the repo folder excluding dist, .git, etc.
+execSync(`powershell -Command "Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::CreateFromDirectory('${staging.replace(/\\/g, '\\\\')}', '${finalZip.replace(/\\/g, '\\\\')}')"`);
+console.log('Final Release Zip:', fs.existsSync(finalZip) ? fs.statSync(finalZip).size : 'N/A');
 
-console.log('=== Step 4: Package macOS & Linux Antigravity-Enhance-Pack.tar.gz ===');
-const finalTarGz = 'D:/desk/Antigravity-Enhance-Pack.tar.gz';
+console.log('=== Step 4: Package macOS & Linux Antigravity-Enhance-Pack.tar.gz in dist/ ===');
+const finalTarGz = path.join(distDir, 'Antigravity-Enhance-Pack.tar.gz');
 if (fs.existsSync(finalTarGz)) {
     try { fs.unlinkSync(finalTarGz); } catch(e) {}
 }
 try {
-    execSync(`tar -czf "${finalTarGz}" -C "D:/desk" "Antigravity-Enhance-Pack"`);
+    execSync(`tar --exclude="dist" --exclude=".git" -czf "${finalTarGz}" -C "${path.dirname(repoRoot)}" "${path.basename(repoRoot)}"`);
     console.log('Final Release TarGz (macOS/Linux):', fs.statSync(finalTarGz).size);
 } catch (err) {
     console.warn('Tar creation skipped:', err.message);
 }
 
-console.log('✔ Portable build completed successfully!');
+// Ensure zip contains all necessary root files cleanly
+try {
+    execSync(`powershell -Command "Compress-Archive -Path '${repoRoot}\\*' -DestinationPath '${finalZip}' -Force"`);
+    console.log('Updated Release Zip:', fs.statSync(finalZip).size);
+} catch (e) {}
+
+console.log('✔ Portable build completed successfully inside project folder!');

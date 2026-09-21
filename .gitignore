@@ -23,3 +23,8 @@ Desktop.ini
 .vscode/
 .idea/
 *.swp
+
+# Release outputs
+dist/
+*.zip
+*.tar.gz
