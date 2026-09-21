@@ -7,11 +7,11 @@
 
 **让 Google Antigravity 桌面客户端获得全界面原生深度汉化、真实上下文动态遥测、4 挡思考调节滑块、实时额度看板与现代沉浸式原生视觉增强**
 
-[![Release](https://img.shields.io/badge/Release-v0.1.2-6366f1?style=for-the-badge)](https://github.com/)
+[![Release](https://img.shields.io/badge/Release-v0.1.2-6366f1?style=for-the-badge)](https://github.com/Tsuenoku/Antigravity-Enhance-Pack-Tools/releases)
 [![License](https://img.shields.io/badge/License-MIT-emerald?style=for-the-badge)](LICENSE)
-[![Platform](https://img.shields.io/badge/Platform-Windows_10%2F11-blue?style=for-the-badge)](https://github.com/)
-[![UI](https://img.shields.io/badge/UI-Dual_Theme_GUI-purple?style=for-the-badge)](https://github.com/)
-[![Zero Dependency](https://img.shields.io/badge/Runtime-Zero_Dependency-orange?style=for-the-badge)](https://github.com/)
+[![Platform](https://img.shields.io/badge/Platform-Windows_10%2F11-blue?style=for-the-badge)](https://github.com/Tsuenoku/Antigravity-Enhance-Pack-Tools)
+[![UI](https://img.shields.io/badge/UI-Dual_Theme_GUI-purple?style=for-the-badge)](https://github.com/Tsuenoku/Antigravity-Enhance-Pack-Tools)
+[![Zero Dependency](https://img.shields.io/badge/Runtime-Zero_Dependency-orange?style=for-the-badge)](https://github.com/Tsuenoku/Antigravity-Enhance-Pack-Tools)
 
 </div>
 
@@ -55,7 +55,7 @@
 ## 🚀 快速开始 (Quick Start)
 
 ### 方式一：使用独立 GUI 安装器 (推荐)
-1. 从 [Releases](https://github.com/) 页面下载最新版 **`Antigravity增强与汉化工具.exe`**。
+1. 从 [Releases 页面](https://github.com/Tsuenoku/Antigravity-Enhance-Pack-Tools/releases) 下载最新版 **`Antigravity增强与汉化工具.exe`**。
 2. 双击直接运行（无需安装额外运行库）。
 3. 程序将自动检测您的 Antigravity 安装目录，确认无误后点击 **「🚀 一键安装 / 更新增强补丁」**。
 4. 安装完成后，程序将自动重新启动客户端，即可享受全新的交互与汉化体验！
@@ -80,8 +80,8 @@
 ### 一键构建流程
 ```bash
 # 1. 克隆代码仓库
-git clone https://github.com/your-username/antigravity-enhance-pack.git
-cd antigravity-enhance-pack
+git clone https://github.com/Tsuenoku/Antigravity-Enhance-Pack-Tools.git
+cd Antigravity-Enhance-Pack-Tools
 
 # 2. 执行构建脚本 (自动完成资源内嵌打包与 C# GUI 编译器调用)
 node build.js
