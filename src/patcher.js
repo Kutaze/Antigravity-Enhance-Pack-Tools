@@ -243,24 +243,47 @@ try {
                 return null;
             }
         });
+        _ipc.handle('antigravity:open-path', async (_e, targetPath) => {
+            try {
+                const { shell: _shell } = require('electron');
+                if (targetPath) {
+                    let p = targetPath;
+                    if (p.indexOf('file:///') === 0) {
+                        try {
+                            const { fileURLToPath: _f2p } = require('url');
+                            p = _f2p(p);
+                        } catch(e) {}
+                    }
+                    if (_fs.existsSync(p)) {
+                        await _shell.openPath(p);
+                        return { success: true };
+                    }
+                    return { success: false, error: 'Path not found' };
+                }
+                return { success: false, error: 'Empty path' };
+            } catch(err) {
+                return { success: false, error: err.message };
+            }
+        });
         _ipc.handle('antigravity:get-skills', async () => {
             try {
                 const _os = require('os');
                 const home = _os.homedir();
-                const skillDirs = [
-                    _path.join(home, '.gemini', 'config', 'skills'),
-                    _path.join(home, '.gemini', 'antigravity', 'builtin', 'skills')
+                const skillSources = [
+                    { dir: _path.join(home, '.gemini', 'config', 'skills'), type: 'custom', label: '用户配置' },
+                    { dir: _path.join(home, '.gemini', 'antigravity', 'builtin', 'skills'), type: 'builtin', label: '官方自带' }
                 ];
                 const pluginBase = _path.join(home, '.gemini', 'config', 'plugins');
                 if (_fs.existsSync(pluginBase)) {
                     for (const p of _fs.readdirSync(pluginBase)) {
                         const pSkills = _path.join(pluginBase, p, 'skills');
-                        if (_fs.existsSync(pSkills)) skillDirs.push(pSkills);
+                        if (_fs.existsSync(pSkills)) skillSources.push({ dir: pSkills, type: 'plugin', label: '插件扩展' });
                     }
                 }
                 const result = [];
                 const seen = new Set();
-                for (const d of skillDirs) {
+                for (const srcItem of skillSources) {
+                    const d = srcItem.dir;
                     if (!_fs.existsSync(d)) continue;
                     for (const f of _fs.readdirSync(d)) {
                         const skillPath = _path.join(d, f, 'SKILL.md');
@@ -279,7 +302,14 @@ try {
                                     break;
                                 }
                             }
-                            result.push({ id: f, name: f, description: desc });
+                            result.push({
+                                id: f,
+                                name: f,
+                                description: desc,
+                                dir: _path.join(d, f),
+                                type: srcItem.type,
+                                typeLabel: srcItem.label
+                            });
                         }
                     }
                 }
@@ -328,7 +358,8 @@ try {
                     const extraApis = `
     takeScreenshot: () => electron_1.ipcRenderer.invoke('antigravity:screenshot'),
     getClipboardImage: () => electron_1.ipcRenderer.invoke('antigravity:clipboard-image'),
-    getSkills: () => electron_1.ipcRenderer.invoke('antigravity:get-skills'),`;
+    getSkills: () => electron_1.ipcRenderer.invoke('antigravity:get-skills'),
+    openPath: (p) => electron_1.ipcRenderer.invoke('antigravity:open-path', p),`;
                     preloadContent = preloadContent.replace(targetNeedle, targetNeedle + extraApis);
                     fs.writeFileSync(preloadJs, preloadContent, 'utf8');
                 }

@@ -107,7 +107,6 @@
         var normalized = trimmed.replace(/\r\n/g, '\n');
         if (exactMap[trimmed] || exactMap[normalized]) {
             var target = exactMap[trimmed] || exactMap[normalized];
-            var target = exactMap[trimmed];
             var leading = original.match(/^\s*/)[0];
             var trailing = original.match(/\s*$/)[0];
             return leading + target + trailing;
@@ -911,13 +910,134 @@
     `;
 
     modal.innerHTML = `
+      <style>
+        #agy-skills-modal {
+          --sk-bg: #ffffff;
+          --sk-header-bg: #f8fafc;
+          --sk-text: #0f172a;
+          --sk-subtext: #475569;
+          --sk-desc: #1e293b;
+          --sk-border: #e2e8f0;
+          --sk-card-bg: #ffffff;
+          --sk-card-border: #cbd5e1;
+          --sk-card-hover-border: #6366f1;
+          --sk-card-hover-bg: #f5f7ff;
+          --sk-card-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+          --sk-badge-color: #3730a3;
+          --sk-badge-bg: rgba(99, 102, 241, 0.12);
+          --sk-badge-border: rgba(99, 102, 241, 0.3);
+          --sk-cat-color: #475569;
+          --sk-cat-bg: #f1f5f9;
+          --sk-cat-border: #cbd5e1;
+          --sk-input-bg: #ffffff;
+          --sk-input-text: #0f172a;
+          --sk-input-border: #cbd5e1;
+          --sk-footer-text: #64748b;
+          --sk-filter-bg: #f1f5f9;
+          --sk-filter-text: #334155;
+          --sk-filter-border: #cbd5e1;
+          --sk-filter-active-bg: #4f46e5;
+          --sk-filter-active-text: #ffffff;
+          --sk-filter-active-border: #4338ca;
+        }
+        #agy-skills-modal[data-theme="dark"],
+        body.theme-dark #agy-skills-modal,
+        body.dark #agy-skills-modal,
+        html.dark #agy-skills-modal {
+          --sk-bg: #18181b;
+          --sk-header-bg: rgba(255, 255, 255, 0.02);
+          --sk-text: #f8fafc;
+          --sk-subtext: #94a3b8;
+          --sk-desc: #e2e8f0;
+          --sk-border: rgba(255, 255, 255, 0.1);
+          --sk-card-bg: rgba(255, 255, 255, 0.035);
+          --sk-card-border: rgba(255, 255, 255, 0.1);
+          --sk-card-hover-border: rgba(129, 140, 248, 0.65);
+          --sk-card-hover-bg: rgba(99, 102, 241, 0.12);
+          --sk-card-shadow: none;
+          --sk-badge-color: #c7d2fe;
+          --sk-badge-bg: rgba(99, 102, 241, 0.22);
+          --sk-badge-border: rgba(99, 102, 241, 0.4);
+          --sk-cat-color: #cbd5e1;
+          --sk-cat-bg: rgba(255, 255, 255, 0.07);
+          --sk-cat-border: rgba(255, 255, 255, 0.12);
+          --sk-input-bg: rgba(255, 255, 255, 0.05);
+          --sk-input-text: #f8fafc;
+          --sk-input-border: rgba(255, 255, 255, 0.15);
+          --sk-footer-text: #94a3b8;
+          --sk-filter-bg: rgba(255, 255, 255, 0.04);
+          --sk-filter-text: #cbd5e1;
+          --sk-filter-border: rgba(255, 255, 255, 0.12);
+          --sk-filter-active-bg: rgba(99, 102, 241, 0.3);
+          --sk-filter-active-text: #e0e7ff;
+          --sk-filter-active-border: #6366f1;
+        }
+        @media (prefers-color-scheme: dark) {
+          body:not(.theme-light) #agy-skills-modal:not([data-theme="light"]) {
+            --sk-bg: #18181b;
+            --sk-header-bg: rgba(255, 255, 255, 0.02);
+            --sk-text: #f8fafc;
+            --sk-subtext: #94a3b8;
+            --sk-desc: #e2e8f0;
+            --sk-border: rgba(255, 255, 255, 0.1);
+            --sk-card-bg: rgba(255, 255, 255, 0.035);
+            --sk-card-border: rgba(255, 255, 255, 0.1);
+            --sk-card-hover-border: rgba(129, 140, 248, 0.65);
+            --sk-card-hover-bg: rgba(99, 102, 241, 0.12);
+            --sk-card-shadow: none;
+            --sk-badge-color: #c7d2fe;
+            --sk-badge-bg: rgba(99, 102, 241, 0.22);
+            --sk-badge-border: rgba(99, 102, 241, 0.4);
+            --sk-cat-color: #cbd5e1;
+            --sk-cat-bg: rgba(255, 255, 255, 0.07);
+            --sk-cat-border: rgba(255, 255, 255, 0.12);
+            --sk-input-bg: rgba(255, 255, 255, 0.05);
+            --sk-input-text: #f8fafc;
+            --sk-input-border: rgba(255, 255, 255, 0.15);
+            --sk-footer-text: #94a3b8;
+            --sk-filter-bg: rgba(255, 255, 255, 0.04);
+            --sk-filter-text: #cbd5e1;
+            --sk-filter-border: rgba(255, 255, 255, 0.12);
+            --sk-filter-active-bg: rgba(99, 102, 241, 0.3);
+            --sk-filter-active-text: #e0e7ff;
+            --sk-filter-active-border: #6366f1;
+          }
+        }
+
+        #agy-skills-cards-wrapper {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+          gap: 10px;
+        }
+        @media (max-width: 860px) {
+          #agy-skills-cards-wrapper {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+          }
+        }
+        @media (max-width: 560px) {
+          #agy-skills-cards-wrapper {
+            grid-template-columns: 1fr !important;
+          }
+        }
+        .agy-skill-card {
+          border: 1px solid var(--sk-card-border);
+          background: var(--sk-card-bg);
+          box-shadow: var(--sk-card-shadow);
+        }
+        .agy-skill-card:hover {
+          border-color: var(--sk-card-hover-border) !important;
+          background: var(--sk-card-hover-bg) !important;
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px -3px rgba(99, 102, 241, 0.18) !important;
+        }
+      </style>
       <div id="agy-skills-container" style="
-        width: 100%;
-        max-width: 680px;
-        max-height: 82vh;
-        background: var(--background, #18181b);
-        color: var(--foreground, #fafafa);
-        border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+        width: 95%;
+        max-width: 960px;
+        max-height: 85vh;
+        background: var(--sk-bg);
+        color: var(--sk-text);
+        border: 1px solid var(--sk-border);
         border-radius: 16px;
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.05);
         display: flex;
@@ -931,8 +1051,8 @@
           align-items: center;
           justify-content: space-between;
           padding: 16px 20px;
-          border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.08));
-          background: var(--muted, rgba(255, 255, 255, 0.02));
+          border-bottom: 1px solid var(--sk-border);
+          background: var(--sk-header-bg);
         ">
           <div style="display: flex; align-items: center; gap: 12px;">
             <div style="
@@ -948,19 +1068,19 @@
               box-shadow: 0 4px 10px rgba(99, 102, 241, 0.35);
             ">✨</div>
             <div>
-              <div style="font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+              <div style="font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; color: var(--sk-text);">
                 <span>技能中心 (Skills Hub)</span>
                 <span id="agy-skills-count-badge" style="
                   font-size: 11px;
-                  font-weight: 500;
+                  font-weight: 600;
                   padding: 1px 7px;
                   border-radius: 9999px;
                   background: rgba(99, 102, 241, 0.15);
-                  color: #818cf8;
+                  color: #4f46e5;
                   border: 1px solid rgba(99, 102, 241, 0.25);
                 ">${AGY_BUILTIN_SKILLS.length} 个可用技能</span>
               </div>
-              <div style="font-size: 12px; color: var(--muted-foreground, #94a3b8); margin-top: 2px;">
+              <div style="font-size: 12px; color: var(--sk-subtext); margin-top: 2px;">
                 点击任意卡片一键填入指令并唤醒对应专家角色
               </div>
             </div>
@@ -968,7 +1088,7 @@
           <button id="agy-skills-close-btn" type="button" style="
             background: transparent;
             border: none;
-            color: var(--muted-foreground, #94a3b8);
+            color: var(--sk-subtext);
             cursor: pointer;
             font-size: 18px;
             width: 30px;
@@ -978,24 +1098,24 @@
             align-items: center;
             justify-content: center;
             transition: all 0.15s ease;
-          " onmouseover="this.style.background='rgba(255,255,255,0.1)';this.style.color='#fff';" onmouseout="this.style.background='transparent';this.style.color='var(--muted-foreground, #94a3b8)';">✕</button>
+          " onmouseover="this.style.background='rgba(99,102,241,0.1)';this.style.color='#6366f1';" onmouseout="this.style.background='transparent';this.style.color='var(--sk-subtext)';">✕</button>
         </div>
 
         <!-- Search Bar & Filters -->
-        <div style="padding: 14px 20px 10px; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.05));">
+        <div style="padding: 14px 20px 10px; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid var(--sk-border);">
           <div style="position: relative; width: 100%;">
             <input id="agy-skills-search-input" type="text" placeholder="🔍 搜索技能名称、描述或关键词 (如: UI、审查、TDD、文档、架构...)" style="
               width: 100%;
               box-sizing: border-box;
               padding: 9px 14px;
-              background: var(--input, rgba(255, 255, 255, 0.05));
-              color: var(--foreground, #fafafa);
-              border: 1px solid var(--border, rgba(255, 255, 255, 0.15));
+              background: var(--sk-input-bg);
+              color: var(--sk-input-text);
+              border: 1px solid var(--sk-input-border);
               border-radius: 8px;
               font-size: 13px;
               outline: none;
               transition: border-color 0.15s ease;
-            " onfocus="this.style.borderColor='#6366f1';" onblur="this.style.borderColor='var(--border, rgba(255, 255, 255, 0.15))';">
+            " onfocus="this.style.borderColor='#6366f1';" onblur="this.style.borderColor='var(--sk-input-border)';">
           </div>
           
           <div id="agy-skills-category-bar" style="display: flex; gap: 6px; flex-wrap: wrap;">
@@ -1003,14 +1123,11 @@
           </div>
         </div>
 
-        <!-- Skills Cards Grid -->
+        <!-- Skills Cards Grid (3 Columns) -->
         <div id="agy-skills-cards-wrapper" style="
           padding: 14px 20px 18px;
           overflow-y: auto;
-          max-height: 440px;
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-          gap: 10px;
+          max-height: 480px;
           box-sizing: border-box;
         ">
         </div>
@@ -1018,16 +1135,16 @@
         <!-- Footer -->
         <div style="
           padding: 10px 20px;
-          border-top: 1px solid var(--border, rgba(255, 255, 255, 0.08));
-          background: var(--muted, rgba(255, 255, 255, 0.02));
+          border-top: 1px solid var(--sk-border);
+          background: var(--sk-header-bg);
           display: flex;
           align-items: center;
           justify-content: space-between;
           font-size: 12px;
-          color: var(--muted-foreground, #94a3b8);
+          color: var(--sk-footer-text);
         ">
           <span>💡 提示：点击技能卡片后直接在对话框输入具体需求并发送</span>
-          <span style="font-size: 11px; opacity: 0.7;">Esc 或点击外围关闭</span>
+          <span style="font-size: 11px; opacity: 0.8;">Esc 或点击外围关闭</span>
         </div>
       </div>
     `;
@@ -1086,16 +1203,16 @@
 
       return `
         <button type="button" data-category="${cat}" style="
-          padding: 4px 10px;
+          padding: 4px 11px;
           border-radius: 6px;
           font-size: 12px;
           cursor: pointer;
-          border: 1px solid ${isActive ? '#6366f1' : 'var(--border, rgba(255, 255, 255, 0.1))'};
-          background: ${isActive ? 'rgba(99, 102, 241, 0.2)' : 'rgba(255, 255, 255, 0.03)'};
-          color: ${isActive ? '#a5b4fc' : 'var(--foreground, #cbd5e1)'};
-          font-weight: ${isActive ? '600' : '400'};
+          border: 1px solid ${isActive ? 'var(--sk-filter-active-border)' : 'var(--sk-filter-border)'};
+          background: ${isActive ? 'var(--sk-filter-active-bg)' : 'var(--sk-filter-bg)'};
+          color: ${isActive ? 'var(--sk-filter-active-text)' : 'var(--sk-filter-text)'};
+          font-weight: ${isActive ? '600' : '500'};
           transition: all 0.15s ease;
-        " onmouseover="if(!${isActive}) this.style.background='rgba(255,255,255,0.08)';" onmouseout="if(!${isActive}) this.style.background='rgba(255,255,255,0.03)';">${catLabels[cat] || cat} (${count})</button>
+        " onmouseover="if(!${isActive}) this.style.opacity='0.85';" onmouseout="if(!${isActive}) this.style.opacity='1';">${catLabels[cat] || cat} (${count})</button>
       `;
     }).join('');
 
@@ -1130,7 +1247,7 @@
 
     if (filtered.length === 0) {
       wrapper.innerHTML = `
-        <div style="grid-column: 1 / -1; text-align: center; padding: 40px 10px; color: var(--muted-foreground, #94a3b8);">
+        <div style="grid-column: 1 / -1; text-align: center; padding: 40px 10px; color: var(--sk-subtext, #94a3b8);">
           <div style="font-size: 28px; margin-bottom: 8px;">🔍</div>
           <div style="font-size: 14px; font-weight: 500;">未找到与 "${agySearchQuery}" 相关的技能</div>
           <div style="font-size: 12px; margin-top: 4px; opacity: 0.7;">请尝试更换关键词搜索</div>
@@ -1144,63 +1261,56 @@
         <div class="agy-skill-card" data-skill-id="${skill.id}" style="
           padding: 12px 14px;
           border-radius: 10px;
-          border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
-          background: rgba(255, 255, 255, 0.025);
           cursor: pointer;
           display: flex;
           flex-direction: column;
           gap: 6px;
           transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
           box-sizing: border-box;
-        " onmouseover="
-          this.style.transform='translateY(-2px)';
-          this.style.borderColor='rgba(99, 102, 241, 0.6)';
-          this.style.background='rgba(99, 102, 241, 0.08)';
-          this.style.boxShadow='0 6px 16px -3px rgba(99, 102, 241, 0.15)';
-        " onmouseout="
-          this.style.transform='none';
-          this.style.borderColor='var(--border, rgba(255, 255, 255, 0.08))';
-          this.style.background='rgba(255, 255, 255, 0.025)';
-          this.style.boxShadow='none';
         ">
           <!-- Card Top: Icon, Name badge, Category -->
           <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
             <div style="display: flex; align-items: center; gap: 6px; min-width: 0;">
-              <span style="font-size: 15px;">${skill.icon || '⚡'}</span>
-              <span style="
+              <span style="font-size: 15px; flex-shrink: 0;">${skill.icon || '⚡'}</span>
+              <span class="agy-skill-badge" style="
                 font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
                 font-size: 12px;
                 font-weight: 600;
-                color: #a5b4fc;
-                background: rgba(99, 102, 241, 0.15);
-                padding: 1px 6px;
-                border-radius: 4px;
-                border: 1px solid rgba(99, 102, 241, 0.3);
+                color: var(--sk-badge-color);
+                background: var(--sk-badge-bg);
+                padding: 1.5px 7px;
+                border-radius: 5px;
+                border: 1px solid var(--sk-badge-border);
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
               ">$${skill.id}</span>
             </div>
-            <span style="
-              font-size: 10px;
-              color: var(--muted-foreground, #94a3b8);
-              background: rgba(255, 255, 255, 0.05);
+            <span class="agy-skill-cat" style="
+              font-size: 10.5px;
+              color: var(--sk-cat-color);
+              background: var(--sk-cat-bg);
+              border: 1px solid var(--sk-cat-border);
               padding: 1px 6px;
               border-radius: 4px;
               white-space: nowrap;
+              flex-shrink: 0;
+              font-weight: 500;
             ">${skill.category || '通用'}</span>
           </div>
 
-          <!-- Description -->
-          <div style="
+          <!-- Description (high-contrast readable dark text) -->
+          <div class="agy-skill-desc" style="
             font-size: 12px;
-            line-height: 1.45;
-            color: var(--muted-foreground, #cbd5e1);
+            line-height: 1.5;
+            color: var(--sk-desc);
+            font-weight: 500;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
             text-overflow: ellipsis;
+            min-height: 36px;
           ">${skill.description || '暂无描述'}</div>
         </div>
       `;
@@ -1219,12 +1329,28 @@
     });
   }
 
+  function detectSkillsThemeIsDark() {
+    if (document.body.classList.contains('theme-dark') || document.documentElement.classList.contains('dark')) return true;
+    if (document.body.classList.contains('theme-light')) return false;
+    try {
+      const bg = window.getComputedStyle(document.body).backgroundColor;
+      const match = bg.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+      if (match) {
+        const lum = 0.299 * parseInt(match[1]) + 0.587 * parseInt(match[2]) + 0.114 * parseInt(match[3]);
+        return lum < 128;
+      }
+    } catch(e) {}
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+
   function openSkillsHubModal() {
     let modal = document.getElementById('agy-skills-modal');
     if (!modal) {
       modal = createSkillsHubModal();
       document.body.appendChild(modal);
     }
+    const isDark = detectSkillsThemeIsDark();
+    modal.setAttribute('data-theme', isDark ? 'dark' : 'light');
     modal.style.display = 'flex';
     
     // Auto focus search input
@@ -3282,22 +3408,81 @@
         }
     ];
 
-    // Mounted Skills Catalog
+    // Mounted Skills Catalog (Comprehensive & Dynamically Enriched)
     const skillsCatalog = [
-        { name: 'documents', desc: 'Word (.docx) 专业文档生成、智能排版与校验', provider: 'Documents', prompt: '/documents 请帮我生成一份专业的 Word 文档：', path: 'C:\\Users\\Lynan\\.gemini\\config\\plugins\\documents\\skills\\documents' },
-        { name: 'presentations', desc: 'PowerPoint (.pptx) 幻灯片智能生成、现代版式与演讲备注', provider: 'Presentations', prompt: '/presentations 请帮我设计一份精美的 PPT 演示文稿：', path: 'C:\\Users\\Lynan\\.gemini\\config\\plugins\\presentations\\skills\\presentations' },
-        { name: 'spreadsheets', desc: 'Excel (.xlsx) 表格自动化建模、公式计算与数据透视', provider: 'Spreadsheets', prompt: '/spreadsheets 请帮我创建和分析这份 Excel 数据表格：', path: 'C:\\Users\\Lynan\\.gemini\\config\\plugins\\spreadsheets\\skills\\spreadsheets' },
-        { name: 'excel-live-control', desc: '实时控制已打开的 Microsoft Excel 工作簿会话', provider: 'Spreadsheets', prompt: '/excel-live-control 帮我操作当前正在运行的 Excel 工作簿：', path: 'C:\\Users\\Lynan\\.gemini\\config\\plugins\\spreadsheets\\skills\\spreadsheets' },
-        { name: 'pdf', desc: 'PDF 深度解析、高保真渲染、表格提取与排版质检', provider: 'PDF Tools', prompt: '/pdf 请帮我深度解析和提取这个 PDF 文件的内容：', path: 'C:\\Users\\Lynan\\.gemini\\config\\plugins\\pdf\\skills\\pdf' },
-        { name: 'template-creator', desc: '企业标准化汇报与规范文档模版提取套件', provider: 'Template Creator', prompt: '/template-creator 请帮我提取企业标准化文档模版：', path: 'C:\\Users\\Lynan\\.gemini\\config\\plugins\\template-creator\\skills\\template-creator' },
-        { name: 'gemini-api-dev', desc: 'Google Gemini 官方 SDK 规范与结构化输出开发', provider: 'Gemini API', prompt: '/gemini-api-dev 帮我编写调用 Gemini API 的功能代码：', path: 'C:\\Users\\Lynan\\.gemini\\config\\plugins\\gemini-api\\skills\\gemini-api-dev' },
-        { name: 'gemini-live-api-dev', desc: 'Gemini Live API 双向流式低延迟语音与交互开发', provider: 'Gemini API', prompt: '/gemini-live-api-dev 帮我编写实时流式双向语音与交互代码：', path: 'C:\\Users\\Lynan\\.gemini\\config\\plugins\\gemini-api\\skills\\gemini-live-api-dev' },
-        { name: 'gemini-omni-flash-api', desc: 'Gemini Omni 1.1 Flash 文本生视频与镜头平滑过渡', provider: 'Gemini API', prompt: '/gemini-omni-flash-api 编写 Omni Flash 生成与编辑视频的代码：', path: 'C:\\Users\\Lynan\\.gemini\\config\\plugins\\gemini-api\\skills\\gemini-omni-flash-api' },
-        { name: 'chrome-extensions', desc: 'Chrome 浏览器扩展 Manifest V3 深度开发规范', provider: 'Modern Web', prompt: '/chrome-extensions 帮我构建一个 Chrome 浏览器扩展：', path: 'C:\\Users\\Lynan\\.gemini\\config\\plugins\\modern-web-guidance-plugin\\skills\\chrome-extensions' },
-        { name: 'modern-web-guidance', desc: '现代化前端布局、动画效果、CWV 性能优化规范', provider: 'Modern Web', prompt: '/modern-web-guidance 帮我按照现代化 Web 最佳实践构建前端组件：', path: 'C:\\Users\\Lynan\\.gemini\\config\\plugins\\modern-web-guidance-plugin\\skills\\modern-web-guidance' },
-        { name: 'generative_ui', desc: '富交互式 HTML 动态部件与实时可视化微件渲染', provider: 'Antigravity Builtin', prompt: '/generative_ui 帮我渲染一个富交互式的动态 HTML 组件：', path: 'C:\\Users\\Lynan\\.gemini\\antigravity\\builtin\\skills\\generative_ui' },
-        { name: 'Chinesizing', desc: 'Electron 桌面端软件深度汉化、逆向与防崩溃规范', provider: 'Chinesizing', prompt: '/Chinesizing 帮我检查并优化桌面端汉化规则：', path: 'C:\\Users\\Lynan\\.gemini\\config\\skills\\Chinesizing' }
+        // User Custom Skills (我让你加载的技能 / 用户自定义)
+        { name: 'Chinesizing', desc: 'Electron 桌面端软件深度汉化、逆向与防崩溃规范', provider: 'Chinesizing', type: 'custom', typeLabel: '用户配置', prompt: '/Chinesizing 帮我检查并优化桌面端汉化规则：', path: 'C:\\Users\\Lynan\\.gemini\\config\\skills\\Chinesizing' },
+        { name: 'ui-ux-pro-max', desc: 'UI/UX 专业设计系统、全栈页面布局、动效与设计令牌', provider: 'UI/UX Design', type: 'custom', typeLabel: '用户配置', prompt: '/ui-ux-pro-max 帮我设计符合现代规范的页面布局与组件风格：', path: 'C:\\Users\\Lynan\\.gemini\\config\\skills\\ui-ux-pro-max' },
+        { name: 'ui-craft', desc: '现代前端动效、微交互、视觉驱动开发 (VDD) 规范', provider: 'UI Craft', type: 'custom', typeLabel: '用户配置', prompt: '/ui-craft 帮我优化这个前端界面的交互质感与动态细节：', path: 'C:\\Users\\Lynan\\.gemini\\config\\skills\\ui-craft' },
+        { name: 'ui-styling', desc: 'Tailwind CSS 与 shadcn/ui 组件库设计与无障碍规范', provider: 'UI Styling', type: 'custom', typeLabel: '用户配置', prompt: '/ui-styling 帮我编写一套高复用性的 Tailwind/shadcn 组件样式：', path: 'C:\\Users\\Lynan\\.gemini\\config\\skills\\ui-styling' },
+        { name: 'tdd', desc: '测试驱动开发（TDD）全流程红绿重构与稳健接缝测试', provider: 'Engineering', type: 'custom', typeLabel: '用户配置', prompt: '/tdd 请以测试驱动开发规范帮我编写这个模块：', path: 'C:\\Users\\Lynan\\.gemini\\config\\skills\\tdd' },
+        { name: 'code-review', desc: '三轴代码与体验审查规范（规范、业务符合度、体验品质）', provider: 'Engineering', type: 'custom', typeLabel: '用户配置', prompt: '/code-review 请对我当前的改动展开三轴代码与体验审查：', path: 'C:\\Users\\Lynan\\.gemini\\config\\skills\\code-review' },
+        { name: 'codebase-design', desc: '深层模块 (Deep Module) 架构设计与高杠杆接口抽象', provider: 'Architecture', type: 'custom', typeLabel: '用户配置', prompt: '/codebase-design 请帮我重构并深化这个模块的接口设计：', path: 'C:\\Users\\Lynan\\.gemini\\config\\skills\\codebase-design' },
+        { name: 'diagnosing-bugs', desc: '疑难 Bug 与性能回退的阶段门禁式诊断与排查闭环', provider: 'Diagnostics', type: 'custom', typeLabel: '用户配置', prompt: '/diagnosing-bugs 帮我诊断定位系统报错与异常闪退的根本原因：', path: 'C:\\Users\\Lynan\\.gemini\\config\\skills\\diagnosing-bugs' },
+        { name: 'domain-modeling', desc: '建立与锐化项目统一领域语言 (Ubiquitous Language) 与 ADR', provider: 'Domain Model', type: 'custom', typeLabel: '用户配置', prompt: '/domain-modeling 帮我梳理业务领域模型并起草架构决策记录 (ADR)：', path: 'C:\\Users\\Lynan\\.gemini\\config\\skills\\domain-modeling' },
+        { name: 'grilling', desc: '审讯式对齐元技能：决策树前沿问题集推演与拍板', provider: 'Planning', type: 'custom', typeLabel: '用户配置', prompt: '/grilling 针对这个技术方案对我展开审讯式提问与对齐：', path: 'C:\\Users\\Lynan\\.gemini\\config\\skills\\grilling' },
+        { name: 'prototype', desc: '抛弃型可运行原型开发，快速验证状态机与业务直觉', provider: 'Prototype', type: 'custom', typeLabel: '用户配置', prompt: '/prototype 帮我构建一个最小验证的原型代码以测试该交互：', path: 'C:\\Users\\Lynan\\.gemini\\config\\skills\\prototype' },
+        { name: 'resolving-merge-conflicts', desc: '意图溯源式 Git 合并冲突化解规范', provider: 'Git Tools', type: 'custom', typeLabel: '用户配置', prompt: '/resolving-merge-conflicts 帮我追溯双方意图并安全化解这个 Git 冲突：', path: 'C:\\Users\\Lynan\\.gemini\\config\\skills\\resolving-merge-conflicts' },
+        { name: 'slides', desc: '专业 HTML 战略演示文稿制作（Chart.js、响应式排版）', provider: 'Presentations', type: 'custom', typeLabel: '用户配置', prompt: '/slides 帮我生成一套高水准的 HTML 演示幻灯片：', path: 'C:\\Users\\Lynan\\.gemini\\config\\skills\\slides' },
+        { name: 'brand', desc: '品牌调性、视觉识别 (VI) 框架与风格指南管理', provider: 'Branding', type: 'custom', typeLabel: '用户配置', prompt: '/brand 帮我设计符合品牌调性的设计规范与视觉指引：', path: 'C:\\Users\\Lynan\\.gemini\\config\\skills\\brand' },
+        { name: 'banner-design', desc: '多平台横幅 Banner 视觉设计与创意资产生成', provider: 'Design Tools', type: 'custom', typeLabel: '用户配置', prompt: '/banner-design 帮我设计一组适配各平台的营销 Banner：', path: 'C:\\Users\\Lynan\\.gemini\\config\\skills\\banner-design' },
+        { name: 'design', desc: '全维度品牌与设计系统：Logo、设计令牌、演示文稿与图标', provider: 'Design System', type: 'custom', typeLabel: '用户配置', prompt: '/design 帮我构建全套设计令牌与视觉识别规范：', path: 'C:\\Users\\Lynan\\.gemini\\config\\skills\\design' },
+        { name: 'design-system', desc: '三层设计令牌体系 (Primitive → Semantic → Component)', provider: 'Design System', type: 'custom', typeLabel: '用户配置', prompt: '/design-system 帮我梳理三层设计 Tokens 架构与 CSS 变量：', path: 'C:\\Users\\Lynan\\.gemini\\config\\skills\\design-system' },
+        { name: 'ask-engineer', desc: '研发流程总路由与向导，协助规划工作流与技能分派', provider: 'Engineering', type: 'custom', typeLabel: '用户配置', prompt: '/ask-engineer 针对我当前的项目任务推荐最佳的工作流与技能：', path: 'C:\\Users\\Lynan\\.gemini\\config\\skills\\ask-engineer' },
+
+        // Builtin Skills (软件自带 / 官方核心内置)
+        { name: 'antigravity_guide', desc: 'Antigravity (AGY) 官方全能指南、快捷键与高级定制索引', provider: 'Antigravity Builtin', type: 'builtin', typeLabel: '官方自带', prompt: '/antigravity_guide 帮我查询 Antigravity 的配置项与核心功能用法：', path: 'C:\\Users\\Lynan\\.gemini\\antigravity\\builtin\\skills\\antigravity_guide' },
+        { name: 'agy-customizations', desc: 'Antigravity 扩展定制体系指南（Skills, Rules, MCP, Hooks）', provider: 'Antigravity Builtin', type: 'builtin', typeLabel: '官方自带', prompt: '/agy-customizations 帮我编写符合规范的 Antigravity 自定义插件或规则：', path: 'C:\\Users\\Lynan\\.gemini\\antigravity\\builtin\\skills\\agy-customizations' },
+        { name: 'generative_ui', desc: '富交互式 HTML 动态部件与实时可视化微件渲染', provider: 'Antigravity Builtin', type: 'builtin', typeLabel: '官方自带', prompt: '/generative_ui 帮我渲染一个富交互式的动态 HTML 微件：', path: 'C:\\Users\\Lynan\\.gemini\\antigravity\\builtin\\skills\\generative_ui' },
+        { name: 'migrate-workflows', desc: '传统旧工作流规范向现代 Skills 架构自动迁移工具', provider: 'Antigravity Builtin', type: 'builtin', typeLabel: '官方自带', prompt: '/migrate-workflows 帮我把旧版工作流迁移为现代 Skill 规范：', path: 'C:\\Users\\Lynan\\.gemini\\antigravity\\builtin\\skills\\migrate-workflows' },
+
+        // Plugin Ecosystem Skills (插件扩展技能)
+        { name: 'documents', desc: 'Word (.docx) 专业文档生成、智能排版与校验', provider: 'Documents', type: 'plugin', typeLabel: '插件扩展', prompt: '/documents 请帮我生成一份专业的 Word 文档：', path: 'C:\\Users\\Lynan\\.gemini\\config\\plugins\\documents\\skills\\documents' },
+        { name: 'presentations', desc: 'PowerPoint (.pptx) 幻灯片智能生成、现代版式与演讲备注', provider: 'Presentations', type: 'plugin', typeLabel: '插件扩展', prompt: '/presentations 请帮我设计一份精美的 PPT 演示文稿：', path: 'C:\\Users\\Lynan\\.gemini\\config\\plugins\\presentations\\skills\\presentations' },
+        { name: 'spreadsheets', desc: 'Excel (.xlsx) 表格自动化建模、公式计算与数据透视', provider: 'Spreadsheets', type: 'plugin', typeLabel: '插件扩展', prompt: '/spreadsheets 请帮我创建和分析这份 Excel 数据表格：', path: 'C:\\Users\\Lynan\\.gemini\\config\\plugins\\spreadsheets\\skills\\spreadsheets' },
+        { name: 'excel-live-control', desc: '实时控制已打开的 Microsoft Excel 工作簿会话', provider: 'Spreadsheets', type: 'plugin', typeLabel: '插件扩展', prompt: '/excel-live-control 帮我操作当前正在运行的 Excel 工作簿：', path: 'C:\\Users\\Lynan\\.gemini\\config\\plugins\\spreadsheets\\skills\\spreadsheets' },
+        { name: 'pdf', desc: 'PDF 深度解析、高保真渲染、表格提取与排版质检', provider: 'PDF Tools', type: 'plugin', typeLabel: '插件扩展', prompt: '/pdf 请帮我深度解析和提取这个 PDF 文件的内容：', path: 'C:\\Users\\Lynan\\.gemini\\config\\plugins\\pdf\\skills\\pdf' },
+        { name: 'template-creator', desc: '企业标准化汇报与规范文档模版提取套件', provider: 'Template Creator', type: 'plugin', typeLabel: '插件扩展', prompt: '/template-creator 请帮我提取企业标准化文档模版：', path: 'C:\\Users\\Lynan\\.gemini\\config\\plugins\\template-creator\\skills\\template-creator' },
+        { name: 'gemini-api-dev', desc: 'Google Gemini 官方 SDK 规范与结构化输出开发', provider: 'Gemini API', type: 'plugin', typeLabel: '插件扩展', prompt: '/gemini-api-dev 帮我编写调用 Gemini API 的功能代码：', path: 'C:\\Users\\Lynan\\.gemini\\config\\plugins\\gemini-api\\skills\\gemini-api-dev' },
+        { name: 'gemini-live-api-dev', desc: 'Gemini Live API 双向流式低延迟语音与交互开发', provider: 'Gemini API', type: 'plugin', typeLabel: '插件扩展', prompt: '/gemini-live-api-dev 帮我编写实时流式双向语音与交互代码：', path: 'C:\\Users\\Lynan\\.gemini\\config\\plugins\\gemini-api\\skills\\gemini-live-api-dev' },
+        { name: 'gemini-omni-flash-api', desc: 'Gemini Omni 1.1 Flash 文本生视频与镜头平滑过渡', provider: 'Gemini API', type: 'plugin', typeLabel: '插件扩展', prompt: '/gemini-omni-flash-api 编写 Omni Flash 生成与编辑视频的代码：', path: 'C:\\Users\\Lynan\\.gemini\\config\\plugins\\gemini-api\\skills\\gemini-omni-flash-api' },
+        { name: 'chrome-extensions', desc: 'Chrome 浏览器扩展 Manifest V3 深度开发规范', provider: 'Modern Web', type: 'plugin', typeLabel: '插件扩展', prompt: '/chrome-extensions 帮我构建一个 Chrome 浏览器扩展：', path: 'C:\\Users\\Lynan\\.gemini\\config\\plugins\\modern-web-guidance-plugin\\skills\\chrome-extensions' },
+        { name: 'modern-web-guidance', desc: '现代化前端布局、动画效果、CWV 性能优化规范', provider: 'Modern Web', type: 'plugin', typeLabel: '插件扩展', prompt: '/modern-web-guidance 帮我按照现代化 Web 最佳实践构建前端组件：', path: 'C:\\Users\\Lynan\\.gemini\\config\\plugins\\modern-web-guidance-plugin\\skills\\modern-web-guidance' }
     ];
+
+    // Asynchronously sync dynamic skills from filesystem via IPC
+    function syncDynamicSkills() {
+        if (window.electronNative && typeof window.electronNative.getSkills === 'function') {
+            window.electronNative.getSkills().then(list => {
+                if (Array.isArray(list) && list.length > 0) {
+                    let changed = false;
+                    for (const item of list) {
+                        const existing = skillsCatalog.find(s => s.name === item.name);
+                        if (!existing) {
+                            skillsCatalog.push({
+                                name: item.name,
+                                desc: item.description || '自定义扩展技能规范',
+                                provider: item.typeLabel || '自定义技能',
+                                type: item.type || 'custom',
+                                typeLabel: item.typeLabel || '用户配置',
+                                prompt: '/' + item.name + ' 请帮我调用该技能处理当前任务：',
+                                path: item.dir
+                            });
+                            changed = true;
+                        } else {
+                            if (item.dir && !existing.path) existing.path = item.dir;
+                            if (item.type && !existing.type) existing.type = item.type;
+                            if (item.typeLabel && !existing.typeLabel) existing.typeLabel = item.typeLabel;
+                        }
+                    }
+                    if (changed && currentMainTab === 'skills') {
+                        renderUI();
+                    }
+                }
+            }).catch(() => {});
+        }
+    }
+    setTimeout(syncDynamicSkills, 800);
 
     // State
     let currentMainTab = 'plugins'; // 'plugins' | 'skills'
@@ -3341,88 +3526,164 @@
     }
     attachOverlay();
 
-    // Helper: Insert Text into Lexical Editor & Focus
-    function invokeInChat(promptText) {
-        closePluginCenter();
-        setTimeout(() => {
-            const editor = document.querySelector('[data-lexical-editor="true"]');
-            if (editor) {
-                editor.focus();
-                
-                let inserted = false;
-                try {
-                    const fiberKey = Object.keys(editor).find(k => k.startsWith('__reactFiber$'));
-                    let cur = editor[fiberKey];
-                    let lexicalEditor = null;
-                    while (cur) {
-                        if (cur.memoizedProps && cur.memoizedProps.lexicalRef) {
-                            lexicalEditor = cur.memoizedProps.lexicalRef.current;
-                            break;
-                        }
-                        cur = cur.return;
-                    }
-                    if (lexicalEditor) {
-                        lexicalEditor.update(() => {
-                            const selectAllKey = Array.from(lexicalEditor._commands.keys()).find(k => k && k.type === 'SELECT_ALL_COMMAND');
-                            const selectBuckets = lexicalEditor._commands.get(selectAllKey);
-                            let selHandled = false;
-                            for (const bucket of selectBuckets) {
-                                if (bucket && !selHandled) {
-                                    for (const fn of bucket) {
-                                        if (fn()) { selHandled = true; break; }
-                                    }
-                                }
-                            }
-
-                            const insertKey = Array.from(lexicalEditor._commands.keys()).find(k => k && k.type === 'CONTROLLED_TEXT_INSERTION_COMMAND');
-                            const insertBuckets = lexicalEditor._commands.get(insertKey);
-                            let insHandled = false;
-                            for (const bucket of insertBuckets) {
-                                if (bucket && !insHandled) {
-                                    for (const fn of bucket) {
-                                        if (fn(promptText)) { insHandled = true; break; }
-                                    }
-                                }
-                            }
-                        });
-                        inserted = true;
-                    }
-                } catch(e) {
-                    console.warn('[Plugin Center] Lexical dispatch fallback:', e);
+    // Helper: Insert Text into Lexical or Standard Editor
+    function insertTextIntoLexicalEditor(editor, promptText) {
+        if (!editor) return;
+        editor.focus();
+        let inserted = false;
+        try {
+            const fiberKey = Object.keys(editor).find(k => k.startsWith('__reactFiber$'));
+            let cur = editor[fiberKey];
+            let lexicalEditor = null;
+            while (cur) {
+                if (cur.memoizedProps && cur.memoizedProps.lexicalRef) {
+                    lexicalEditor = cur.memoizedProps.lexicalRef.current;
+                    break;
                 }
-
-                if (!inserted) {
-                    document.execCommand('selectAll', false, null);
-                    document.execCommand('insertText', false, promptText);
-                }
-
-                try {
-                    const range = document.createRange();
-                    const sel = window.getSelection();
-                    range.selectNodeContents(editor);
-                    range.collapse(false);
-                    sel.removeAllRanges();
-                    sel.addRange(range);
-                } catch(e) {}
-
-                showToast(`已载入指令，请在输入框继续输入具体要求`, '💬');
-            } else {
-                showToast('已复制指令到剪贴板，请在对话框粘贴使用', '📋');
-                if (navigator.clipboard) navigator.clipboard.writeText(promptText);
+                cur = cur.return;
             }
-        }, 120);
+            if (lexicalEditor) {
+                lexicalEditor.update(() => {
+                    const selectAllKey = Array.from(lexicalEditor._commands.keys()).find(k => k && k.type === 'SELECT_ALL_COMMAND');
+                    const selectBuckets = lexicalEditor._commands.get(selectAllKey);
+                    let selHandled = false;
+                    if (selectBuckets) {
+                        for (const bucket of selectBuckets) {
+                            if (bucket && !selHandled) {
+                                for (const fn of bucket) {
+                                    if (fn()) { selHandled = true; break; }
+                                }
+                            }
+                        }
+                    }
+
+                    const insertKey = Array.from(lexicalEditor._commands.keys()).find(k => k && k.type === 'CONTROLLED_TEXT_INSERTION_COMMAND');
+                    const insertBuckets = lexicalEditor._commands.get(insertKey);
+                    let insHandled = false;
+                    if (insertBuckets) {
+                        for (const bucket of insertBuckets) {
+                            if (bucket && !insHandled) {
+                                for (const fn of bucket) {
+                                    if (fn(promptText)) { insHandled = true; break; }
+                                }
+                            }
+                        }
+                    }
+                });
+                inserted = true;
+            }
+        } catch(e) {
+            console.warn('[Plugin Center] Lexical dispatch fallback:', e);
+        }
+
+        if (!inserted) {
+            try {
+                document.execCommand('selectAll', false, null);
+                document.execCommand('insertText', false, promptText);
+                inserted = true;
+            } catch(e) {}
+        }
+
+        if (!inserted && typeof editor.value === 'string') {
+            editor.value = promptText;
+            editor.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+
+        try {
+            const range = document.createRange();
+            const sel = window.getSelection();
+            range.selectNodeContents(editor);
+            range.collapse(false);
+            sel.removeAllRanges();
+            sel.addRange(range);
+        } catch(e) {}
     }
 
-    // Helper: Open Local Directory
-    function openDirectory(path) {
+    function safeClickElement(el) {
+        if (!el) return;
         try {
-            const fileUrl = 'file:///' + path.replace(/\\/g, '/');
-            window.open(fileUrl);
-            showToast('已在资源管理器中打开插件目录', '📂');
-        } catch (e) {
-            console.error('Error opening folder:', e);
-            showToast('定位目录: ' + path, '📂');
+            el.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true }));
+            el.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, cancelable: true }));
+            el.click();
+        } catch(e) {
+            el.click();
         }
+    }
+
+    // Helper: Close Plugin Center, Click New Chat, and Insert Skill
+    function triggerNewChatAndInvoke(promptText, skillName) {
+        closePluginCenter();
+
+        // 1. Try to click "+ 新建会话" button on sidebar
+        try {
+            const allElements = Array.from(document.querySelectorAll('*'));
+            const textMatch = allElements.find(el => {
+                if (el.children && el.children.length > 2) return false;
+                const t = (el.textContent || '').trim();
+                return t === '新建会话' || t === '+ 新建会话' || t === 'New Chat' || t === '+ New Chat';
+            });
+            if (textMatch) {
+                const targetBtn = textMatch.closest('button, [role="button"]') || textMatch;
+                safeClickElement(targetBtn);
+            } else {
+                const plusBtn = document.querySelector('button[aria-label*="新建"], button[aria-label*="New"], [data-testid*="new-chat"]');
+                if (plusBtn) safeClickElement(plusBtn);
+            }
+        } catch(e) {
+            console.warn('Error clicking new chat:', e);
+        }
+
+        // 2. Poll waiting for new chat editor to mount
+        let attempts = 0;
+        const maxAttempts = 35;
+        const pollTimer = setInterval(() => {
+            attempts++;
+            const editor = document.querySelector('[data-lexical-editor="true"], textarea.chat-input, textarea');
+            if (editor || attempts >= maxAttempts) {
+                clearInterval(pollTimer);
+                if (editor) {
+                    insertTextIntoLexicalEditor(editor, promptText);
+                    showToast('已开启新会话，并载入技能 /' + (skillName || '') + ' 🚀', '✨');
+                } else {
+                    if (navigator.clipboard) navigator.clipboard.writeText(promptText);
+                    showToast('已复制指令到剪贴板，请在会话中粘贴', '📋');
+                }
+            }
+        }, 100);
+    }
+
+    // Helper: Open Local Directory via Native Shell with triple fallback
+    function openDirectory(folderPath) {
+        if (!folderPath) {
+            showToast('未找到有效目录路径', '⚠️');
+            return;
+        }
+
+        const normPath = folderPath.indexOf('/') !== -1 ? folderPath.split('/').join('\\\\') : folderPath;
+        const fileUrl = 'file:///' + folderPath.split('\\\\').join('/');
+
+        // 1. Try our custom openPath (native direct folder open)
+        if (window.electronNative && typeof window.electronNative.openPath === 'function') {
+            try {
+                window.electronNative.openPath(normPath).catch(() => {});
+            } catch(e) {}
+        }
+
+        // 2. Try official revealInFilePicker with fileUrl (official backend requirement: URL scheme file://)
+        if (window.electronNative && typeof window.electronNative.revealInFilePicker === 'function') {
+            try {
+                window.electronNative.revealInFilePicker(fileUrl);
+            } catch(e) {}
+        }
+
+        // 3. Fallback openExternal
+        if (window.electronNative && typeof window.electronNative.openExternal === 'function') {
+            try {
+                window.electronNative.openExternal(fileUrl);
+            } catch(e) {}
+        }
+
+        showToast('已在资源管理器中打开规范目录', '📂');
     }
 
     // Render UI
@@ -3446,10 +3707,14 @@
 
         // Filter skills
         const filteredSkills = skillsCatalog.filter(s => {
-            return !searchQuery || 
-                s.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                s.desc.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                s.provider.toLowerCase().includes(searchQuery.toLowerCase());
+            if (!searchQuery) return true;
+            const q = searchQuery.toLowerCase();
+            const note = (localStorage.getItem('__AGY_SKILL_NOTE_' + s.name) || '').toLowerCase();
+            return s.name.toLowerCase().includes(q) || 
+                s.desc.toLowerCase().includes(q) ||
+                s.provider.toLowerCase().includes(q) ||
+                (s.typeLabel && s.typeLabel.toLowerCase().includes(q)) ||
+                note.includes(q);
         });
 
         overlay.innerHTML = `
@@ -3541,21 +3806,47 @@
             ` : `
                 <!-- Skills View -->
                 <div style="max-width: 960px; display: flex; flex-direction: column; gap: 12px;">
-                    ${filteredSkills.map(s => `
-                        <div style="border: 1px solid var(--agy-pc-card-border); background: var(--agy-pc-card-bg); border-radius: 12px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; gap: 16px; transition: border-color 0.15s, box-shadow 0.15s;" onmouseover="this.style.borderColor='#94a3b8'" onmouseout="this.style.borderColor='var(--agy-pc-card-border)'">
-                            <div style="flex-grow: 1;">
-                                <div style="font-weight: 600; font-size: 14px; color: var(--agy-pc-text); display: flex; align-items: center; gap: 10px;">
-                                    <code style="background: var(--agy-pc-pill-bg); padding: 2px 8px; border-radius: 6px; color: #2563eb; font-size: 13px;">/${s.name}</code>
-                                    <span style="font-size: 11.5px; padding: 2px 8px; border-radius: 9999px; background: var(--agy-pc-pill-bg); color: var(--agy-pc-subtext); font-weight: 500;">${s.provider}</span>
+                    ${filteredSkills.map(s => {
+                        const note = localStorage.getItem('__AGY_SKILL_NOTE_' + s.name) || '';
+                        let badgeHtml = '';
+                        if (s.type === 'custom') {
+                            badgeHtml = '<span style="font-size: 11px; padding: 2px 7px; border-radius: 5px; background: rgba(245, 158, 11, 0.12); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.3); font-weight: 600; display: inline-flex; align-items: center; gap: 3px;">👤 用户配置</span>';
+                        } else if (s.type === 'builtin') {
+                            badgeHtml = '<span style="font-size: 11px; padding: 2px 7px; border-radius: 5px; background: rgba(59, 130, 246, 0.12); color: #2563eb; border: 1px solid rgba(59, 130, 246, 0.3); font-weight: 600; display: inline-flex; align-items: center; gap: 3px;">⚡ 官方自带</span>';
+                        } else {
+                            badgeHtml = '<span style="font-size: 11px; padding: 2px 7px; border-radius: 5px; background: rgba(147, 51, 234, 0.12); color: #7c3aed; border: 1px solid rgba(147, 51, 234, 0.3); font-weight: 600; display: inline-flex; align-items: center; gap: 3px;">🧩 插件扩展</span>';
+                        }
+
+                        return `
+                            <div style="border: 1px solid var(--agy-pc-card-border); background: var(--agy-pc-card-bg); border-radius: 12px; padding: 14px 18px; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; transition: border-color 0.15s, box-shadow 0.15s;" onmouseover="this.style.borderColor='#94a3b8'" onmouseout="this.style.borderColor='var(--agy-pc-card-border)'">
+                                <div style="flex-grow: 1;">
+                                    <div style="font-weight: 600; font-size: 14px; color: var(--agy-pc-text); display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                        <code style="background: var(--agy-pc-pill-bg); padding: 2px 8px; border-radius: 6px; color: #2563eb; font-size: 13px; font-weight: 600;">/${s.name}</code>
+                                        ${badgeHtml}
+                                        <span style="font-size: 11.5px; padding: 2px 8px; border-radius: 9999px; background: var(--agy-pc-pill-bg); color: var(--agy-pc-subtext); font-weight: 500;">${s.provider}</span>
+                                    </div>
+                                    <div style="font-size: 12.5px; color: var(--agy-pc-subtext); margin-top: 6px; line-height: 1.45;">${s.desc}</div>
+                                    <div style="margin-top: 8px; display: flex; align-items: center; gap: 8px;">
+                                        ${note ? `
+                                            <div style="font-size: 11.5px; background: rgba(245, 158, 11, 0.08); border: 1px dashed rgba(245, 158, 11, 0.35); padding: 3px 8px; border-radius: 6px; color: var(--agy-pc-text); display: inline-flex; align-items: center; gap: 6px;">
+                                                <span>📝 <b>备注:</b> ${note}</span>
+                                                <button onclick="window.__AGY_EDIT_SKILL_NOTE__('${s.name}')" style="background: none; border: none; color: #2563eb; font-size: 11px; cursor: pointer; text-decoration: underline; padding: 0;">修改</button>
+                                                <button onclick="window.__AGY_CLEAR_SKILL_NOTE__('${s.name}')" style="background: none; border: none; color: #ef4444; font-size: 11px; cursor: pointer; text-decoration: underline; padding: 0;">清除</button>
+                                            </div>
+                                        ` : `
+                                            <button onclick="window.__AGY_EDIT_SKILL_NOTE__('${s.name}')" style="background: none; border: 1px dashed var(--agy-pc-card-border); color: var(--agy-pc-subtext); font-size: 11px; cursor: pointer; padding: 2px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px; opacity: 0.75;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.75">
+                                                + 添加个人备注
+                                            </button>
+                                        `}
+                                    </div>
                                 </div>
-                                <div style="font-size: 12.5px; color: var(--agy-pc-subtext); margin-top: 5px; line-height: 1.4;">${s.desc}</div>
+                                <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0; margin-top: 2px;">
+                                    <button class="agy-pc-btn" style="padding: 5px 10px; font-size: 11.5px;" onclick="window.__AGY_OPEN_SKILL_DIR__('${s.name}')" title="在资源管理器中打开包含 SKILL.md 的目录">📖 规范目录</button>
+                                    <button class="agy-pc-btn agy-pc-btn-primary" style="padding: 5px 14px; font-size: 11.5px; font-weight: 600;" onclick="window.__AGY_INVOKE_SKILL__('${s.name}')" title="自动开启新会话并在聊天框中填入该技能">💬 立即调用</button>
+                                </div>
                             </div>
-                            <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
-                                <button class="agy-pc-btn" style="padding: 4px 9px; font-size: 11.5px;" onclick="window.__AGY_OPEN_SKILL_DIR__('${s.name}')" title="查看 SKILL.md 规范">📖 规范目录</button>
-                                <button class="agy-pc-btn agy-pc-btn-primary" style="padding: 4px 14px; font-size: 11.5px; font-weight: 600;" onclick="window.__AGY_INVOKE_SKILL__('${s.name}')" title="立即在对话中调用该技能">💬 立即调用</button>
-                            </div>
-                        </div>
-                    `).join('')}
+                        `;
+                    }).join('')}
                 </div>
             `}
 
@@ -3785,7 +4076,7 @@
         if (modal) modal.style.display = 'none';
         const p = pluginsCatalog.find(x => x.id === id);
         if (p) {
-            invokeInChat(p.defaultPrompt);
+            triggerNewChatAndInvoke(p.defaultPrompt, p.name);
         }
     };
 
@@ -3793,13 +4084,13 @@
         const modal = document.getElementById('agy-pc-detail-modal');
         if (modal) modal.style.display = 'none';
         const prompt = decodeURIComponent(encodedPrompt);
-        invokeInChat(prompt);
+        triggerNewChatAndInvoke(prompt, 'custom');
     };
 
     window.__AGY_INVOKE_SKILL__ = function(name) {
         const s = skillsCatalog.find(x => x.name === name);
         if (s) {
-            invokeInChat(s.prompt);
+            triggerNewChatAndInvoke(s.prompt, s.name);
         }
     };
 
@@ -3817,8 +4108,30 @@
         if (s && s.path) {
             openDirectory(s.path);
         } else {
-            openDirectory('C:\\Users\\Lynan\\.gemini\\config\\plugins\\' + name);
+            openDirectory('C:\\Users\\Lynan\\.gemini\\config\\skills\\' + name);
         }
+    };
+
+    window.__AGY_EDIT_SKILL_NOTE__ = function(name) {
+        const current = localStorage.getItem('__AGY_SKILL_NOTE_' + name) || '';
+        const input = prompt('为技能 /' + name + ' 设置个人专属备注与工作说明：', current);
+        if (input !== null) {
+            const trimmed = input.trim();
+            if (trimmed) {
+                localStorage.setItem('__AGY_SKILL_NOTE_' + name, trimmed);
+                showToast('已保存 /' + name + ' 的备注', '📝');
+            } else {
+                localStorage.removeItem('__AGY_SKILL_NOTE_' + name);
+                showToast('已清除 /' + name + ' 的备注', '🗑️');
+            }
+            renderUI();
+        }
+    };
+
+    window.__AGY_CLEAR_SKILL_NOTE__ = function(name) {
+        localStorage.removeItem('__AGY_SKILL_NOTE_' + name);
+        showToast('已清除 /' + name + ' 的备注', '🗑️');
+        renderUI();
     };
 
     window.__AGY_INSTALL_MARKET__ = function(id) {
@@ -3829,7 +4142,7 @@
             localStorage.setItem('agy_plugin_' + id + '_installed', 'true');
             localStorage.setItem('agy_plugin_' + id + '_enabled', 'true');
             renderUI();
-            showToast(`✓ 成功安装 ${p.name}！已就绪并在 Antigravity 中启用。`, '🎉');
+            showToast('✓ 成功安装 ' + p.name + '！已就绪并在 Antigravity 中启用。', '🎉');
         }
     };
 
