@@ -50,7 +50,23 @@
 
 ## 🧠 核心概念
 
-**Antigravity Enhance Tools** 是一套专为 **Google Antigravity** 官方桌面客户端量身定制的原生扩展与体验增强系统。不同于传统的文本正则暴力替换或脆弱的内存热挂钩方案，本项目采用**全原生 AST 解构与响应式注入（Pure Native AST & Reactive Injection）**架构：
+### 💡 开发思路与设计灵感 (Design Philosophy & Inspiration)
+
+在软件架构构思与交互体系设计的全过程中，**Antigravity Enhance Tools** 深入学习并借鉴了业内两款标杆级 AI 生产力工具的精髓交互体验：
+
+1. **学习 Codex 的深度交互逻辑 (Codex-Inspired Interaction)**：
+   - **上下文预算透明化与认知安全感**：Codex 强调让模型与代码环境之间的交互过程清晰、透明且可预期。本项目借鉴其对 Token 消耗与长程上下文管理的透传思维，开发了底栏实时动态度量胶囊与五段式用量遥测面板，使开发者在多轮代码生成、重构与工具调用过程中，对会话预算与上下文窗口占用一目了然，彻底消除“上下文溢出未知”的心理焦虑。
+   - **平滑即时的认知深度调控（Thinking Depth Control）**：吸收其对大语言模型推理深度按需调优的交互直觉，将模型思维链（Thinking）调控抽象为模型切换菜单内的 4 挡无级滑动调节，随心随手，不打断沉浸式编程心流。
+
+2. **学习 Workbuddy 的界面交互体验 (Workbuddy-Inspired UI/UX)**：
+   - **现代呼吸感视觉与极简美学**：Workbuddy 在桌面端交互界面中展现了极高水准的克制美学。本项目在原生 GUI 安装向导以及内嵌增强 UI 体系中，全面吸收其圆角卡片、柔和微光渐变徽标、层次清晰的阴影层叠与高品质排版体系，彻底摒弃传统插件粗糙突兀的高反差视觉，与宿主官方现代暗色/亮色环境浑然天成。
+   - **防震荡与高流畅度体验（Zero-Jank Experience）**：不仅在视觉风格上对齐 Workbuddy 的现代丝滑交互，更在底层设计了独创的「DOM 缓存守卫（Cache Guard）」与事件防抖节流引擎，杜绝 Electron + React 复杂长会话频繁重绘引发的界面抖动与递归死循环，确保每一步点击与滑动都如 Workbuddy 般轻盈流畅。
+
+---
+
+### 🏛️ 底层原生注入架构 (Native Architecture)
+
+**Antigravity Enhance Tools** 专为 **Google Antigravity** 官方桌面客户端量身定制。不同于传统的文本正则暴力替换或脆弱的内存热挂钩方案，本项目采用**全原生 AST 解构与响应式注入（Pure Native AST & Reactive Injection）**架构：
 
 1. **结构化 AST 安全注入**：在保证 Electron 核心包 (`workbench.desktop.main.js`) 语法树完备性的前提下，安全嵌入扩展主控入口，不破坏 V8 字节码运行拓扑。
 2. **独创 DOM 缓存守卫（Cache Guard）**：为杜绝 Electron + React 单页频繁重新渲染触发的 `MutationObserver` 递归卡死与死循环，所有注入节点均具备状态缓存指纹校验，仅在真实数据变动时操作 DOM。
