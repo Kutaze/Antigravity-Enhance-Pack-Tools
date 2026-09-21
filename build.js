@@ -11,6 +11,12 @@ fs.mkdirSync(staging, { recursive: true });
 fs.copyFileSync(path.join(repoRoot, 'src', 'patcher.js'), path.join(staging, 'patcher.js'));
 fs.copyFileSync(path.join(repoRoot, 'src', 'unpatcher.js'), path.join(staging, 'unpatcher.js'));
 fs.copyFileSync(path.join(repoRoot, 'README.md'), path.join(staging, 'README.md'));
+if (fs.existsSync(path.join(repoRoot, 'install.sh'))) {
+    fs.copyFileSync(path.join(repoRoot, 'install.sh'), path.join(staging, 'install.sh'));
+}
+if (fs.existsSync(path.join(repoRoot, 'uninstall.sh'))) {
+    fs.copyFileSync(path.join(repoRoot, 'uninstall.sh'), path.join(staging, 'uninstall.sh'));
+}
 
 function copyDirSync(src, dest) {
     fs.mkdirSync(dest, { recursive: true });
@@ -66,5 +72,17 @@ if (fs.existsSync(finalZip)) {
 }
 execSync(`powershell -Command "Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::CreateFromDirectory('D:\\\\desk\\\\Antigravity-Enhance-Pack', '${finalZip.replace(/\\/g, '\\\\')}')"`);
 console.log('Final Release Zip:', fs.statSync(finalZip).size);
+
+console.log('=== Step 4: Package macOS & Linux Antigravity-Enhance-Pack.tar.gz ===');
+const finalTarGz = 'D:/desk/Antigravity-Enhance-Pack.tar.gz';
+if (fs.existsSync(finalTarGz)) {
+    try { fs.unlinkSync(finalTarGz); } catch(e) {}
+}
+try {
+    execSync(`tar -czf "${finalTarGz}" -C "D:/desk" "Antigravity-Enhance-Pack"`);
+    console.log('Final Release TarGz (macOS/Linux):', fs.statSync(finalTarGz).size);
+} catch (err) {
+    console.warn('Tar creation skipped:', err.message);
+}
 
 console.log('✔ Portable build completed successfully!');

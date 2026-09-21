@@ -7,10 +7,10 @@
 
 **专为 Google Antigravity 官方桌面客户端打造的工业级深度汉化与原生 UI 交互增强套件。**
 
-[![Release](https://img.shields.io/badge/Release-v0.1.2-6366f1?style=for-the-badge)](https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases)
+[![Release](https://img.shields.io/badge/Release-v0.1.3-6366f1?style=for-the-badge)](https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases)
 [![License](https://img.shields.io/badge/License-MIT-10b981?style=for-the-badge)](LICENSE)
-[![Platform](https://img.shields.io/badge/Platform-Windows_10%2F11_(x64)-0284c7?style=for-the-badge)](https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools)
-[![UI](https://img.shields.io/badge/UI-Dual_Theme_GUI-8b5cf6?style=for-the-badge)](https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools)
+[![Platform](https://img.shields.io/badge/Platform-Windows_%7C_macOS_%7C_Linux-0284c7?style=for-the-badge)](https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools)
+[![UI](https://img.shields.io/badge/UI-Dual_Theme_GUI_%2B_CLI-8b5cf6?style=for-the-badge)](https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools)
 [![Runtime](https://img.shields.io/badge/Runtime-Zero_Dependency-f59e0b?style=for-the-badge)](https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools)
 
 <p align="center">
@@ -61,13 +61,14 @@
 
 ## 📦 支持项目
 
-| 维度 | 支持范围 / 兼容矩阵 | 状态 |
-| :--- | :--- | :---: |
-| **官方宿主** | Google Antigravity 官方桌面客户端 (Windows 10 / 11 64位) | ✔ 完美支持 |
-| **底层架构** | Electron 28+ / Chromium 120+ / Node.js 18+ (ASAR 打包体系) | ✔ 完美适配 |
-| **跨平台路线** | macOS (Apple Silicon / Intel) 与 Linux 平台适配计划 | 🔄 研发规划中 |
-| **语言环境** | 中文简体 (zh-CN) 100% 覆盖率，保留原生英文快速切换能力 | ✔ 官方级润色 |
-| **模型上下文** | Gemini 2.0 / 1.5 系列 (1.05M)、Claude 3.7 / 3.5 系列 (200K~250K)、GPT-4o / o1 系列 (128K) | ✔ 动态精准识别 |
+| 平台 / 架构 | 支持范围 / 兼容环境 | 部署方式 | 状态 |
+| :--- | :--- | :--- | :---: |
+| **Windows** | Windows 10 / 11 (64位) | 双主题原生 GUI 安装向导 / 离线包 | ✔ 完美支持 |
+| **macOS** | macOS 12+ (Apple Silicon M1~M4 / Intel) | 终端一行命令 / 离线脚本 `install.sh` | ✔ 完美支持 |
+| **Linux** | Ubuntu / Debian / Fedora / Arch 等主流发行版 | 终端一行命令 / 离线脚本 `install.sh` | ✔ 完美支持 |
+| **底层架构** | Electron 28+ / Chromium 120+ / Node.js 18+ (ASAR) | 智能识别并复用宿主自带 Electron 运行时 | ✔ 完美适配 |
+| **语言环境** | 中文简体 (zh-CN) 100% 覆盖率，保留原生英文快速切换能力 | 核心字典深度校对与动态响应 | ✔ 官方级润色 |
+| **模型上下文** | Gemini 2.0/1.5 (1.05M)、Claude 3.7/3.5 (200K~250K)、GPT-4o/o1 (128K) | 底层通信毫秒级遥测与动态阈值适配 | ✔ 动态精准识别 |
 
 ---
 
@@ -143,23 +144,48 @@ graph TD
 
 ## 🚀 部署指南
 
-### 方式一：使用单文件 GUI 安装器 (强烈推荐)
+### 1. Windows 用户部署
 
+#### 方式一：使用独立双主题 GUI 安装器 (推荐)
 1. 前往项目的 [Releases 页面](https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases) 下载最新版本的 **`Antigravity增强与汉化工具.exe`**。
-2. 双击直接运行（程序会自动寻找您的 Antigravity 安装目录）。
+2. 双击直接运行（程序会自动识别您的 Antigravity 安装目录）。
 3. 确认路径无误后，点击 **「🚀 一键安装 / 更新增强补丁」**。
 4. 安装完成后，程序将自动重新启动客户端，即可享受全新的全中文与增强交互体验！
 
 > [!TIP]
 > 如果您的客户端安装在非默认盘符，程序提供了 **「🔍 自动搜索」** 按钮与 **「浏览...」** 按钮，方便随时手动重探或指定目录。
 
-### 方式二：使用绿色离线扩展包
-
+#### 方式二：使用绿色离线扩展包
 1. 下载 **`Antigravity-Enhance-Pack.zip`** 压缩包。
 2. 解压至本地任意目录，直接双击运行其中的 `Antigravity增强与汉化工具.exe`。
-3. 适合离线环境、企业内网或换机迁移使用。
 
-### 方式三：从源码自主构建
+---
+
+### 2. macOS 与 Linux 用户部署
+
+#### 方式一：终端一行命令自动安装 (最快捷)
+打开系统终端（Terminal），直接粘贴并执行以下命令即可自动完成检测、下载与原子注入：
+```bash
+curl -fsSL https://raw.githubusercontent.com/Kutaze/Antigravity-Enhance-Pack-Tools/main/install.sh | bash
+```
+
+#### 方式二：离线扩展包手动安装 (`.tar.gz` / `.zip`)
+1. 前往 [Releases 页面](https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases) 下载 **`Antigravity-Enhance-Pack.tar.gz`** 并解压：
+```bash
+tar -xzf Antigravity-Enhance-Pack.tar.gz
+cd Antigravity-Enhance-Pack
+
+# 赋予执行权限并运行安装向导
+chmod +x install.sh uninstall.sh
+./install.sh
+```
+
+> [!NOTE]
+> 安装脚本会自动检测系统环境变量中的 `node`；若未安装 Node.js，脚本将自动复用 Antigravity 客户端内置的 Electron 引擎（`ELECTRON_RUN_AS_NODE=1`）完成免依赖注入，完全无需配置任何额外开发环境！
+
+---
+
+### 3. 从源码自主构建
 
 本项目完全开源，构建过程透明可靠：
 
@@ -168,18 +194,24 @@ graph TD
 git clone https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools.git
 cd Antigravity-Enhance-Pack-Tools
 
-# 2. 执行一键构建脚本 (自动完成资源压缩、嵌入与 C# 编译器调用)
+# 2. 执行一键构建脚本 (自动生成可执行程序与双端压缩归档)
 node build.js
 
-# 或者在 Windows 控制台中直接执行
+# Windows 用户亦可双击运行
 build.bat
 ```
-构建成功后，将在根目录下生成独立的单文件可执行程序 `Antigravity增强与汉化工具.exe`。
 
-### 🔄 一键恢复官方原版
+---
+
+### 🔄 跨平台一键恢复官方原版
+
 若您在任何时候需要回到官方英文纯净版本：
-- 只需在 GUI 安装工具中点击 **「↺ 一键还原官方原版」**；
-- 程序将自动根据备份的 `.bak` 快照进行原子级复原，整个过程干净无残留。
+- **Windows 用户**：在 GUI 安装工具中直接点击 **「↺ 一键还原官方原版」**。
+- **macOS / Linux 用户**：在仓库或解压目录下执行：
+  ```bash
+  ./uninstall.sh
+  ```
+- 程序将自动根据备份的 `app.asar.bak` 快照进行秒级原子复原，干净无残留。
 
 ---
 
@@ -258,6 +290,15 @@ window.__AGY_APPLY_THINKING_LEVEL__('high');
 ## 📝 软件更新变更日志
 
 本项目遵循语义化版本递增规范（`v0.1.x` 逢十进一）：
+
+### [v0.1.3] - 2026-09-21
+- **跨平台与多端原生适配**：
+  - 全面支持 **macOS**（全面适配 Apple Silicon M1~M4 及 Intel 芯片，深度兼容 `/Applications/Antigravity.app` 应用结构）；
+  - 全面支持 **Linux** 各大主流发行版（Ubuntu、Debian、Fedora、Arch、CentOS 及 Flatpak 目录结构）；
+  - 新增全自动化跨平台终端安装向导 `install.sh`（支持 `curl ... | bash` 终端一行命令静默部署）与还原向导 `uninstall.sh`；
+  - 研发跨平台运行时智能探针：若宿主未配置独立 Node.js，自动无感复用客户端内置 Electron 引擎作为 Node 运行环境；
+  - 自动编译构建并发布专为 Unix 权限体系优化的 `Antigravity-Enhance-Pack.tar.gz` 离线压缩包；
+  - Windows 端 GUI 同步升级版本标识至 `v0.1.3`。
 
 ### [v0.1.2] - 2026-09-21
 - **界面与交互**：

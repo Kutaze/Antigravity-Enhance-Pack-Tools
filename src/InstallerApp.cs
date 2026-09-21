@@ -179,7 +179,7 @@ namespace AntigravityInstaller
             };
             verBadgeText = new TextBlock
             {
-                Text = "v0.1.2",
+                Text = "v0.1.3",
                 FontSize = 10.5,
                 FontWeight = FontWeights.Medium
             };

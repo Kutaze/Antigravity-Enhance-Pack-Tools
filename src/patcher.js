@@ -27,38 +27,84 @@ if (!fs.existsSync(coreRunnerPath) || !fs.existsSync(coreDataPath)) {
     process.exit(1);
 }
 
-// 2. Locate Antigravity Installation
-function findInstallDir() {
-    if (process.argv[2] && fs.existsSync(path.join(process.argv[2], 'resources', 'app.asar'))) {
-        return process.argv[2];
+// 2. Locate Antigravity Installation (Cross-Platform)
+function findAsarLocation() {
+    // Check command line arg
+    if (process.argv[2]) {
+        const arg = path.resolve(process.argv[2]);
+        if (fs.existsSync(arg) && fs.statSync(arg).isFile() && arg.endsWith('app.asar')) {
+            return { asarPath: arg, resourcesDir: path.dirname(arg), installDir: path.dirname(path.dirname(arg)) };
+        }
+        if (fs.existsSync(path.join(arg, 'app.asar'))) {
+            return { asarPath: path.join(arg, 'app.asar'), resourcesDir: arg, installDir: path.dirname(arg) };
+        }
+        if (fs.existsSync(path.join(arg, 'resources', 'app.asar'))) {
+            return { asarPath: path.join(arg, 'resources', 'app.asar'), resourcesDir: path.join(arg, 'resources'), installDir: arg };
+        }
+        if (fs.existsSync(path.join(arg, 'Contents', 'Resources', 'app.asar'))) {
+            return { asarPath: path.join(arg, 'Contents', 'Resources', 'app.asar'), resourcesDir: path.join(arg, 'Contents', 'Resources'), installDir: arg };
+        }
     }
-    const candidates = [
-        path.join(process.env.LOCALAPPDATA || '', 'Programs', 'antigravity'),
-        path.join(process.env.ProgramFiles || '', 'Antigravity'),
-        path.join(process.env['ProgramFiles(x86)'] || '', 'Antigravity'),
-        'C:\\Users\\Lynan\\AppData\\Local\\Programs\\antigravity'
-    ];
+
+    const isMac = process.platform === 'darwin';
+    const isLinux = process.platform === 'linux';
+    const home = process.env.HOME || '';
+
+    const candidates = [];
+    if (isMac) {
+        candidates.push(
+            '/Applications/Antigravity.app/Contents/Resources',
+            path.join(home, 'Applications/Antigravity.app/Contents/Resources'),
+            '/Applications/Google Antigravity.app/Contents/Resources',
+            path.join(home, 'Applications/Google Antigravity.app/Contents/Resources')
+        );
+    } else if (isLinux) {
+        candidates.push(
+            '/opt/Antigravity/resources',
+            '/opt/antigravity/resources',
+            '/usr/share/antigravity/resources',
+            '/usr/lib/antigravity/resources',
+            path.join(home, '.local/share/antigravity/resources')
+        );
+    } else {
+        // Windows
+        candidates.push(
+            path.join(process.env.LOCALAPPDATA || '', 'Programs', 'antigravity', 'resources'),
+            path.join(process.env.ProgramFiles || '', 'Antigravity', 'resources'),
+            path.join(process.env['ProgramFiles(x86)'] || '', 'Antigravity', 'resources')
+        );
+    }
+
     for (const c of candidates) {
-        if (c && fs.existsSync(path.join(c, 'resources', 'app.asar'))) {
-            return c;
+        if (c && fs.existsSync(path.join(c, 'app.asar'))) {
+            return {
+                asarPath: path.join(c, 'app.asar'),
+                resourcesDir: c,
+                installDir: isMac ? path.dirname(path.dirname(c)) : path.dirname(c)
+            };
         }
     }
     return null;
 }
 
-const installDir = findInstallDir();
-if (!installDir) {
+const loc = findAsarLocation();
+if (!loc) {
     console.error('[错误] 未能自动定位 Antigravity 安装目录！');
-    console.error('请通过命令行传入 Antigravity 安装根目录，例如:');
-    console.error('  patcher.exe "C:\\Users\\<用户名>\\AppData\\Local\\Programs\\antigravity"');
+    console.error('请通过命令行传入 Antigravity 安装根目录或 app.asar 路径，例如:');
+    if (process.platform === 'darwin') {
+        console.error('  node patcher.js "/Applications/Antigravity.app"');
+    } else if (process.platform === 'linux') {
+        console.error('  node patcher.js "/opt/Antigravity"');
+    } else {
+        console.error('  patcher.exe "C:\\Users\\<用户名>\\AppData\\Local\\Programs\\antigravity"');
+    }
     process.exit(1);
 }
 
-console.log('[1/6] 成功定位 Antigravity 安装目录:');
-console.log('      ' + installDir);
+const { asarPath, resourcesDir, installDir } = loc;
+console.log('[1/6] 成功定位 Antigravity 核心路径:');
+console.log('      ' + asarPath);
 
-const resourcesDir = path.join(installDir, 'resources');
-const asarPath = path.join(resourcesDir, 'app.asar');
 const backupPath = path.join(resourcesDir, 'app.asar.bak');
 const tempSandbox = path.join(__dirname, '.temp_patch_sandbox');
 const tempOutAsar = path.join(__dirname, '.temp_patched.asar');
@@ -204,12 +250,14 @@ exports.injectAntigravityI18n = injectAntigravityI18n;
         console.log('\n[6/6] 正在部署增强包至客户端目录...');
         fs.copyFileSync(tempOutAsar, asarPath);
 
-        // Update Desktop Shortcut icon if exists
-        try {
-            const cp = require('child_process');
-            const psCmd = `powershell -NoProfile -Command "$wsh=New-Object -ComObject WScript.Shell; @([System.IO.Path]::Combine([Environment]::GetFolderPath('Desktop'), 'Antigravity.lnk'), 'D:\\\\desk\\\\Antigravity.lnk') | ForEach-Object { if(Test-Path $_){ $sc=$wsh.CreateShortcut($_); $sc.IconLocation='${targetAppIco.replace(/\\/g, '\\\\')},0'; $sc.Save(); } }"`;
-            cp.execSync(psCmd, { stdio: 'ignore' });
-        } catch(e) {}
+        // Update Desktop Shortcut icon if exists (Windows only)
+        if (process.platform === 'win32') {
+            try {
+                const cp = require('child_process');
+                const psCmd = `powershell -NoProfile -Command "$wsh=New-Object -ComObject WScript.Shell; @([System.IO.Path]::Combine([Environment]::GetFolderPath('Desktop'), 'Antigravity.lnk'), 'D:\\\\desk\\\\Antigravity.lnk') | ForEach-Object { if(Test-Path $_){ $sc=$wsh.CreateShortcut($_); $sc.IconLocation='${targetAppIco.replace(/\\/g, '\\\\')},0'; $sc.Save(); } }"`;
+                cp.execSync(psCmd, { stdio: 'ignore' });
+            } catch(e) {}
+        }
 
         // 10. Cleanup
         try {
