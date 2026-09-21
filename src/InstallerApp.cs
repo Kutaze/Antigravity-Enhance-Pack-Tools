@@ -24,6 +24,18 @@ namespace AntigravityInstaller
             var app = new App();
             bool isDark = false; // Default to clean modern light theme
             bool doCapture = false;
+            if (args != null && args.Length >= 4 && (args[0].Equals("/mockup", StringComparison.OrdinalIgnoreCase) || args[0].Equals("--mockup", StringComparison.OrdinalIgnoreCase)))
+            {
+                AntigravityInstaller.MainWindow.CustomLogoPath = args[1];
+                string outLight = args[2];
+                string outDark = args[3];
+                var win = new AntigravityInstaller.MainWindow(false);
+                win.SetupMockupState();
+                AntigravityInstaller.MainWindow.SaveVisualAsPng((FrameworkElement)win.Content, outLight);
+                win.ApplyTheme(true);
+                AntigravityInstaller.MainWindow.SaveVisualAsPng((FrameworkElement)win.Content, outDark);
+                return;
+            }
             if (args != null && args.Length > 0)
             {
                 foreach (var a in args)
@@ -61,6 +73,8 @@ namespace AntigravityInstaller
 
     public class MainWindow : Window
     {
+        public static string CustomLogoPath { get; set; }
+
         // Controls
         private Border rootBorder;
         private Grid titleBar;
@@ -869,6 +883,16 @@ namespace AntigravityInstaller
         {
             try
             {
+                if (!string.IsNullOrEmpty(CustomLogoPath) && File.Exists(CustomLogoPath))
+                {
+                    var customImg = new BitmapImage();
+                    customImg.BeginInit();
+                    customImg.UriSource = new Uri(Path.GetFullPath(CustomLogoPath));
+                    customImg.CacheOption = BitmapCacheOption.OnLoad;
+                    customImg.EndInit();
+                    customImg.Freeze();
+                    return customImg;
+                }
                 var asm = Assembly.GetExecutingAssembly();
                 using (var stream = asm.GetManifestResourceStream(resourceName))
                 {
@@ -1437,7 +1461,15 @@ namespace AntigravityInstaller
             }
         }
 
-        private static void SaveVisualAsPng(FrameworkElement visual, string outputPath)
+        public void SetupMockupState()
+        {
+            txtPath.Text = @"C:\Users\Lynan\AppData\Local\Programs\antigravity";
+            lblPathStatus.Text = "● 已定位有效的 Antigravity 客户端目录 (已识别 resources/app.asar)";
+            lblPathStatus.Foreground = new SolidColorBrush(Color.FromRgb(16, 185, 129));
+            txtLog.Text = "[14:00:00] 自动检测到 Antigravity 安装目录: C:\\Users\\Lynan\\AppData\\Local\\Programs\\antigravity\r\n[14:00:01] 核心文件校验通过 (resources\\app.asar, 版本: 1.109.0)\r\n[14:00:01] 就绪状态：可点击下方按钮一键安装增强补丁或还原官方原版。";
+        }
+
+        public static void SaveVisualAsPng(FrameworkElement visual, string outputPath)
         {
             int w = 750;
             int h = 670;

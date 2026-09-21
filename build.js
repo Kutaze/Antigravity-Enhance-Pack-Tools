@@ -70,9 +70,12 @@ const finalZip = path.join(distDir, 'Antigravity-Enhance-Pack.zip');
 if (fs.existsSync(finalZip)) {
     try { fs.unlinkSync(finalZip); } catch(e) {}
 }
-// Package the repo folder excluding dist, .git, etc.
-execSync(`powershell -Command "Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::CreateFromDirectory('${staging.replace(/\\/g, '\\\\')}', '${finalZip.replace(/\\/g, '\\\\')}')"`);
-console.log('Final Release Zip:', fs.existsSync(finalZip) ? fs.statSync(finalZip).size : 'N/A');
+try {
+    execSync(`tar --exclude="dist" --exclude=".git" -a -c -f "${finalZip}" -C "${path.dirname(repoRoot)}" "${path.basename(repoRoot)}"`);
+    console.log('Final Release Zip:', fs.statSync(finalZip).size);
+} catch (e) {
+    console.warn('Zip creation warning:', e.message);
+}
 
 console.log('=== Step 4: Package macOS & Linux Antigravity-Enhance-Pack.tar.gz in dist/ ===');
 const finalTarGz = path.join(distDir, 'Antigravity-Enhance-Pack.tar.gz');
@@ -85,11 +88,5 @@ try {
 } catch (err) {
     console.warn('Tar creation skipped:', err.message);
 }
-
-// Ensure zip contains all necessary root files cleanly
-try {
-    execSync(`powershell -Command "Compress-Archive -Path '${repoRoot}\\*' -DestinationPath '${finalZip}' -Force"`);
-    console.log('Updated Release Zip:', fs.statSync(finalZip).size);
-} catch (e) {}
 
 console.log('✔ Portable build completed successfully inside project folder!');
