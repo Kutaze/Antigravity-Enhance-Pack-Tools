@@ -23,11 +23,16 @@ namespace AntigravityInstaller
         {
             var app = new App();
             bool isDark = false; // Default to clean modern light theme
+            bool doCapture = false;
             if (args != null && args.Length > 0)
             {
                 foreach (var a in args)
                 {
-                    if (a.Equals("/dark", StringComparison.OrdinalIgnoreCase) || a.Equals("-dark", StringComparison.OrdinalIgnoreCase))
+                    if (a.Equals("/capture", StringComparison.OrdinalIgnoreCase) || a.Equals("--capture", StringComparison.OrdinalIgnoreCase))
+                    {
+                        doCapture = true;
+                    }
+                    else if (a.Equals("/dark", StringComparison.OrdinalIgnoreCase) || a.Equals("-dark", StringComparison.OrdinalIgnoreCase))
                     {
                         isDark = true;
                     }
@@ -38,6 +43,11 @@ namespace AntigravityInstaller
                 }
             }
             var mainWindow = new MainWindow(isDark);
+            if (doCapture)
+            {
+                mainWindow.ExportPreviews();
+                return;
+            }
             app.Run(mainWindow);
         }
     }
@@ -1395,6 +1405,55 @@ namespace AntigravityInstaller
                     Dispatcher.Invoke(() => SetWorking(false, lblStatus.Text));
                 }
             });
+        }
+
+        public void ExportPreviews()
+        {
+            try
+            {
+                txtPath.Text = @"C:\Users\Lynan\AppData\Local\Programs\antigravity";
+                lblPathStatus.Text = "● 已定位有效的 Antigravity 客户端目录 (已识别 resources/app.asar)";
+                lblPathStatus.Foreground = new SolidColorBrush(Color.FromRgb(16, 185, 129));
+                txtLog.Text = "[13:40:00] 自动检测到 Antigravity 安装目录: C:\\Users\\Lynan\\AppData\\Local\\Programs\\antigravity\r\n[13:40:01] 核心文件校验通过 (resources\\app.asar, 版本: 1.109.0)\r\n[13:40:01] 就绪状态：可点击下方按钮一键安装增强补丁或还原官方原版。";
+
+                string assetsDir = @"D:\desk\Antigravity-Enhance-Pack\assets";
+                string brainDir = @"C:\Users\Lynan\.gemini\antigravity\brain\52cfb1d6-5446-4024-b205-602befeaea39";
+
+                // 1. Light theme
+                ApplyTheme(false);
+                SaveVisualAsPng((FrameworkElement)this.Content, Path.Combine(assetsDir, "gui_installer_light_preview.png"));
+                SaveVisualAsPng((FrameworkElement)this.Content, Path.Combine(brainDir, "gui_installer_light_preview.png"));
+
+                // 2. Dark theme
+                ApplyTheme(true);
+                SaveVisualAsPng((FrameworkElement)this.Content, Path.Combine(assetsDir, "gui_installer_dark_preview.png"));
+                SaveVisualAsPng((FrameworkElement)this.Content, Path.Combine(brainDir, "gui_installer_dark_preview.png"));
+
+                File.WriteAllText(@"C:\Users\Lynan\.gemini\antigravity\scratch\export_err.log", "SUCCESS");
+            }
+            catch (Exception ex)
+            {
+                File.WriteAllText(@"C:\Users\Lynan\.gemini\antigravity\scratch\export_err.log", ex.ToString());
+            }
+        }
+
+        private static void SaveVisualAsPng(FrameworkElement visual, string outputPath)
+        {
+            int w = 750;
+            int h = 670;
+            visual.Measure(new Size(w, h));
+            visual.Arrange(new Rect(0, 0, w, h));
+            visual.UpdateLayout();
+
+            var rtb = new RenderTargetBitmap(w, h, 96, 96, PixelFormats.Pbgra32);
+            rtb.Render(visual);
+
+            var encoder = new PngBitmapEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(rtb));
+            using (var stream = new FileStream(outputPath, FileMode.Create))
+            {
+                encoder.Save(stream);
+            }
         }
 
         private void ExtractEmbeddedPayload(string targetDir)
