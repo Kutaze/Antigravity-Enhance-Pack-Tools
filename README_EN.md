@@ -8,7 +8,7 @@
 **An all-in-one UI and interaction enhancement suite tailored for the official Google Antigravity desktop client.**
 
 <p align="center">
-  <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases"><img src="https://img.shields.io/badge/Release-v0.1.3-6366f1?style=flat-square" alt="Release" /></a>
+  <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases"><img src="https://img.shields.io/badge/Release-v0.1.4-6366f1?style=flat-square" alt="Release" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-10b981?style=flat-square" alt="License" /></a>
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools"><img src="https://img.shields.io/badge/Platform-Windows_%7C_macOS_%7C_Linux-0284c7?style=flat-square" alt="Platform" /></a>
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools"><img src="https://img.shields.io/badge/UI-Dual_Theme_GUI-8b5cf6?style=flat-square" alt="UI" /></a>
@@ -117,6 +117,10 @@ curl -fsSL https://raw.githubusercontent.com/Kutaze/Antigravity-Enhance-Pack-Too
 ---
 
 ## 📝 Changelog
+
+### [v0.1.4] - 2026-09-21
+- **Skills Hub Overhaul**: Upgraded to 3-column responsive grid layout, high-contrast dark typography for both themes, auto new-chat invocation, and directory reveal.
+- **Startup Zoom Safety Guard**: Cleared corrupted Chromium zoom caches and implemented strict bounds clamping against abnormal UI magnifications; added global zoom hotkeys (`Ctrl+0` / `Ctrl+=` / `Ctrl+-`) with visual toast feedback.
 
 ### [v0.1.3] - 2026-09-21
 - Added full macOS (Apple Silicon M1-M4 & Intel) and Linux support with automated bash scripts.

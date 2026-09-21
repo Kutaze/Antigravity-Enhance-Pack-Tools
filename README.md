@@ -8,7 +8,7 @@
 **专为 Google Antigravity 官方桌面客户端打造的汉化与原生 UI 交互增强套件。**
 
 <p align="center">
-  <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases"><img src="https://img.shields.io/badge/Release-v0.1.3-6366f1?style=flat-square" alt="Release" /></a>
+  <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases"><img src="https://img.shields.io/badge/Release-v0.1.4-6366f1?style=flat-square" alt="Release" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-10b981?style=flat-square" alt="License" /></a>
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools"><img src="https://img.shields.io/badge/Platform-Windows_%7C_macOS_%7C_Linux-0284c7?style=flat-square" alt="Platform" /></a>
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools"><img src="https://img.shields.io/badge/UI-Dual_Theme_GUI-8b5cf6?style=flat-square" alt="UI" /></a>
@@ -330,6 +330,17 @@ window.__AGY_APPLY_THINKING_LEVEL__('high');
 ## 📝 变更日志
 
 本项目遵循语义化版本递增规范（`v0.1.x` 逢十进一）：
+
+### [v0.1.4] - 2026-09-21
+- **技能中心 (Skills Hub) 体验全面升级**：
+  - 排版重构为更整齐舒适的 3 列响应式网格布局，卡片层次分明；
+  - 文字对比度大幅加深优化，亮色/暗色双主题下描述文字清晰锐利，告别发淡；
+  - 侧边栏技能库新增「📖 规范目录」一键打开 Windows 资源管理器对应文件夹；
+  - 新增「💬 立即调用」一键自动跳转新会话并装填技能；
+  - 支持技能来源标签（官方自带 / 用户配置 / 插件扩展）与个人专属备注。
+- **启动缩放异常与防爆安全门禁**：
+  - 彻底根治因误触或 Chromium 历史缓存导致的客户端每次启动界面巨大缩放问题；
+  - 新增全局缩放快捷键：`Ctrl + 0` 一键重置为 100% 原始大小，`Ctrl + =` / `Ctrl + -` 顺滑缩放并带实时气泡提示。
 
 ### [v0.1.3] - 2026-09-21
 - **跨平台与多端原生适配**：

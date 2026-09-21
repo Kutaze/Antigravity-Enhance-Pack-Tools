@@ -68,7 +68,7 @@ try {
     
     fs.copyFileSync(tempCompiledExe, mainExe);
     fs.copyFileSync(tempCompiledExe, path.join(distDir, 'Antigravity Enhance Tools.exe'));
-    fs.copyFileSync(tempCompiledExe, path.join(distDir, 'Antigravity-Enhance-Tools-v0.1.3.exe'));
+    fs.copyFileSync(tempCompiledExe, path.join(distDir, 'Antigravity-Enhance-Tools-v0.1.4.exe'));
     try { fs.unlinkSync(tempCompiledExe); } catch(e) {}
     console.log('Successfully deployed to:', mainExe);
     
