@@ -1,0 +1,25 @@
+# Build temporary directories
+.payload_staging/
+.temp_patch_sandbox/
+.temp_patched.asar
+temp_asar_build/
+bin/
+obj/
+
+# Logs & backups
+*.log
+*.bak
+
+# Node & package locks
+node_modules/
+npm-debug.log*
+
+# OS artifacts
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Temporary editor files
+.vscode/
+.idea/
+*.swp
