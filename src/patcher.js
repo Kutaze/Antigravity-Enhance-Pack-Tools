@@ -8,15 +8,19 @@ console.log('   Antigravity 深度汉化与原生 UI 交互增强扩展补丁   
 console.log('====================================================\n');
 
 // 1. Resolve dependencies
-const asarLibPath = path.join(__dirname, 'core', 'node_modules', '@electron', 'asar');
+const coreDir = fs.existsSync(path.join(__dirname, 'core'))
+    ? path.join(__dirname, 'core')
+    : path.join(__dirname, '..', 'core');
+
+const asarLibPath = path.join(coreDir, 'node_modules', '@electron', 'asar');
 if (!fs.existsSync(asarLibPath)) {
     console.error('[错误] 未在 core/node_modules 下找到 asar 依赖，请确认安装包完整。');
     process.exit(1);
 }
 const asar = require(asarLibPath);
 
-const coreRunnerPath = path.join(__dirname, 'core', 'i18n_runner.js');
-const coreDataPath = path.join(__dirname, 'core', 'i18n_data.json');
+const coreRunnerPath = path.join(coreDir, 'i18n_runner.js');
+const coreDataPath = path.join(coreDir, 'i18n_data.json');
 
 if (!fs.existsSync(coreRunnerPath) || !fs.existsSync(coreDataPath)) {
     console.error('[错误] 核心资源文件 (i18n_runner.js / i18n_data.json) 缺失！');
@@ -67,7 +71,10 @@ const tempOutAsar = path.join(__dirname, '.temp_patched.asar');
             fs.copyFileSync(asarPath, backupPath);
             console.log('      官方备份已保存至: app.asar.bak');
         } else {
-            console.log('\n[2/6] 检测到官方备份 app.asar.bak，跳过备份。');
+            console.log('\n[2/6] 检测到官方备份 app.asar.bak，正在重置官方底包进行全新注入...');
+            try {
+                fs.copyFileSync(backupPath, asarPath);
+            } catch (e) {}
         }
 
         // 4. Clean & Extract asar into sandbox
@@ -94,14 +101,14 @@ const tempOutAsar = path.join(__dirname, '.temp_patched.asar');
         fs.copyFileSync(coreRunnerPath, targetRunner);
         fs.copyFileSync(coreDataPath, targetData);
 
-        const coreIconPng = path.join(__dirname, 'core', 'icon.png');
+        const coreIconPng = path.join(coreDir, 'icon.png');
         const targetIconPng = path.join(tempSandbox, 'icon.png');
         if (fs.existsSync(coreIconPng)) {
             fs.copyFileSync(coreIconPng, targetIconPng);
             console.log('      已替换客户端原生窗口与任务栏 Logo (Antigravity & Gemini 聚变版)');
         }
 
-        const coreAppIco = path.join(__dirname, 'core', 'app.ico');
+        const coreAppIco = path.join(coreDir, 'app.ico');
         const targetAppIco = path.join(installDir, 'app.ico');
         if (fs.existsSync(coreAppIco)) {
             try {
@@ -127,8 +134,7 @@ const injectAntigravityI18n = (wc) => {
         if (_fs.existsSync(runnerPath) && _fs.existsSync(dataPath)) {
             const dataStr = _fs.readFileSync(dataPath, 'utf8');
             const runnerCode = _fs.readFileSync(runnerPath, 'utf8');
-            const script = '(function(){\n try {\n window.__ANTIGRAVITY_I18N_DATA__ = ' + dataStr + ';\n' + runnerCode + '\n } catch(e){ console.error("[Antigravity i18n] Error:", e); }\n})();';
-            wc.executeJavaScript(script).catch(() => {});
+            wc.executeJavaScript('window.__ANTIGRAVITY_I18N_DATA__ = ' + dataStr + ';' + runnerCode).catch(() => {});
         }
     } catch (e) {
         console.error('[Antigravity i18n] Injection error:', e);

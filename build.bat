@@ -5,15 +5,21 @@ echo   Antigravity 增强扩展包 一键构建脚本
 echo ========================================================
 echo.
 
+set "NODE_CMD=node"
 where node >nul 2>nul
 if %errorlevel% neq 0 (
-    echo [错误] 未检测到 Node.js 环境，请先安装 Node.js 后重试。
-    pause
-    exit /b 1
+    if exist "%LOCALAPPDATA%\Programs\antigravity\Antigravity.exe" (
+        set "NODE_CMD=%LOCALAPPDATA%\Programs\antigravity\Antigravity.exe"
+        set ELECTRON_RUN_AS_NODE=1
+    ) else (
+        echo [错误] 未检测到 Node.js 或 Antigravity 运行时环境！
+        pause
+        exit /b 1
+    )
 )
 
 echo [1/2] 正在运行构建脚本 build.js...
-node build.js
+"%NODE_CMD%" build.js
 
 if %errorlevel% equ 0 (
     echo.

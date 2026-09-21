@@ -37,7 +37,8 @@ const icoPath = path.join(repoRoot, 'core', 'app.ico');
 const iconPng = path.join(repoRoot, 'core', 'icon.png');
 
 const targets = [
-    path.join(repoRoot, 'Antigravity增强与汉化工具.exe')
+    path.join(repoRoot, 'Antigravity增强与汉化工具.exe'),
+    path.join('D:/desk', 'Antigravity增强与汉化工具.exe')
 ];
 
 for (const t of targets) {
@@ -57,5 +58,13 @@ for (const t of targets) {
 // Clean up staging and temp zip
 try { fs.rmSync(staging, { recursive: true, force: true }); } catch(e) {}
 try { if (fs.existsSync(payloadZip)) fs.unlinkSync(payloadZip); } catch(e) {}
+
+console.log('=== Step 3: Package D:\\desk\\Antigravity-Enhance-Pack.zip ===');
+const finalZip = 'D:/desk/Antigravity-Enhance-Pack.zip';
+if (fs.existsSync(finalZip)) {
+    try { fs.unlinkSync(finalZip); } catch(e) {}
+}
+execSync(`powershell -Command "Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::CreateFromDirectory('D:\\\\desk\\\\Antigravity-Enhance-Pack', '${finalZip.replace(/\\/g, '\\\\')}')"`);
+console.log('Final Release Zip:', fs.statSync(finalZip).size);
 
 console.log('✔ Portable build completed successfully!');
