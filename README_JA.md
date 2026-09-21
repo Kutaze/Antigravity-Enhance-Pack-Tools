@@ -7,11 +7,13 @@
 
 **Google Antigravity 公式デスクトップクライアント向けに特化したUIおよび操作性拡張スイート。**
 
-[![Release](https://img.shields.io/badge/Release-v0.1.3-6366f1?style=for-the-badge)](https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases)
-[![License](https://img.shields.io/badge/License-MIT-10b981?style=for-the-badge)](LICENSE)
-[![Platform](https://img.shields.io/badge/Platform-Windows_%7C_macOS_%7C_Linux-0284c7?style=for-the-badge)](https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools)
-[![UI](https://img.shields.io/badge/UI-Dual_Theme_GUI_%2B_CLI-8b5cf6?style=for-the-badge)](https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools)
-[![Runtime](https://img.shields.io/badge/Runtime-Zero_Dependency-f59e0b?style=for-the-badge)](https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools)
+<p align="center">
+  <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases"><img src="https://img.shields.io/badge/Release-v0.1.3-6366f1?style=flat-square" alt="Release" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-10b981?style=flat-square" alt="License" /></a>
+  <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools"><img src="https://img.shields.io/badge/Platform-Windows_%7C_macOS_%7C_Linux-0284c7?style=flat-square" alt="Platform" /></a>
+  <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools"><img src="https://img.shields.io/badge/UI-Dual_Theme_GUI-8b5cf6?style=flat-square" alt="UI" /></a>
+  <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools"><img src="https://img.shields.io/badge/Runtime-Zero_Dependency-f59e0b?style=flat-square" alt="Runtime" /></a>
+</p>
 
 <p align="center">
   <a href="README.md">简体中文</a> • 
