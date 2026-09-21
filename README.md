@@ -5,7 +5,7 @@
 # Antigravity Enhance Tools (Antigravity 扩展增强工具)
 ### 全界面原生深度汉化 · 动态上下文遥测 · 思考能力调控 · 现代双主题交互套件
 
-**专为 Google Antigravity 官方桌面客户端打造的工业级深度汉化与原生 UI 交互增强套件。**
+**专为 Google Antigravity 官方桌面客户端打造的汉化与原生 UI 交互增强套件。**
 
 [![Release](https://img.shields.io/badge/Release-v0.1.3-6366f1?style=for-the-badge)](https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases)
 [![License](https://img.shields.io/badge/License-MIT-10b981?style=for-the-badge)](LICENSE)
