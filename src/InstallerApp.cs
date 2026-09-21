@@ -1177,7 +1177,7 @@ namespace AntigravityInstaller
                     // Step 4: Execute patcher
                     Dispatcher.Invoke(() =>
                     {
-                        lblStatus.Text = "步骤 4/5: 正在执行汉化注入、Logo 聚变与防卡死守护封包...";
+                        lblStatus.Text = "步骤 4/5: 正在执行汉化注入与防卡死守护封包...";
                         progressBar.Value = 75;
                         Log("调用 patcher.js 注入核心逻辑并生成原子化 app.asar...");
                     });
@@ -1245,7 +1245,7 @@ namespace AntigravityInstaller
                         }
 
                         MessageBox.Show(
-                            "🎉 Antigravity 深度汉化与原生 UI 交互增强补丁安装成功！\n\n已具备：\n• 全界面原生深度汉化\n• 真实上下文实时动态监测\n• 思考能力 4 挡滑块调节\n• 实时额度与消耗看板\n• 品牌视觉聚变体系与防卡死主控引擎",
+                            "🎉 Antigravity 深度汉化与原生 UI 交互增强补丁安装成功！\n\n已具备：\n• 全界面原生深度汉化\n• 真实上下文实时动态监测\n• 思考能力 4 挡滑块调节\n• 实时额度与消耗看板\n• 防死循环与防卡死主控引擎",
                             "安装成功 - Antigravity Enhance Tools",
                             MessageBoxButton.OK,
                             MessageBoxImage.Information);

@@ -117,10 +117,7 @@ const tempOutAsar = path.join(__dirname, '.temp_patched.asar');
             fs.copyFileSync(asarPath, backupPath);
             console.log('      官方备份已保存至: app.asar.bak');
         } else {
-            console.log('\n[2/6] 检测到官方备份 app.asar.bak，正在重置官方底包进行全新注入...');
-            try {
-                fs.copyFileSync(backupPath, asarPath);
-            } catch (e) {}
+            console.log('\n[2/6] 检测到官方备份 app.asar.bak，正在基于官方底包进行注入...');
         }
 
         // 4. Clean & Extract asar into sandbox
@@ -132,6 +129,16 @@ const tempOutAsar = path.join(__dirname, '.temp_patched.asar');
         asar.extractAll(asarPath, tempSandbox);
         process.noAsar = true;
 
+        // Ensure client official icon is always preserved (never replaced by custom project logo)
+        if (fs.existsSync(backupPath)) {
+            try {
+                const officialIconBuf = asar.extractFile(backupPath, 'icon.png');
+                if (officialIconBuf && officialIconBuf.length > 0) {
+                    fs.writeFileSync(path.join(tempSandbox, 'icon.png'), officialIconBuf);
+                }
+            } catch (e) {}
+        }
+
         const distDir = path.join(tempSandbox, 'dist');
         const targetRunner = path.join(distDir, 'i18n_runner.js');
         const targetData = path.join(distDir, 'i18n_data.json');
@@ -142,25 +149,10 @@ const tempOutAsar = path.join(__dirname, '.temp_patched.asar');
             throw new Error('解包后未在 dist/ 下找到 utils.js 或 main.js，客户端版本可能不兼容！');
         }
 
-        // 5. Copy enhancement scripts into dist & fusion logo
-        console.log('\n[4/6] 正在植入深度汉化、Antigravity & Gemini 聚变 Logo 与原生 UI 增强引擎...');
+        // 5. Copy enhancement scripts into dist (preserving official client logo)
+        console.log('\n[4/6] 正在植入深度汉化与原生 UI 增强引擎...');
         fs.copyFileSync(coreRunnerPath, targetRunner);
         fs.copyFileSync(coreDataPath, targetData);
-
-        const coreIconPng = path.join(coreDir, 'icon.png');
-        const targetIconPng = path.join(tempSandbox, 'icon.png');
-        if (fs.existsSync(coreIconPng)) {
-            fs.copyFileSync(coreIconPng, targetIconPng);
-            console.log('      已替换客户端原生窗口与任务栏 Logo (Antigravity & Gemini 聚变版)');
-        }
-
-        const coreAppIco = path.join(coreDir, 'app.ico');
-        const targetAppIco = path.join(installDir, 'app.ico');
-        if (fs.existsSync(coreAppIco)) {
-            try {
-                fs.copyFileSync(coreAppIco, targetAppIco);
-            } catch(e) {}
-        }
 
         // 6. Patch utils.js
         let utilsContent = fs.readFileSync(utilsJs, 'utf8');
@@ -250,15 +242,6 @@ exports.injectAntigravityI18n = injectAntigravityI18n;
         console.log('\n[6/6] 正在部署增强包至客户端目录...');
         fs.copyFileSync(tempOutAsar, asarPath);
 
-        // Update Desktop Shortcut icon if exists (Windows only)
-        if (process.platform === 'win32') {
-            try {
-                const cp = require('child_process');
-                const psCmd = `powershell -NoProfile -Command "$wsh=New-Object -ComObject WScript.Shell; @([System.IO.Path]::Combine([Environment]::GetFolderPath('Desktop'), 'Antigravity.lnk'), 'D:\\\\desk\\\\Antigravity.lnk') | ForEach-Object { if(Test-Path $_){ $sc=$wsh.CreateShortcut($_); $sc.IconLocation='${targetAppIco.replace(/\\/g, '\\\\')},0'; $sc.Save(); } }"`;
-                cp.execSync(psCmd, { stdio: 'ignore' });
-            } catch(e) {}
-        }
-
         // 10. Cleanup
         try {
             if (fs.existsSync(tempSandbox)) fs.rmSync(tempSandbox, { recursive: true, force: true });
@@ -270,7 +253,7 @@ exports.injectAntigravityI18n = injectAntigravityI18n;
         console.log('====================================================');
         console.log('包含功能:');
         console.log('  ✔ 全界面深度汉化与文本对照覆盖');
-        console.log('  ✔ Antigravity × Google Gemini 品牌聚变 Logo (任务栏/视窗/侧边栏/桌面图标)');
+        console.log('  ✔ 保留官方原生客户端视窗与系统托盘 Logo');
         console.log('  ✔ 侧边栏实时额度面板 (Gemini / Claude 多周期额度与刷新)');
         console.log('  ✔ 个人中心与淡色极简 PRO 徽标');
         console.log('  ✔ 底部紧凑设置按钮交互对齐');
