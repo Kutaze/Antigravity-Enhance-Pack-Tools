@@ -22,7 +22,7 @@ namespace AntigravityInstaller
         public static void Main(string[] args)
         {
             var app = new App();
-            bool isDark = false; // Default to modern light mode
+            bool isDark = false; // Default to clean modern light theme
             if (args != null && args.Length > 0)
             {
                 foreach (var a in args)
@@ -69,6 +69,7 @@ namespace AntigravityInstaller
         private Border pathBoxBorder;
         private TextBox txtPath;
         private TextBlock lblPathStatus;
+        private Button btnAutoSearch;
         private Button btnBrowse;
 
         private List<FeatureChipData> featureChips = new List<FeatureChipData>();
@@ -91,9 +92,9 @@ namespace AntigravityInstaller
         {
             isDarkMode = startDark;
 
-            Title = "Antigravity 深度汉化与原生 UI 增强工具箱";
-            Width = 720;
-            Height = 630;
+            Title = "Antigravity Enhance Tools (Antigravity 扩展增强工具)";
+            Width = 750;
+            Height = 670;
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
             WindowStyle = WindowStyle.None;
             AllowsTransparency = true;
@@ -101,31 +102,38 @@ namespace AntigravityInstaller
 
             BuildUI();
             ApplyTheme(isDarkMode);
-            DetectPath();
+            DetectPath(false);
         }
 
         private void BuildUI()
         {
+            var windowContainer = new Grid();
+
             rootBorder = new Border
             {
+                Margin = new Thickness(10), // Reserved outer space for smooth drop shadow without OS clipping
                 BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(14)
+                CornerRadius = new CornerRadius(16),
+                SnapsToDevicePixels = true
             };
 
             var mainGrid = new Grid();
-            mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(44) }); // Header
+            mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(46) }); // Header
             mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) }); // Content
-            mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(66) }); // Bottom Actions
+            mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(64) }); // Bottom Actions
 
             // ================= 1. Custom Title Bar =================
-            titleBar = new Grid();
+            titleBar = new Grid
+            {
+                Background = Brushes.Transparent // Transparent so rootBorder rounded corners are preserved
+            };
             titleBar.MouseLeftButtonDown += (s, e) => { if (e.ButtonState == MouseButtonState.Pressed) DragMove(); };
 
             var titleLeft = new StackPanel
             {
                 Orientation = Orientation.Horizontal,
                 VerticalAlignment = VerticalAlignment.Center,
-                Margin = new Thickness(16, 0, 0, 0)
+                Margin = new Thickness(18, 0, 0, 0)
             };
 
             var iconImage = LoadEmbeddedImage("icon.png");
@@ -142,7 +150,7 @@ namespace AntigravityInstaller
 
             titleText = new TextBlock
             {
-                Text = "Antigravity 深度汉化与原生 UI 增强工具箱",
+                Text = "Antigravity Enhance Tools (Antigravity 扩展增强工具)",
                 FontSize = 13,
                 FontWeight = FontWeights.SemiBold,
                 VerticalAlignment = VerticalAlignment.Center
@@ -152,9 +160,9 @@ namespace AntigravityInstaller
             verBadge = new Border
             {
                 BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(4),
-                Padding = new Thickness(6, 1.5, 6, 1.5),
-                Margin = new Thickness(8, 0, 0, 0),
+                CornerRadius = new CornerRadius(6),
+                Padding = new Thickness(7, 2, 7, 2),
+                Margin = new Thickness(10, 0, 0, 0),
                 VerticalAlignment = VerticalAlignment.Center
             };
             verBadgeText = new TextBlock
@@ -173,13 +181,13 @@ namespace AntigravityInstaller
                 Orientation = Orientation.Horizontal,
                 HorizontalAlignment = HorizontalAlignment.Right,
                 VerticalAlignment = VerticalAlignment.Center,
-                Margin = new Thickness(0, 0, 10, 0)
+                Margin = new Thickness(0, 0, 14, 0)
             };
 
             btnTheme = new Button
             {
-                Height = 26,
-                Padding = new Thickness(8, 0, 8, 0),
+                Height = 28,
+                Padding = new Thickness(10, 0, 10, 0),
                 Margin = new Thickness(0, 0, 8, 0),
                 FontSize = 11,
                 Cursor = Cursors.Hand,
@@ -200,20 +208,20 @@ namespace AntigravityInstaller
             // ================= 2. Body Content =================
             var bodyStack = new StackPanel
             {
-                Margin = new Thickness(20, 14, 20, 10)
+                Margin = new Thickness(20, 10, 20, 10)
             };
 
             // Banner Card
             bannerBorder = new Border
             {
                 BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(10),
-                Padding = new Thickness(14, 12, 14, 12),
+                CornerRadius = new CornerRadius(12),
+                Padding = new Thickness(16, 12, 16, 12),
                 Margin = new Thickness(0, 0, 0, 14)
             };
 
             var bannerGrid = new Grid();
-            bannerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(50) });
+            bannerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(48) });
             bannerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
             if (iconImage != null)
@@ -221,15 +229,15 @@ namespace AntigravityInstaller
                 var bannerLogo = new Image
                 {
                     Source = iconImage,
-                    Width = 42,
-                    Height = 42,
+                    Width = 38,
+                    Height = 38,
                     HorizontalAlignment = HorizontalAlignment.Left,
                     VerticalAlignment = VerticalAlignment.Center,
                     Effect = new DropShadowEffect
                     {
-                        Color = Color.FromRgb(99, 102, 241),
-                        BlurRadius = 12,
-                        Opacity = 0.5,
+                        Color = Color.FromRgb(59, 130, 246),
+                        BlurRadius = 10,
+                        Opacity = 0.35,
                         ShadowDepth = 0
                     }
                 };
@@ -244,14 +252,14 @@ namespace AntigravityInstaller
             };
             bannerTitle = new TextBlock
             {
-                Text = "Antigravity × Google Gemini 深度增强扩展包",
-                FontSize = 15,
+                Text = "Antigravity Enhance Tools (Antigravity 扩展增强工具)",
+                FontSize = 14.5,
                 FontWeight = FontWeights.Bold
             };
             bannerSubtitle = new TextBlock
             {
-                Text = "全界面深度汉化 · 动态上下文用量监测 · 4 挡思考滑块 · 实时额度卡片 · 防卡死守护",
-                FontSize = 11.5,
+                Text = "全界面原生深度汉化 · 动态上下文实时遥测 · 4 挡思考调节滑块 · 额度看板 · 防卡死守护",
+                FontSize = 11,
                 Margin = new Thickness(0, 3, 0, 0)
             };
             bannerTextStack.Children.Add(bannerTitle);
@@ -265,7 +273,7 @@ namespace AntigravityInstaller
             pathHeader = new TextBlock
             {
                 Text = "客户端安装目录:",
-                FontSize = 12.5,
+                FontSize = 12,
                 FontWeight = FontWeights.SemiBold,
                 Margin = new Thickness(2, 0, 0, 6)
             };
@@ -273,12 +281,13 @@ namespace AntigravityInstaller
 
             var pathRow = new Grid { Margin = new Thickness(0, 0, 0, 4) };
             pathRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            pathRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(85) });
+            pathRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(108) });
+            pathRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(88) });
 
             pathBoxBorder = new Border
             {
-                Height = 34,
-                CornerRadius = new CornerRadius(6),
+                Height = 36,
+                CornerRadius = new CornerRadius(8),
                 BorderThickness = new Thickness(1),
                 Padding = new Thickness(10, 0, 10, 0)
             };
@@ -295,10 +304,23 @@ namespace AntigravityInstaller
             Grid.SetColumn(pathBoxBorder, 0);
             pathRow.Children.Add(pathBoxBorder);
 
-            btnBrowse = CreateStyledButton("浏览...", new CornerRadius(6), 34, new Thickness(12, 0, 12, 0));
+            btnAutoSearch = CreateStyledButton("🔍 自动搜索", new CornerRadius(8), 36, new Thickness(8, 0, 8, 0));
+            btnAutoSearch.Margin = new Thickness(8, 0, 0, 0);
+            btnAutoSearch.ToolTip = "深度检索系统运行进程、默认安装目录与注册表";
+            btnAutoSearch.Click += (s, e) =>
+            {
+                lblPathStatus.Text = "🔍 正在全盘深度检索客户端安装目录与运行进程...";
+                lblPathStatus.Foreground = new SolidColorBrush(isDarkMode ? Color.FromRgb(147, 197, 253) : Color.FromRgb(37, 99, 235));
+                DetectPath(true);
+            };
+            Grid.SetColumn(btnAutoSearch, 1);
+            pathRow.Children.Add(btnAutoSearch);
+
+            btnBrowse = CreateStyledButton("📁 浏览...", new CornerRadius(8), 36, new Thickness(12, 0, 12, 0));
             btnBrowse.Margin = new Thickness(8, 0, 0, 0);
+            btnBrowse.ToolTip = "手动选择 Antigravity.exe 或 resources 目录";
             btnBrowse.Click += BtnBrowse_Click;
-            Grid.SetColumn(btnBrowse, 1);
+            Grid.SetColumn(btnBrowse, 2);
             pathRow.Children.Add(btnBrowse);
             bodyStack.Children.Add(pathRow);
 
@@ -306,7 +328,7 @@ namespace AntigravityInstaller
             {
                 Text = "正在检测客户端安装目录...",
                 FontSize = 11,
-                Margin = new Thickness(2, 0, 0, 12)
+                Margin = new Thickness(2, 0, 0, 10)
             };
             bodyStack.Children.Add(lblPathStatus);
 
@@ -314,21 +336,21 @@ namespace AntigravityInstaller
             var featuresWrap = new UniformGrid
             {
                 Columns = 2,
-                Margin = new Thickness(0, 0, 0, 12)
+                Margin = new Thickness(0, 0, 0, 10)
             };
-            featuresWrap.Children.Add(AddFeatureChip("🈳 全界面深度汉化", "覆盖所有菜单、弹窗与侧边栏"));
-            featuresWrap.Children.Add(AddFeatureChip("📈 真实上下文动态监测", "毫秒级实时统计，自适应模型上限"));
-            featuresWrap.Children.Add(AddFeatureChip("🧠 思考能力 4 挡滑块", "动静态模型参数绑定，紫粉高光"));
-            featuresWrap.Children.Add(AddFeatureChip("📊 实时额度与消耗面板", "支持 Gemini / Claude 额度轮询"));
-            featuresWrap.Children.Add(AddFeatureChip("⚡ 品牌聚变 Logo", "任务栏、视窗、侧边栏全套聚变"));
-            featuresWrap.Children.Add(AddFeatureChip("🛡️ 防死循环守护引擎", "DOM 缓存守卫，彻底告别卡死"));
+            featuresWrap.Children.Add(AddFeatureChip("🌐 全界面原生深度汉化", "全量覆盖核心菜单、会话视窗与系统设置"));
+            featuresWrap.Children.Add(AddFeatureChip("📈 动态上下文实时遥测", "会话级消耗毫秒同步，自适应模型上限"));
+            featuresWrap.Children.Add(AddFeatureChip("🧠 思考能力 4 挡调节滑块", "模型思维链深度绑定，平滑阻尼调节"));
+            featuresWrap.Children.Add(AddFeatureChip("📊 实时额度与用量看板", "支持 Gemini / Claude 额度轮询遥测"));
+            featuresWrap.Children.Add(AddFeatureChip("✨ 现代视效与原生沉浸交互", "重构品牌视效体系，深度适配沉浸式交互流"));
+            featuresWrap.Children.Add(AddFeatureChip("🛡️ 防卡死单主控守卫", "DOM 变化防抖节流，杜绝界面卡顿死循环"));
             bodyStack.Children.Add(featuresWrap);
 
             // Progress Bar & Status Text
             lblStatus = new TextBlock
             {
                 Text = "就绪状态：可点击下方按钮一键安装或还原官方版。",
-                FontSize = 12,
+                FontSize = 11.5,
                 FontWeight = FontWeights.Medium,
                 Margin = new Thickness(2, 0, 0, 6)
             };
@@ -336,7 +358,7 @@ namespace AntigravityInstaller
 
             progressBar = new ProgressBar
             {
-                Height = 6,
+                Height = 4,
                 BorderThickness = new Thickness(0),
                 Value = 0,
                 Maximum = 100,
@@ -347,10 +369,10 @@ namespace AntigravityInstaller
             // Live Log Console Box inside Border
             logBorder = new Border
             {
-                Height = 90,
+                Height = 88,
                 CornerRadius = new CornerRadius(8),
                 BorderThickness = new Thickness(1),
-                Padding = new Thickness(6, 4, 6, 4)
+                Padding = new Thickness(8, 6, 8, 6)
             };
 
             txtLog = new TextBox
@@ -372,6 +394,7 @@ namespace AntigravityInstaller
             // ================= 3. Bottom Action Row =================
             bottomGrid = new Grid
             {
+                Background = Brushes.Transparent, // Transparent so rootBorder bottom rounded corners are preserved
                 Margin = new Thickness(0)
             };
             bottomGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
@@ -396,7 +419,7 @@ namespace AntigravityInstaller
                 Margin = new Thickness(0, 0, 20, 0)
             };
 
-            btnRestore = CreateStyledButton("↺ 一键还原官方原版", new CornerRadius(8), 36, new Thickness(16, 0, 16, 0), false);
+            btnRestore = CreateStyledButton("↺ 一键还原官方原版", new CornerRadius(8), 38, new Thickness(16, 0, 16, 0), false);
             btnRestore.Margin = new Thickness(0, 0, 10, 0);
             btnRestore.Click += BtnRestore_Click;
             buttonStack.Children.Add(btnRestore);
@@ -404,16 +427,9 @@ namespace AntigravityInstaller
             btnInstall = CreateStyledButton(
                 "🚀 一键安装 / 更新增强补丁",
                 new CornerRadius(8),
-                36,
+                38,
                 new Thickness(20, 0, 20, 0),
-                true,
-                new DropShadowEffect
-                {
-                    Color = Color.FromRgb(99, 102, 241),
-                    BlurRadius = 10,
-                    Opacity = 0.4,
-                    ShadowDepth = 1
-                }
+                true
             );
             btnInstall.Click += BtnInstall_Click;
             buttonStack.Children.Add(btnInstall);
@@ -425,7 +441,8 @@ namespace AntigravityInstaller
             mainGrid.Children.Add(bottomGrid);
 
             rootBorder.Child = mainGrid;
-            Content = rootBorder;
+            windowContainer.Children.Add(rootBorder);
+            Content = windowContainer;
         }
 
         public void ApplyTheme(bool dark)
@@ -434,123 +451,129 @@ namespace AntigravityInstaller
 
             if (dark)
             {
-                // Dark Theme Palette (Deep Midnight Slate)
+                // Dark Theme Palette (Sleek Modern Obsidian / Slate)
                 rootBorder.Background = new SolidColorBrush(Color.FromRgb(15, 23, 42)); // Slate 900
                 rootBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(51, 65, 85)); // Slate 700
                 rootBorder.Effect = new DropShadowEffect
                 {
                     Color = Colors.Black,
                     Direction = 270,
-                    ShadowDepth = 8,
+                    ShadowDepth = 6,
                     BlurRadius = 24,
                     Opacity = 0.55
                 };
 
-                titleBar.Background = new SolidColorBrush(Color.FromRgb(30, 41, 59)); // Slate 800
-                titleText.Foreground = new SolidColorBrush(Color.FromRgb(241, 245, 249));
+                titleText.Foreground = new SolidColorBrush(Color.FromRgb(248, 250, 252));
 
-                verBadge.Background = new SolidColorBrush(Color.FromArgb(50, 99, 102, 241));
-                verBadge.BorderBrush = new SolidColorBrush(Color.FromArgb(120, 99, 102, 241));
-                verBadgeText.Foreground = new SolidColorBrush(Color.FromRgb(165, 180, 252));
+                verBadge.Background = new SolidColorBrush(Color.FromArgb(40, 59, 130, 246));
+                verBadge.BorderBrush = new SolidColorBrush(Color.FromArgb(90, 59, 130, 246));
+                verBadgeText.Foreground = new SolidColorBrush(Color.FromRgb(147, 197, 253));
 
                 btnTheme.Content = "☀️ 浅色模式";
                 UpdateButtonStyle(btnTheme,
-                    new SolidColorBrush(Color.FromRgb(51, 65, 85)),
+                    new SolidColorBrush(Color.FromRgb(30, 41, 59)),
                     new SolidColorBrush(Color.FromRgb(226, 232, 240)),
-                    new CornerRadius(4));
+                    new CornerRadius(6),
+                    new SolidColorBrush(Color.FromRgb(51, 65, 85)));
 
                 UpdateWindowButtonStyle(btnMin, false, true);
                 UpdateWindowButtonStyle(btnClose, true, true);
 
-                bannerBorder.Background = new LinearGradientBrush(
-                    Color.FromRgb(30, 27, 75), // Indigo 950
-                    Color.FromRgb(15, 23, 42), // Slate 900
-                    new Point(0, 0),
-                    new Point(1, 1)
-                );
-                bannerBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(67, 56, 202));
+                bannerBorder.Background = new SolidColorBrush(Color.FromRgb(30, 41, 59));
+                bannerBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(51, 65, 85));
                 bannerTitle.Foreground = new SolidColorBrush(Color.FromRgb(248, 250, 252));
                 bannerSubtitle.Foreground = new SolidColorBrush(Color.FromRgb(148, 163, 184));
 
                 pathHeader.Foreground = new SolidColorBrush(Color.FromRgb(226, 232, 240));
-                pathBoxBorder.Background = new SolidColorBrush(Color.FromRgb(30, 41, 59));
-                pathBoxBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(71, 85, 105));
-                txtPath.Foreground = new SolidColorBrush(Color.FromRgb(241, 245, 249));
+                pathBoxBorder.Background = new SolidColorBrush(Color.FromRgb(15, 23, 42));
+                pathBoxBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(51, 65, 85));
+                txtPath.Foreground = new SolidColorBrush(Color.FromRgb(248, 250, 252));
                 txtPath.CaretBrush = Brushes.White;
 
+                UpdateButtonStyle(btnAutoSearch,
+                    new SolidColorBrush(Color.FromRgb(30, 41, 59)),
+                    new SolidColorBrush(Color.FromRgb(226, 232, 240)),
+                    new CornerRadius(8),
+                    new SolidColorBrush(Color.FromRgb(51, 65, 85)));
+
                 UpdateButtonStyle(btnBrowse,
-                    new SolidColorBrush(Color.FromRgb(51, 65, 85)),
-                    new SolidColorBrush(Color.FromRgb(241, 245, 249)),
-                    new CornerRadius(6));
+                    new SolidColorBrush(Color.FromRgb(30, 41, 59)),
+                    new SolidColorBrush(Color.FromRgb(226, 232, 240)),
+                    new CornerRadius(8),
+                    new SolidColorBrush(Color.FromRgb(51, 65, 85)));
 
                 foreach (var chip in featureChips)
                 {
-                    chip.Border.Background = new SolidColorBrush(Color.FromArgb(45, 30, 41, 59));
+                    chip.Border.Background = new SolidColorBrush(Color.FromRgb(30, 41, 59));
                     chip.Border.BorderBrush = new SolidColorBrush(Color.FromRgb(51, 65, 85));
-                    chip.TitleBlock.Foreground = new SolidColorBrush(Color.FromRgb(241, 245, 249));
+                    chip.TitleBlock.Foreground = new SolidColorBrush(Color.FromRgb(248, 250, 252));
                     chip.DescBlock.Foreground = new SolidColorBrush(Color.FromRgb(148, 163, 184));
                 }
 
-                lblStatus.Foreground = new SolidColorBrush(Color.FromRgb(226, 232, 240));
+                lblStatus.Foreground = new SolidColorBrush(Color.FromRgb(203, 213, 225));
                 progressBar.Background = new SolidColorBrush(Color.FromRgb(30, 41, 59));
-                progressBar.Foreground = new LinearGradientBrush(Color.FromRgb(99, 102, 241), Color.FromRgb(168, 85, 247), 0);
+                progressBar.Foreground = new SolidColorBrush(Color.FromRgb(59, 130, 246)); // Clean modern blue
 
                 logBorder.Background = new SolidColorBrush(Color.FromRgb(10, 15, 30));
                 logBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(30, 41, 59));
                 txtLog.Foreground = new SolidColorBrush(Color.FromRgb(148, 163, 184));
 
-                bottomGrid.Background = new SolidColorBrush(Color.FromRgb(30, 41, 59));
                 chkAutoLaunch.Foreground = new SolidColorBrush(Color.FromRgb(203, 213, 225));
 
                 UpdateButtonStyle(btnRestore,
-                    new SolidColorBrush(Color.FromRgb(51, 65, 85)),
+                    new SolidColorBrush(Color.FromRgb(30, 41, 59)),
                     new SolidColorBrush(Color.FromRgb(226, 232, 240)),
-                    new CornerRadius(8));
+                    new CornerRadius(8),
+                    new SolidColorBrush(Color.FromRgb(51, 65, 85)));
 
+                // Minimalist, sleek, modern accent button (clean tech blue, not oversaturated neon)
                 UpdateButtonStyle(btnInstall,
-                    new LinearGradientBrush(Color.FromRgb(79, 70, 229), Color.FromRgb(124, 58, 237), 0),
+                    new SolidColorBrush(Color.FromRgb(37, 99, 235)), // Blue 600
                     Brushes.White,
-                    new CornerRadius(8));
+                    new CornerRadius(8),
+                    new SolidColorBrush(Color.FromRgb(37, 99, 235)));
+                btnInstall.Effect = new DropShadowEffect
+                {
+                    Color = Color.FromRgb(37, 99, 235),
+                    BlurRadius = 10,
+                    Opacity = 0.28,
+                    ShadowDepth = 1
+                };
             }
             else
             {
-                // Light Theme Palette (Modern Apple/Fluent Crisp Light)
-                rootBorder.Background = new SolidColorBrush(Color.FromRgb(255, 255, 255)); // White
-                rootBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(203, 213, 225)); // Slate 300
+                // Light Theme Palette (Minimalist, Crisp, Apple / Linear Neutral)
+                rootBorder.Background = new SolidColorBrush(Color.FromRgb(255, 255, 255)); // Pure White
+                rootBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(226, 232, 240)); // Slate 200
                 rootBorder.Effect = new DropShadowEffect
                 {
                     Color = Color.FromRgb(100, 116, 139),
                     Direction = 270,
-                    ShadowDepth = 6,
-                    BlurRadius = 24,
-                    Opacity = 0.28
+                    ShadowDepth = 5,
+                    BlurRadius = 22,
+                    Opacity = 0.20
                 };
 
-                titleBar.Background = new SolidColorBrush(Color.FromRgb(248, 250, 252)); // Slate 50
                 titleText.Foreground = new SolidColorBrush(Color.FromRgb(15, 23, 42)); // Slate 900
 
-                verBadge.Background = new SolidColorBrush(Color.FromRgb(224, 231, 255)); // Indigo 100
-                verBadge.BorderBrush = new SolidColorBrush(Color.FromRgb(165, 180, 252)); // Indigo 300
-                verBadgeText.Foreground = new SolidColorBrush(Color.FromRgb(67, 56, 202)); // Indigo 700
+                verBadge.Background = new SolidColorBrush(Color.FromRgb(241, 245, 249)); // Slate 100
+                verBadge.BorderBrush = new SolidColorBrush(Color.FromRgb(203, 213, 225)); // Slate 300
+                verBadgeText.Foreground = new SolidColorBrush(Color.FromRgb(71, 85, 105)); // Slate 600
 
                 btnTheme.Content = "🌙 深色模式";
                 UpdateButtonStyle(btnTheme,
-                    new SolidColorBrush(Color.FromRgb(241, 245, 249)),
+                    new SolidColorBrush(Color.FromRgb(248, 250, 252)),
                     new SolidColorBrush(Color.FromRgb(51, 65, 85)),
-                    new CornerRadius(4));
+                    new CornerRadius(6),
+                    new SolidColorBrush(Color.FromRgb(226, 232, 240)));
 
                 UpdateWindowButtonStyle(btnMin, false, false);
                 UpdateWindowButtonStyle(btnClose, true, false);
 
-                bannerBorder.Background = new LinearGradientBrush(
-                    Color.FromRgb(238, 242, 255), // Indigo 50
-                    Color.FromRgb(248, 250, 252), // Slate 50
-                    new Point(0, 0),
-                    new Point(1, 1)
-                );
-                bannerBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(199, 210, 254)); // Indigo 200
-                bannerTitle.Foreground = new SolidColorBrush(Color.FromRgb(30, 27, 75)); // Indigo 950
-                bannerSubtitle.Foreground = new SolidColorBrush(Color.FromRgb(71, 85, 105)); // Slate 600
+                bannerBorder.Background = new SolidColorBrush(Color.FromRgb(248, 250, 252)); // Slate 50
+                bannerBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(226, 232, 240)); // Slate 200
+                bannerTitle.Foreground = new SolidColorBrush(Color.FromRgb(15, 23, 42)); // Slate 900
+                bannerSubtitle.Foreground = new SolidColorBrush(Color.FromRgb(100, 116, 139)); // Slate 500
 
                 pathHeader.Foreground = new SolidColorBrush(Color.FromRgb(30, 41, 59));
                 pathBoxBorder.Background = new SolidColorBrush(Color.FromRgb(255, 255, 255));
@@ -558,14 +581,21 @@ namespace AntigravityInstaller
                 txtPath.Foreground = new SolidColorBrush(Color.FromRgb(15, 23, 42));
                 txtPath.CaretBrush = Brushes.Black;
 
-                UpdateButtonStyle(btnBrowse,
-                    new SolidColorBrush(Color.FromRgb(241, 245, 249)),
+                UpdateButtonStyle(btnAutoSearch,
+                    new SolidColorBrush(Color.FromRgb(248, 250, 252)),
                     new SolidColorBrush(Color.FromRgb(51, 65, 85)),
-                    new CornerRadius(6));
+                    new CornerRadius(8),
+                    new SolidColorBrush(Color.FromRgb(203, 213, 225)));
+
+                UpdateButtonStyle(btnBrowse,
+                    new SolidColorBrush(Color.FromRgb(248, 250, 252)),
+                    new SolidColorBrush(Color.FromRgb(51, 65, 85)),
+                    new CornerRadius(8),
+                    new SolidColorBrush(Color.FromRgb(203, 213, 225)));
 
                 foreach (var chip in featureChips)
                 {
-                    chip.Border.Background = new SolidColorBrush(Color.FromRgb(248, 250, 252));
+                    chip.Border.Background = new SolidColorBrush(Color.FromRgb(255, 255, 255));
                     chip.Border.BorderBrush = new SolidColorBrush(Color.FromRgb(226, 232, 240));
                     chip.TitleBlock.Foreground = new SolidColorBrush(Color.FromRgb(15, 23, 42));
                     chip.DescBlock.Foreground = new SolidColorBrush(Color.FromRgb(100, 116, 139));
@@ -573,30 +603,39 @@ namespace AntigravityInstaller
 
                 lblStatus.Foreground = new SolidColorBrush(Color.FromRgb(30, 41, 59));
                 progressBar.Background = new SolidColorBrush(Color.FromRgb(226, 232, 240));
-                progressBar.Foreground = new LinearGradientBrush(Color.FromRgb(79, 70, 229), Color.FromRgb(147, 51, 234), 0);
+                progressBar.Foreground = new SolidColorBrush(Color.FromRgb(37, 99, 235)); // Modern Blue 600
 
                 logBorder.Background = new SolidColorBrush(Color.FromRgb(248, 250, 252));
                 logBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(226, 232, 240));
                 txtLog.Foreground = new SolidColorBrush(Color.FromRgb(51, 65, 85));
 
-                bottomGrid.Background = new SolidColorBrush(Color.FromRgb(248, 250, 252));
                 chkAutoLaunch.Foreground = new SolidColorBrush(Color.FromRgb(51, 65, 85));
 
                 UpdateButtonStyle(btnRestore,
-                    new SolidColorBrush(Color.FromRgb(241, 245, 249)),
+                    new SolidColorBrush(Color.FromRgb(255, 255, 255)),
                     new SolidColorBrush(Color.FromRgb(51, 65, 85)),
-                    new CornerRadius(8));
+                    new CornerRadius(8),
+                    new SolidColorBrush(Color.FromRgb(203, 213, 225)));
 
+                // Minimalist Obsidian primary button: clean, low saturation, high-end Apple / Vercel style
                 UpdateButtonStyle(btnInstall,
-                    new LinearGradientBrush(Color.FromRgb(79, 70, 229), Color.FromRgb(124, 58, 237), 0),
+                    new SolidColorBrush(Color.FromRgb(15, 23, 42)), // Slate 900
                     Brushes.White,
-                    new CornerRadius(8));
+                    new CornerRadius(8),
+                    new SolidColorBrush(Color.FromRgb(15, 23, 42)));
+                btnInstall.Effect = new DropShadowEffect
+                {
+                    Color = Color.FromRgb(15, 23, 42),
+                    BlurRadius = 8,
+                    Opacity = 0.16,
+                    ShadowDepth = 1
+                };
             }
 
             ValidatePath();
         }
 
-        private void UpdateButtonStyle(Button btn, Brush bg, Brush fg, CornerRadius radius)
+        private void UpdateButtonStyle(Button btn, Brush bg, Brush fg, CornerRadius radius, Brush borderBrush = null)
         {
             btn.Background = bg;
             btn.Foreground = fg;
@@ -608,9 +647,9 @@ namespace AntigravityInstaller
             borderFactory.SetValue(Border.CornerRadiusProperty, radius);
             borderFactory.SetValue(Border.PaddingProperty, btn.Padding);
             borderFactory.SetValue(Border.BorderThicknessProperty, new Thickness(1));
-            borderFactory.SetValue(Border.BorderBrushProperty, isDarkMode
-                ? new SolidColorBrush(Color.FromArgb(70, 255, 255, 255))
-                : new SolidColorBrush(Color.FromRgb(203, 213, 225)));
+            borderFactory.SetValue(Border.BorderBrushProperty, borderBrush ?? (isDarkMode
+                ? new SolidColorBrush(Color.FromArgb(60, 255, 255, 255))
+                : new SolidColorBrush(Color.FromRgb(203, 213, 225))));
 
             var cpFactory = new FrameworkElementFactory(typeof(ContentPresenter));
             cpFactory.SetValue(ContentPresenter.HorizontalAlignmentProperty, HorizontalAlignment.Center);
@@ -628,7 +667,7 @@ namespace AntigravityInstaller
             template.Triggers.Add(pressedTrigger);
 
             var disabledTrigger = new Trigger { Property = Button.IsEnabledProperty, Value = false };
-            disabledTrigger.Setters.Add(new Setter(Button.OpacityProperty, 0.4));
+            disabledTrigger.Setters.Add(new Setter(Button.OpacityProperty, 0.38));
             template.Triggers.Add(disabledTrigger);
 
             btn.Template = template;
@@ -644,7 +683,7 @@ namespace AntigravityInstaller
             var borderFactory = new FrameworkElementFactory(typeof(Border));
             borderFactory.Name = "b";
             borderFactory.SetValue(Border.BackgroundProperty, Brushes.Transparent);
-            borderFactory.SetValue(Border.CornerRadiusProperty, new CornerRadius(4));
+            borderFactory.SetValue(Border.CornerRadiusProperty, new CornerRadius(6));
 
             var cpFactory = new FrameworkElementFactory(typeof(ContentPresenter));
             cpFactory.SetValue(ContentPresenter.HorizontalAlignmentProperty, HorizontalAlignment.Center);
@@ -683,8 +722,8 @@ namespace AntigravityInstaller
             var b = new Border
             {
                 BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(7),
-                Padding = new Thickness(10, 6, 10, 6),
+                CornerRadius = new CornerRadius(8),
+                Padding = new Thickness(12, 8, 12, 8),
                 Margin = new Thickness(3, 3, 3, 3)
             };
             var s = new StackPanel();
@@ -751,28 +790,113 @@ namespace AntigravityInstaller
             catch { return null; }
         }
 
-        private void DetectPath()
+        private void DetectPath(bool isManual = false)
         {
-            string[] candidates = new string[]
+            var checkedPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            // 1. Detect from active running processes
+            try
+            {
+                var procs = Process.GetProcessesByName("Antigravity");
+                if (procs != null && procs.Length > 0)
+                {
+                    foreach (var proc in procs)
+                    {
+                        try
+                        {
+                            string procPath = proc.MainModule.FileName;
+                            string dir = Path.GetDirectoryName(procPath);
+                            if (File.Exists(Path.Combine(dir, "resources", "app.asar")))
+                            {
+                                detectedInstallDir = dir;
+                                txtPath.Text = dir;
+                                Log((isManual ? "✔ [手动检索] " : "✔ [自动识别] ") + "已定位当前运行中的客户端: " + dir);
+                                ValidatePath();
+                                return;
+                            }
+                        }
+                        catch { }
+                    }
+                }
+            }
+            catch { }
+
+            // 2. Candidate folders
+            var candidates = new List<string>
             {
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", "antigravity"),
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Antigravity"),
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Antigravity"),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Programs", "antigravity"),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "AppData", "Local", "Programs", "antigravity"),
                 @"C:\Users\Lynan\AppData\Local\Programs\antigravity"
             };
 
+            // 3. Registry Uninstall Entries
+            try
+            {
+                string[] regRoots = new string[]
+                {
+                    @"Software\Microsoft\Windows\CurrentVersion\Uninstall",
+                    @"Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
+                };
+
+                foreach (var regRoot in regRoots)
+                {
+                    using (var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(regRoot))
+                    {
+                        if (key != null)
+                        {
+                            foreach (var subKeyName in key.GetSubKeyNames())
+                            {
+                                using (var subKey = key.OpenSubKey(subKeyName))
+                                {
+                                    if (subKey != null)
+                                    {
+                                        var disp = subKey.GetValue("DisplayName") as string;
+                                        if (!string.IsNullOrEmpty(disp) && disp.IndexOf("Antigravity", StringComparison.OrdinalIgnoreCase) >= 0)
+                                        {
+                                            var loc = subKey.GetValue("InstallLocation") as string;
+                                            if (!string.IsNullOrEmpty(loc)) candidates.Add(loc);
+                                            var icon = subKey.GetValue("DisplayIcon") as string;
+                                            if (!string.IsNullOrEmpty(icon))
+                                            {
+                                                string iconDir = Path.GetDirectoryName(icon.Trim('\"', ' '));
+                                                if (!string.IsNullOrEmpty(iconDir)) candidates.Add(iconDir);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch { }
+
             foreach (var c in candidates)
             {
-                if (!string.IsNullOrEmpty(c) && File.Exists(Path.Combine(c, "resources", "app.asar")))
+                if (string.IsNullOrEmpty(c) || checkedPaths.Contains(c)) continue;
+                checkedPaths.Add(c);
+
+                if (File.Exists(Path.Combine(c, "resources", "app.asar")))
                 {
                     detectedInstallDir = c;
                     txtPath.Text = c;
-                    Log("自动检测到 Antigravity 安装目录: " + c);
+                    Log((isManual ? "✔ [手动检索] " : "✔ [自动识别] ") + "已定位 Antigravity 客户端目录: " + c);
+                    ValidatePath();
                     return;
                 }
             }
 
-            Log("未能自动定位 Antigravity 目录，请手动点击“浏览”选择。");
+            if (isManual)
+            {
+                Log("⚠ 未能自动检索到客户端目录，请点击“浏览”手动指定 Antigravity 安装目录。");
+            }
+            else
+            {
+                Log("未自动定位到默认目录，等待用户指定或点击“自动搜索”。");
+            }
             ValidatePath();
         }
 
@@ -800,7 +924,7 @@ namespace AntigravityInstaller
             }
             else
             {
-                lblPathStatus.Text = "▲ 未能在该目录下找到 resources/app.asar，请确认所选目录为 Antigravity 安装根目录。";
+                lblPathStatus.Text = "▲ 未在该目录下找到 resources/app.asar，请确认所选目录为 Antigravity 安装根目录。";
                 lblPathStatus.Foreground = new SolidColorBrush(isDarkMode ? Color.FromRgb(245, 158, 11) : Color.FromRgb(217, 119, 6)); // Amber
                 btnInstall.IsEnabled = false;
                 btnRestore.IsEnabled = false;
@@ -843,6 +967,7 @@ namespace AntigravityInstaller
             btnInstall.IsEnabled = !working;
             btnRestore.IsEnabled = !working;
             btnBrowse.IsEnabled = !working;
+            btnAutoSearch.IsEnabled = !working;
             txtPath.IsEnabled = !working;
             lblStatus.Text = status;
         }
@@ -949,51 +1074,60 @@ namespace AntigravityInstaller
                         StandardOutputEncoding = Encoding.UTF8,
                         StandardErrorEncoding = Encoding.UTF8
                     };
+
                     if (isElectron)
                     {
                         psi.EnvironmentVariables["ELECTRON_RUN_AS_NODE"] = "1";
                     }
 
-                    var proc = Process.Start(psi);
-                    string stdOut = proc.StandardOutput.ReadToEnd();
-                    string stdErr = proc.StandardError.ReadToEnd();
-                    proc.WaitForExit();
-
-                    Dispatcher.Invoke(() =>
+                    using (var proc = Process.Start(psi))
                     {
-                        if (!string.IsNullOrWhiteSpace(stdOut))
+                        proc.OutputDataReceived += (s, args) =>
                         {
-                            var lines = stdOut.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-                            foreach (var l in lines) Log(l);
-                        }
-                    });
+                            if (!string.IsNullOrEmpty(args.Data))
+                            {
+                                Dispatcher.Invoke(() => Log(args.Data));
+                            }
+                        };
+                        proc.ErrorDataReceived += (s, args) =>
+                        {
+                            if (!string.IsNullOrEmpty(args.Data))
+                            {
+                                Dispatcher.Invoke(() => Log("[ERR] " + args.Data));
+                            }
+                        };
 
-                    if (proc.ExitCode != 0)
-                    {
-                        throw new Exception("补丁注入返回错误码: " + proc.ExitCode + "\n" + stdErr);
+                        proc.BeginOutputReadLine();
+                        proc.BeginErrorReadLine();
+                        proc.WaitForExit();
+
+                        if (proc.ExitCode != 0)
+                        {
+                            throw new Exception("补丁注入脚本执行失败，退出代码: " + proc.ExitCode);
+                        }
                     }
 
-                    // Step 5: Finish
+                    // Step 5: Finished
                     Dispatcher.Invoke(() =>
                     {
                         progressBar.Value = 100;
-                        lblStatus.Text = "🎉 安装完成！Antigravity 增强与汉化已全面生效。";
+                        lblStatus.Text = "🎉 安装完成！Antigravity 深度汉化与原生 UI 增强补丁已生效。";
+                        Log("==========================================");
                         Log("✔ 增强与汉化补丁全部部署成功！");
-                        SetWorking(false, "🎉 安装完成！");
 
                         if (autoLaunch)
                         {
                             string exePath = Path.Combine(installDir, "Antigravity.exe");
                             if (File.Exists(exePath))
                             {
-                                Process.Start(exePath);
+                                Process.Start(new ProcessStartInfo(exePath) { UseShellExecute = true });
                                 Log("已为您自动启动 Antigravity 客户端。");
                             }
                         }
 
-                        MessageBox.Show(this,
-                            "恭喜！Antigravity 增强与汉化扩展包已成功安装！\n\n已包含全界面深度汉化、实时动态上下文用量、4 挡思考滑块、额度卡片与防卡死守护。",
-                            "安装成功",
+                        MessageBox.Show(
+                            "🎉 Antigravity 深度汉化与原生 UI 交互增强补丁安装成功！\n\n已具备：\n• 全界面原生深度汉化\n• 真实上下文实时动态监测\n• 思考能力 4 挡滑块调节\n• 实时额度与消耗看板\n• 品牌视觉聚变体系与防卡死主控引擎",
+                            "安装成功 - Antigravity Enhance Tools",
                             MessageBoxButton.OK,
                             MessageBoxImage.Information);
                     });
@@ -1003,24 +1137,15 @@ namespace AntigravityInstaller
                     Dispatcher.Invoke(() =>
                     {
                         progressBar.Value = 0;
-                        lblStatus.Text = "❌ 安装失败，详情请查看下方日志。";
-                        Log("[错误] " + ex.Message);
-                        SetWorking(false, "安装失败");
-
-                        MessageBox.Show(this,
-                            "安装过程出现错误：\n" + ex.Message,
-                            "错误",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Error);
+                        lblStatus.Text = "❌ 安装失败：" + ex.Message;
+                        Log("❌ [错误] " + ex.Message);
+                        MessageBox.Show("安装过程中发生错误：\n" + ex.Message, "安装失败", MessageBoxButton.OK, MessageBoxImage.Error);
                     });
                 }
                 finally
                 {
-                    try
-                    {
-                        if (Directory.Exists(tempDir)) Directory.Delete(tempDir, true);
-                    }
-                    catch { }
+                    try { if (Directory.Exists(tempDir)) Directory.Delete(tempDir, true); } catch { }
+                    Dispatcher.Invoke(() => SetWorking(false, lblStatus.Text));
                 }
             });
         }
@@ -1029,67 +1154,142 @@ namespace AntigravityInstaller
         {
             if (!ValidatePath()) return;
             string installDir = detectedInstallDir;
-            string backupPath = Path.Combine(installDir, "resources", "app.asar.bak");
-            string asarPath = Path.Combine(installDir, "resources", "app.asar");
 
-            if (!File.Exists(backupPath))
-            {
-                MessageBox.Show(this,
-                    "未找到官方备份文件 (resources/app.asar.bak)。\n当前客户端可能已经是官方原生纯净版，或从未安装过增强补丁。",
-                    "提示",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
-                return;
-            }
-
-            var confirm = MessageBox.Show(this,
-                "是否确认还原为官方原生纯净版？\n（将恢复为官方原生英文界面，并移除增强组件）",
-                "确认还原",
+            var result = MessageBox.Show(
+                "确定要还原 Antigravity 官方原版吗？\n这将恢复官方 app.asar 并还原默认英文界面与原生设置。",
+                "确认还原官方原版",
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Question);
 
-            if (confirm != MessageBoxResult.Yes) return;
+            if (result != MessageBoxResult.Yes) return;
 
-            SetWorking(true, "正在还原官方纯净版...");
-            progressBar.Value = 20;
+            SetWorking(true, "正在准备还原官方原版...");
+            progressBar.Value = 10;
             Log("==========================================");
-            Log("开始还原官方原生 app.asar...");
+            Log("开始还原 Antigravity 官方原生纯净版本...");
 
             ThreadPool.QueueUserWorkItem(_ =>
             {
+                string tempDir = Path.Combine(Path.GetTempPath(), "AgyUnpatch_" + Guid.NewGuid().ToString("N"));
                 try
                 {
+                    Dispatcher.Invoke(() =>
+                    {
+                        lblStatus.Text = "正在退出 Antigravity 进程...";
+                        progressBar.Value = 30;
+                        Log("检查并关闭 Antigravity 进程...");
+                    });
+
                     KillProcesses("Antigravity");
-                    Thread.Sleep(500);
+                    Thread.Sleep(800);
 
                     Dispatcher.Invoke(() =>
                     {
-                        progressBar.Value = 60;
-                        Log("正在从 app.asar.bak 覆盖恢复原生 app.asar...");
+                        lblStatus.Text = "正在提取还原脚本...";
+                        progressBar.Value = 50;
                     });
 
-                    File.Copy(backupPath, asarPath, true);
+                    Directory.CreateDirectory(tempDir);
+                    ExtractEmbeddedPayload(tempDir);
+
+                    string unpatcherJs = Path.Combine(tempDir, "unpatcher.js");
+                    if (!File.Exists(unpatcherJs))
+                    {
+                        throw new Exception("解压载荷失败，未找到 unpatcher.js！");
+                    }
+
+                    string runner = null;
+                    bool isElectron = false;
+
+                    try
+                    {
+                        var p = Process.Start(new ProcessStartInfo("where", "node")
+                        {
+                            UseShellExecute = false,
+                            RedirectStandardOutput = true,
+                            CreateNoWindow = true
+                        });
+                        p.WaitForExit();
+                        if (p.ExitCode == 0) runner = "node";
+                    }
+                    catch { }
+
+                    if (string.IsNullOrEmpty(runner))
+                    {
+                        string electronPath = Path.Combine(installDir, "Antigravity.exe");
+                        if (File.Exists(electronPath))
+                        {
+                            runner = electronPath;
+                            isElectron = true;
+                        }
+                    }
+
+                    if (string.IsNullOrEmpty(runner))
+                    {
+                        throw new Exception("未找到可用的 Node.js 或 Antigravity.exe 运行时！");
+                    }
+
+                    Dispatcher.Invoke(() =>
+                    {
+                        lblStatus.Text = "正在从备份恢复官方原生 app.asar...";
+                        progressBar.Value = 75;
+                        Log("执行官方内核还原流程...");
+                    });
+
+                    ProcessStartInfo psi = new ProcessStartInfo
+                    {
+                        FileName = runner,
+                        Arguments = "\"" + unpatcherJs + "\" \"" + installDir + "\"",
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        CreateNoWindow = true,
+                        StandardOutputEncoding = Encoding.UTF8,
+                        StandardErrorEncoding = Encoding.UTF8
+                    };
+
+                    if (isElectron)
+                    {
+                        psi.EnvironmentVariables["ELECTRON_RUN_AS_NODE"] = "1";
+                    }
+
+                    using (var proc = Process.Start(psi))
+                    {
+                        proc.OutputDataReceived += (s, args) =>
+                        {
+                            if (!string.IsNullOrEmpty(args.Data))
+                            {
+                                Dispatcher.Invoke(() => Log(args.Data));
+                            }
+                        };
+                        proc.ErrorDataReceived += (s, args) =>
+                        {
+                            if (!string.IsNullOrEmpty(args.Data))
+                            {
+                                Dispatcher.Invoke(() => Log("[ERR] " + args.Data));
+                            }
+                        };
+
+                        proc.BeginOutputReadLine();
+                        proc.BeginErrorReadLine();
+                        proc.WaitForExit();
+
+                        if (proc.ExitCode != 0)
+                        {
+                            throw new Exception("还原脚本执行失败，退出代码: " + proc.ExitCode);
+                        }
+                    }
 
                     Dispatcher.Invoke(() =>
                     {
                         progressBar.Value = 100;
-                        lblStatus.Text = "✔ 还原成功！已恢复为官方原生纯净版。";
-                        Log("✔ 官方原生纯净版已成功还原。");
-                        SetWorking(false, "已还原官方版");
+                        lblStatus.Text = "✔ 官方原版已成功还原！客户端已恢复为默认英文状态。";
+                        Log("==========================================");
+                        Log("✔ 官方原生纯净版本已还原完成！");
 
-                        if (chkAutoLaunch.IsChecked == true)
-                        {
-                            string exePath = Path.Combine(installDir, "Antigravity.exe");
-                            if (File.Exists(exePath))
-                            {
-                                Process.Start(exePath);
-                                Log("已为您启动 Antigravity 原版客户端。");
-                            }
-                        }
-
-                        MessageBox.Show(this,
-                            "Antigravity 客户端已成功还原为官方原生纯净版！",
-                            "还原成功",
+                        MessageBox.Show(
+                            "Antigravity 官方原版已成功还原！\n客户端已恢复为官方默认英文状态与原生设置。",
+                            "还原成功 - Antigravity Enhance Tools",
                             MessageBoxButton.OK,
                             MessageBoxImage.Information);
                     });
@@ -1099,14 +1299,33 @@ namespace AntigravityInstaller
                     Dispatcher.Invoke(() =>
                     {
                         progressBar.Value = 0;
-                        lblStatus.Text = "❌ 还原失败: " + ex.Message;
-                        Log("[错误] " + ex.Message);
-                        SetWorking(false, "还原失败");
-
-                        MessageBox.Show(this, "还原失败: " + ex.Message, "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                        lblStatus.Text = "❌ 还原失败：" + ex.Message;
+                        Log("❌ [错误] " + ex.Message);
+                        MessageBox.Show("还原失败：\n" + ex.Message, "还原错误", MessageBoxButton.OK, MessageBoxImage.Error);
                     });
                 }
+                finally
+                {
+                    try { if (Directory.Exists(tempDir)) Directory.Delete(tempDir, true); } catch { }
+                    Dispatcher.Invoke(() => SetWorking(false, lblStatus.Text));
+                }
             });
+        }
+
+        private void ExtractEmbeddedPayload(string targetDir)
+        {
+            var asm = Assembly.GetExecutingAssembly();
+            using (var s = asm.GetManifestResourceStream("payload.zip"))
+            {
+                if (s == null) throw new Exception("内置核心载荷资源 payload.zip 丢失！");
+                string tempZip = Path.Combine(targetDir, "_payload.zip");
+                using (var fs = File.Create(tempZip))
+                {
+                    s.CopyTo(fs);
+                }
+                ZipFile.ExtractToDirectory(tempZip, targetDir);
+                File.Delete(tempZip);
+            }
         }
 
         private void KillProcesses(string name)
@@ -1114,37 +1333,12 @@ namespace AntigravityInstaller
             try
             {
                 var procs = Process.GetProcessesByName(name);
-                if (procs.Length > 0)
+                foreach (var p in procs)
                 {
-                    Dispatcher.Invoke(() => Log("正在关闭 " + procs.Length + " 个运行中的 Antigravity 进程..."));
-                    foreach (var p in procs)
-                    {
-                        try
-                        {
-                            p.Kill();
-                            p.WaitForExit(3000);
-                        }
-                        catch { }
-                    }
+                    try { p.Kill(); p.WaitForExit(3000); } catch { }
                 }
             }
             catch { }
-        }
-
-        private void ExtractEmbeddedPayload(string targetDir)
-        {
-            var asm = Assembly.GetExecutingAssembly();
-            using (var stream = asm.GetManifestResourceStream("payload.zip"))
-            {
-                if (stream == null) throw new Exception("内置 Payload 资源不存在！");
-                string tempZip = Path.Combine(targetDir, "_payload.zip");
-                using (var fs = new FileStream(tempZip, FileMode.Create, FileAccess.Write))
-                {
-                    stream.CopyTo(fs);
-                }
-                ZipFile.ExtractToDirectory(tempZip, targetDir);
-                try { File.Delete(tempZip); } catch { }
-            }
         }
     }
 }

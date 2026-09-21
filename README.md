@@ -2,10 +2,10 @@
 
 <img src="assets/logo_v3_transparent.png" alt="Antigravity × Gemini" width="96" height="96" />
 
-# Antigravity 深度汉化与原生 UI 交互增强套件
-### Antigravity Enhance Pack
+# Antigravity Enhance Tools (Antigravity 扩展增强工具)
+### 全界面原生深度汉化与原生 UI 交互增强套件
 
-**让 Google Antigravity 桌面客户端获得全界面深度汉化、实时动态上下文用量监测、多模型思考能力滑块、实时额度卡片与品牌聚变 Logo**
+**让 Google Antigravity 桌面客户端获得全界面原生深度汉化、真实上下文动态遥测、4 挡思考调节滑块、实时额度看板与现代沉浸式原生视觉增强**
 
 [![Release](https://img.shields.io/badge/Release-v2.5_Pro-6366f1?style=for-the-badge)](https://github.com/)
 [![License](https://img.shields.io/badge/License-MIT-emerald?style=for-the-badge)](LICENSE)
@@ -46,7 +46,7 @@
 | **🧠 思考能力 4 挡动态滑块** | 嵌入模型切换面板，提供「关闭 / 低 / 中 / 高」四挡顺滑拖拽调节，绑定当前选定模型，最高挡尊享紫粉微光。 | ✔ 已就绪 |
 | **📊 实时额度与消耗面板** | 侧边栏常驻实时额度卡片，支持 Gemini / Claude 额度多周期轮询与手动刷新。 | ✔ 已就绪 |
 | **💎 极简淡色 PRO 徽标** | 替换原高饱和刺眼标识，改用优雅低调的淡紫微光 PRO 胶囊勋章，与整体暗色/亮色风格完美契合。 | ✔ 已就绪 |
-| **⚡ Antigravity × Gemini 聚变 Logo**| 全套重塑品牌视觉：覆盖窗口图标、任务栏图标、桌面快捷方式及侧边栏标头，科技感拉满。 | ✔ 已就绪 |
+| **✨ 现代视效与原生沉浸交互** | 重构应用视觉标识体系，深度适配现代沉浸式交互流与暗/浅色界面视觉规范。 | ✔ 已就绪 |
 | **🛡️ 防死循环守护引擎** | 独创 **DOM 缓存守卫（Cache Guard）** 与主控防重入锁，彻底杜绝 MutationObserver 递归卡死与内存映射字节码损坏。 | ✔ 已就绪 |
 | **📦 零依赖单文件 GUI 安装器** | 基于原生 C# / WPF 编译，无须安装任何额外环境，双击即开，集安装、更新、还原于一体。 | ✔ 已就绪 |
 
