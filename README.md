@@ -1,17 +1,30 @@
 <div align="center">
 
-<img src="assets/logo_v3_transparent.png" alt="Antigravity × Gemini" width="96" height="96" />
+<img src="assets/logo_v3_transparent.png" alt="Antigravity Enhance Tools" width="100" height="100" />
 
 # Antigravity Enhance Tools (Antigravity 扩展增强工具)
-### 全界面原生深度汉化与原生 UI 交互增强套件
+### 全界面原生深度汉化 · 动态上下文遥测 · 思考能力调控 · 现代双主题交互套件
 
-**让 Google Antigravity 桌面客户端获得全界面原生深度汉化、真实上下文动态遥测、4 挡思考调节滑块、实时额度看板与现代沉浸式原生视觉增强**
+**专为 Google Antigravity 官方桌面客户端打造的工业级深度汉化与原生 UI 交互增强套件。**
 
 [![Release](https://img.shields.io/badge/Release-v0.1.2-6366f1?style=for-the-badge)](https://github.com/Tsuenoku/Antigravity-Enhance-Pack-Tools/releases)
-[![License](https://img.shields.io/badge/License-MIT-emerald?style=for-the-badge)](LICENSE)
-[![Platform](https://img.shields.io/badge/Platform-Windows_10%2F11-blue?style=for-the-badge)](https://github.com/Tsuenoku/Antigravity-Enhance-Pack-Tools)
-[![UI](https://img.shields.io/badge/UI-Dual_Theme_GUI-purple?style=for-the-badge)](https://github.com/Tsuenoku/Antigravity-Enhance-Pack-Tools)
-[![Zero Dependency](https://img.shields.io/badge/Runtime-Zero_Dependency-orange?style=for-the-badge)](https://github.com/Tsuenoku/Antigravity-Enhance-Pack-Tools)
+[![License](https://img.shields.io/badge/License-MIT-10b981?style=for-the-badge)](LICENSE)
+[![Platform](https://img.shields.io/badge/Platform-Windows_10%2F11_(x64)-0284c7?style=for-the-badge)](https://github.com/Tsuenoku/Antigravity-Enhance-Pack-Tools)
+[![UI](https://img.shields.io/badge/UI-Dual_Theme_GUI-8b5cf6?style=for-the-badge)](https://github.com/Tsuenoku/Antigravity-Enhance-Pack-Tools)
+[![Runtime](https://img.shields.io/badge/Runtime-Zero_Dependency-f59e0b?style=for-the-badge)](https://github.com/Tsuenoku/Antigravity-Enhance-Pack-Tools)
+
+<p align="center">
+  <a href="#-核心概念">核心概念</a> • 
+  <a href="#-支持项目">支持项目</a> • 
+  <a href="#-特色">特色</a> • 
+  <a href="#-工作流程">工作流程</a> • 
+  <a href="#-部署指南">部署指南</a> • 
+  <a href="#-型号与应用">型号与应用</a> • 
+  <a href="#-零配置资产与版本同步">零配置资产与版本同步</a> • 
+  <a href="#-api-参考">API 参考</a> • 
+  <a href="#-软件更新变更日志">变更日志</a> • 
+  <a href="#-许可证与安全声明">许可证与安全声明</a>
+</p>
 
 </div>
 
@@ -20,145 +33,268 @@
 ## 🌟 视觉展示 (Showcase)
 
 ### 1. 现代化双主题 GUI 安装向导 (`Antigravity增强与汉化工具.exe`)
-支持在窗口右上角实时一键无缝切换「☀️ 浅色明亮」与「🌙 深色极夜」主题，具备路径自动识别、平滑进度条与滚动控制台日志：
+内置平滑圆角卡片、ClearType 高清文字排版、目录智能自适应探测引擎，支持右上角一键无缝切换「☀️ 浅色明亮」与「🌙 深色极夜」模式：
 
 | ☀️ 现代浅色模式 (默认) | 🌙 深色极夜模式 (一键切换) |
 | :---: | :---: |
-| <img src="assets/gui_installer_light_preview.png" width="420" /> | <img src="assets/gui_installer_dark_preview.png" width="420" /> |
+| <img src="assets/gui_installer_light_preview.png" width="450" /> | <img src="assets/gui_installer_dark_preview.png" width="450" /> |
 
 ### 2. 客户端内嵌增强功能实测
-客户端运行时丝滑流畅，彻底消除死循环，毫秒级响应每一轮对话交互：
+消除 DOM 监听震荡死循环，毫秒级响应每一轮对话交互：
 
 | 实时上下文用量浮窗与底栏彩色胶囊 | 模型选择菜单 4 挡思考能力动态滑块 |
 | :---: | :---: |
-| <img src="assets/verified_anti_freeze_live.png" width="420" /> | <img src="assets/verified_model_slider_live.png" width="420" /> |
+| <img src="assets/verified_anti_freeze_live.png" width="450" /> | <img src="assets/verified_model_slider_live.png" width="450" /> |
 
 ---
 
-## ✨ 核心特性矩阵 (Feature Matrix)
+## 🧠 核心概念
 
-| 功能特性 | 说明描述 | 状态 |
+**Antigravity Enhance Tools** 是一套专为 **Google Antigravity** 官方桌面客户端量身定制的原生扩展与体验增强系统。不同于传统的文本正则暴力替换或脆弱的内存热挂钩方案，本项目采用**全原生 AST 解构与响应式注入（Pure Native AST & Reactive Injection）**架构：
+
+1. **结构化 AST 安全注入**：在保证 Electron 核心包 (`workbench.desktop.main.js`) 语法树完备性的前提下，安全嵌入扩展主控入口，不破坏 V8 字节码运行拓扑。
+2. **独创 DOM 缓存守卫（Cache Guard）**：为杜绝 Electron + React 单页频繁重新渲染触发的 `MutationObserver` 递归卡死与死循环，所有注入节点均具备状态缓存指纹校验，仅在真实数据变动时操作 DOM。
+3. **React Fiber 响应式状态感知**：深度订阅宿主底层的状态总线，无须侵入式修改后端代码即可实时捕捉会话切换、步骤演进与 Token 增量变动。
+4. **无损原子化还原体系**：具备完整的官方原生包快照备份（`.bak`）与校验机制，任何时候均可秒级无损一键还原官方纯净环境。
+
+---
+
+## 📦 支持项目
+
+| 维度 | 支持范围 / 兼容矩阵 | 状态 |
 | :--- | :--- | :---: |
-| **🈳 全界面深度汉化** | 全面汉化原生客户端顶部菜单栏、视窗、侧边栏导航、对话输入框、配置弹窗及各组件提示语，100% 词条覆盖率。 | ✔ 已就绪 |
-| **📈 真实上下文动态监测** | 监听底层响应式状态，每发送一轮消息、执行一个工具或生成回复，上下文用量与 Token 毫秒级即时更新。 | ✔ 已就绪 |
-| **🎯 模型上下文上限自适应** | 动态适配不同模型最大额度：**Gemini 1.05M**、**Claude 4.6 250K**、**Claude 3.7/3.5 200K**、**GPT 系列 128K**，拒绝固定虚假数值。 | ✔ 已就绪 |
-| **🌈 五层分段占比卡片** | 细化呈现「🔵已缓存上下文」、「🟢输入载荷」、「🟣思维推理」、「🔴回复生成」与「⚪剩余可用量」，内置 `/compact` 压缩快捷指令。 | ✔ 已就绪 |
-| **🧠 思考能力 4 挡动态滑块** | 嵌入模型切换面板，提供「关闭 / 低 / 中 / 高」四挡顺滑拖拽调节，绑定当前选定模型，最高挡尊享紫粉微光。 | ✔ 已就绪 |
-| **📊 实时额度与消耗面板** | 侧边栏常驻实时额度卡片，支持 Gemini / Claude 额度多周期轮询与手动刷新。 | ✔ 已就绪 |
-| **💎 极简淡色 PRO 徽标** | 替换原高饱和刺眼标识，改用优雅低调的淡紫微光 PRO 胶囊勋章，与整体暗色/亮色风格完美契合。 | ✔ 已就绪 |
-| **✨ 现代视效与原生沉浸交互** | 重构应用视觉标识体系，深度适配现代沉浸式交互流与暗/浅色界面视觉规范。 | ✔ 已就绪 |
-| **🛡️ 防死循环守护引擎** | 独创 **DOM 缓存守卫（Cache Guard）** 与主控防重入锁，彻底杜绝 MutationObserver 递归卡死与内存映射字节码损坏。 | ✔ 已就绪 |
-| **📦 零依赖单文件 GUI 安装器** | 基于原生 C# / WPF 编译，无须安装任何额外环境，双击即开，集安装、更新、还原于一体。 | ✔ 已就绪 |
+| **官方宿主** | Google Antigravity 官方桌面客户端 (Windows 10 / 11 64位) | ✔ 完美支持 |
+| **底层架构** | Electron 28+ / Chromium 120+ / Node.js 18+ (ASAR 打包体系) | ✔ 完美适配 |
+| **跨平台路线** | macOS (Apple Silicon / Intel) 与 Linux 平台适配计划 | 🔄 研发规划中 |
+| **语言环境** | 中文简体 (zh-CN) 100% 覆盖率，保留原生英文快速切换能力 | ✔ 官方级润色 |
+| **模型上下文** | Gemini 2.0 / 1.5 系列 (1.05M)、Claude 3.7 / 3.5 系列 (200K~250K)、GPT-4o / o1 系列 (128K) | ✔ 动态精准识别 |
 
 ---
 
-## 🚀 快速开始 (Quick Start)
+## ✨ 特色
 
-### 方式一：使用独立 GUI 安装器 (推荐)
-1. 从 [Releases 页面](https://github.com/Tsuenoku/Antigravity-Enhance-Pack-Tools/releases) 下载最新版 **`Antigravity增强与汉化工具.exe`**。
-2. 双击直接运行（无需安装额外运行库）。
-3. 程序将自动检测您的 Antigravity 安装目录，确认无误后点击 **「🚀 一键安装 / 更新增强补丁」**。
-4. 安装完成后，程序将自动重新启动客户端，即可享受全新的交互与汉化体验！
-5. 若需恢复官方原版，随时点击 **「↺ 一键还原官方原版」** 即可。
+### 🈳 全界面原生深度汉化
+- **词条 100% 深度覆盖**：全面汉化客户端菜单栏、工作区视窗、侧边栏导航、对话输入框、配置面板及各组件提示语。
+- **专业级术语润色**：针对大语言模型、上下文预算、Agent 智能体、结对编程场景进行母语级精细校准，彻底告别机器翻译的生硬感。
 
-### 方式二：使用离线归档扩展包
-1. 下载 **`Antigravity-Enhance-Pack.zip`** 并解压。
-2. 运行目录内的 `Antigravity增强与汉化工具.exe`。
-3. 随时随地随拷随用，换电脑、重装系统皆可一键生效。
+### 📈 真实上下文动态遥测
+- **底栏常驻高灵敏胶囊**：实时显示当前对话消耗的 Token 精确数值与使用百分比（如 `6.4K / 250K (2.6%)`）。
+- **五段式分层占比卡片**：点击悬浮展开「🔵已缓存上下文」、「🟢输入载荷」、「🟣思维推理」、「🔴回复生成」与「⚪剩余可用量」，内置 `/compact` 压缩快捷键。
+
+### 🧠 思考能力 (Thinking) 4 挡动态滑块
+- **模型菜单原生植入**：在模型切换面板中注入平滑拖拽滑块，支持「关闭 / 低 / 中 / 高」4 挡无级切换。
+- **配置即时同步**：自动与所选模型思考参数进行状态绑定，最高挡尊享紫粉渐变流光视觉动效。
+
+### 📊 实时额度与状态看板
+- **侧边栏常驻监控卡片**：集成 Gemini 官方额度与 Claude 额度多周期轮询机制，支持手动一键刷新。
+
+### 💎 极简淡色微光 PRO 徽标
+- **去除刺眼高饱和反差**：将原有突兀的标识替换为低饱和极简淡紫微光 PRO 徽标胶囊，与整体编辑器风格融为一体。
+
+### 🛡️ 防死循环守护引擎
+- **DOM 缓存守卫（Cache Guard）**：通过建立节点哈希指纹，防止重复插入节点引发死锁崩溃。
+- **防重入锁机制**：确保多线程与异步消息突发时不发生逻辑竞态冲突。
+
+### 🎨 现代化双主题 GUI 安装向导
+- **零依赖独立单文件**：基于原生 C# / WPF 编译，无须额外安装环境，双击即开。
+- **双主题无缝切换**：右上角一键切换「浅色明亮」与「深色极夜」模式，自适应高分屏 ClearType 字体抗锯齿。
 
 ---
 
-## 🛠️ 从源码构建 (Build from Source)
+## 🏗 工作流程
 
-本项目完全开源，您可以自行检视所有代码并一键编译：
+### 架构数据流图 (Architecture Data Flow)
 
-### 环境要求
-- **操作系统**：Windows 10 / Windows 11 (x64)
-- **编译工具**：Windows 自带的 `csc.exe` (.NET Framework 4.0+)
-- **脚本引擎**：Node.js 18.0 或更高版本
+```mermaid
+graph TD
+    User([开发者 / 用户]) -->|双击运行| GUI[InstallerApp.cs 原生双主题 GUI]
+    GUI -->|1. 智能探测| PROBE[注册表 / AppData / Programs 路径探针]
+    GUI -->|2. 调用| PATCH[patcher.js 安全部署引擎]
+    
+    subgraph CoreEngine [核心注入与安全引擎]
+        PATCH -->|提取与解包| ASAR[core.asar / workbench.js]
+        PATCH -->|建立备份| BAK[workbench.desktop.main.js.bak]
+        PATCH -->|注入运行时钩子| INJECT[i18n_runner.js 运行时核心]
+        INJECT -->|加载词条映射| DICT[i18n_data.json 深度汉化词库]
+        PATCH -->|原子封包| REPACK[原子级安全打包写入]
+    end
+    
+    subgraph ClientRuntime [Antigravity 客户端运行时]
+        REPACK -->|自动拉起| CLIENT[Antigravity Desktop]
+        CLIENT -->|React Fiber 状态监听| MONITOR[agentStateProvider 动态订阅]
+        MONITOR -->|Token / 步骤演进| CTX[五段式上下文遥测面板]
+        CLIENT -->|DOM 监听| GUARD[DOM 缓存守卫引擎 Cache Guard]
+        GUARD -->|精准文本替换| RENDER[汉化渲染 & PRO 徽标]
+        CLIENT -->|模型面板渲染| SLIDER[4 挡思考能力动态调节滑块]
+    end
 
-### 一键构建流程
+    User -.->|需要时随时恢复| UNPATCH[unpatcher.js 原生官方无损还原]
+    UNPATCH -.->|还原备份| BAK
+```
+
+### 核心模块职责说明
+- **`InstallerApp.cs`**：原生 C# WPF GUI 宿主，提供现代化圆角窗口、双主题切换、智能目录探测与交互日志流输出。
+- **`patcher.js`**：负责 Node.js 运行环境下的 `asar` 解包、语法树锚点识别、安全注入与原子封包部署。
+- **`unpatcher.js`**：官方原版还原引擎，校验 `.bak` 备份文件完整性并执行回滚。
+- **`i18n_runner.js`**：客户端注入核心，承载 DOM 缓存守卫、React 响应式订阅、思考滑块控制与 Token 度量。
+- **`i18n_data.json`**：全量界面词条双语映射表，经过多轮人工校对。
+
+---
+
+## 🚀 部署指南
+
+### 方式一：使用单文件 GUI 安装器 (强烈推荐)
+
+1. 前往项目的 [Releases 页面](https://github.com/Tsuenoku/Antigravity-Enhance-Pack-Tools/releases) 下载最新版本的 **`Antigravity增强与汉化工具.exe`**。
+2. 双击直接运行（程序会自动寻找您的 Antigravity 安装目录）。
+3. 确认路径无误后，点击 **「🚀 一键安装 / 更新增强补丁」**。
+4. 安装完成后，程序将自动重新启动客户端，即可享受全新的全中文与增强交互体验！
+
+> [!TIP]
+> 如果您的客户端安装在非默认盘符，程序提供了 **「🔍 自动搜索」** 按钮与 **「浏览...」** 按钮，方便随时手动重探或指定目录。
+
+### 方式二：使用绿色离线扩展包
+
+1. 下载 **`Antigravity-Enhance-Pack.zip`** 压缩包。
+2. 解压至本地任意目录，直接双击运行其中的 `Antigravity增强与汉化工具.exe`。
+3. 适合离线环境、企业内网或换机迁移使用。
+
+### 方式三：从源码自主构建
+
+本项目完全开源，构建过程透明可靠：
+
 ```bash
-# 1. 克隆代码仓库
+# 1. 克隆本仓库到本地
 git clone https://github.com/Tsuenoku/Antigravity-Enhance-Pack-Tools.git
 cd Antigravity-Enhance-Pack-Tools
 
-# 2. 执行构建脚本 (自动完成资源内嵌打包与 C# GUI 编译器调用)
+# 2. 执行一键构建脚本 (自动完成资源压缩、嵌入与 C# 编译器调用)
 node build.js
 
-# 或者直接双击运行
+# 或者在 Windows 控制台中直接执行
 build.bat
 ```
-构建成功后，将在当前目录输出单文件独立可执行程序 `Antigravity增强与汉化工具.exe`。
+构建成功后，将在根目录下生成独立的单文件可执行程序 `Antigravity增强与汉化工具.exe`。
+
+### 🔄 一键恢复官方原版
+若您在任何时候需要回到官方英文纯净版本：
+- 只需在 GUI 安装工具中点击 **「↺ 一键还原官方原版」**；
+- 程序将自动根据备份的 `.bak` 快照进行原子级复原，整个过程干净无残留。
 
 ---
 
-## 📂 项目结构 (Repository Structure)
+## 🎯 型号与应用
 
-```
-Antigravity-Enhance-Pack/
-├── assets/                          # 界面预览截图与品牌 Logo 资源
-│   ├── gui_installer_light_preview.png
-│   ├── gui_installer_dark_preview.png
-│   ├── verified_anti_freeze_live.png
-│   ├── verified_model_slider_live.png
-│   └── logo_v3_transparent.png
-├── core/                            # 核心注入运行时与词条资源
-│   ├── i18n_runner.js               # 客户端注入脚本 (DOM 缓存守卫、实时上下文、滑块逻辑)
-│   ├── i18n_data.json               # 深度汉化词条对照字典
-│   ├── icon.png                     # 高清聚变品牌图标 (PNG)
-│   ├── app.ico                      # Windows 原生图标文件 (ICO)
-│   └── node_modules/                # 解包与封包核心依赖 (@electron/asar)
-├── src/                             # 安装包源码目录
-│   ├── InstallerApp.cs              # 双主题现代化 WPF GUI 安装器源码
-│   ├── patcher.js                   # 自动化解包、注入与原子化部署引擎
-│   └── unpatcher.js                 # 官方原生纯净版还原脚本
-├── build.js                         # 自动化资源打包与 C# 编译管线
-├── build.bat                        # Windows 批处理一键构建脚本
-├── .gitignore                       # Git 忽略配置
-├── LICENSE                          # MIT 开源许可证
-└── README.md                        # 项目官方中英文档
-```
+### 1. 动态上下文阈值适配矩阵
+
+不同模型具有不同的上下文窗口物理极限，本扩展自动感应当前会话模型并动态调整监控刻度，杜绝虚假数值：
+
+| 模型代号 / 族系 | 最大上下文规格 | 动态色标与预警阈值 | 建议应用场景 |
+| :--- | :---: | :---: | :--- |
+| **Gemini 2.0 / 1.5 Pro / Flash** | **1,048,576 Token** (1.05M) | > 80% 触发橙色，> 90% 触发红色 | 超大型代码库全仓分析、长视频/长文档理解 |
+| **Claude 3.7 Sonnet (Hybrid)** | **250,000 Token** (250K) | > 75% 触发橙色，> 85% 触发红色 | 复杂架构重构、长链条逻辑推演、Thinking 模式 |
+| **Claude 3.5 Sonnet** | **200,000 Token** (200K) | > 75% 触发橙色，> 85% 触发红色 | 日常高强度敏捷编码、精细化重构 |
+| **OpenAI o1 / o3-mini** | **128,000 Token** (128K) | > 70% 触发橙色，> 85% 触发红色 | 算法竞赛、数学计算、复杂逻辑证明 |
+| **GPT-4o / GPT-4 Turbo** | **128,000 Token** (128K) | > 70% 触发橙色，> 85% 触发红色 | 常规自然语言转换、工具调用协同 |
+
+### 2. 核心应用场景
+- **长对话防爆仓**：在大型工程推进中，通过底栏百分比实时掌握上下文厚度，在接近危险线时主动使用 `/compact`。
+- **思考深度灵活分配**：针对简单任务将思考滑块设为「低」或「关闭」以获得极速响应；面对底层疑难 Bug 时拖拽至「高」开启最大深度思考。
+- **企业与团队无障碍协作**：彻底消除英文界面阅读阻碍，降低新员工上手难度与认知负担。
 
 ---
 
-## 🛡️ 技术原理与架构设计
+## 🔄 零配置资产与版本同步
 
-### 1. 独创 DOM 缓存守卫 (Cache Guard)
-为解决 Electron + React 单页架构下频繁的 DOM 树重绘引发的监听器循环震荡问题，在所有注入点实施了强一致性缓存守卫：
+### 1. 内存载荷零网络嵌入
+- 工具采用离线自包含打包策略：`build.js` 将汉化词库 `i18n_data.json`、运行引擎 `i18n_runner.js`、补丁脚本及相关资产经过 Deflate 压缩打包为 `payload.zip`，并作为资源文件直接编译进 C# 可执行程序内部。
+- 运行时在系统临时安全沙箱释放与自清理，实现真正的**零网络请求、零外部依赖、即开即用**。
+
+### 2. 官方客户端更新兼容策略
+- 当 Google Antigravity 官方发布客户端升级（覆盖覆盖更新）后，您无需等待本工具发布新版本；
+- 再次启动 `Antigravity增强与汉化工具.exe` 点击「一键安装 / 更新增强补丁」，补丁引擎将针对新版本的 `workbench.desktop.main.js` 重新执行 AST 识别与安全锚点注入，秒级完成对新版本的支持。
+
+---
+
+## 🔌 API 参考
+
+本扩展在 Antigravity 客户端渲染层（Renderer Process）暴露了全局安全钩子与响应式接口，供高级开发者进行调试或二次开发：
+
+### 全局接口 (`window.__AGY_*`)
+
+#### 1. `window.__AGY_MOUNT_CONTEXT_USAGE__()`
+手动触发一次上下文 Token 用量分析与底栏胶囊重新计算渲染。
 ```javascript
-// 仅在真实内容发生变更时才允许操作 DOM 节点，彻底杜绝无谓重绘与事件循环死锁
-if (trigger.__agyLastHTML !== newHTML) {
-    trigger.__agyLastHTML = newHTML;
-    trigger.innerHTML = newHTML;
+// 手动刷新上下文数据
+if (typeof window.__AGY_MOUNT_CONTEXT_USAGE__ === 'function') {
+    window.__AGY_MOUNT_CONTEXT_USAGE__();
 }
 ```
 
-### 2. 毫秒级动态上下文响应式订阅
-通过智能探测 React Fiber 树上的 `agentStateProvider` 实例并建立事件监听：
-```javascript
-// 挂载响应式信号：当对话步骤与 Token 状态产生变化时，毫秒级更新底栏胶囊与浮窗卡片
-asp.onDidChange(() => {
-    if (typeof window.__AGY_MOUNT_CONTEXT_USAGE__ === 'function') {
-        window.__AGY_MOUNT_CONTEXT_USAGE__();
-    }
-});
+#### 2. `window.__AGY_ACTIVE_SESSION_DATA__`
+只读对象，存储当前会话的上下文统计信息：
+```typescript
+interface ActiveSessionContext {
+    usedTokens: number;        // 已消耗 Token 总数
+    limitTokens: number;       // 当前模型上限 Token
+    usagePercentage: number;   // 占用百分比 (0.0 ~ 100.0)
+    cachedTokens?: number;     // 命中缓存的 Token 数量
+    inputTokens?: number;      // 本轮输入提示词载荷
+    thinkingTokens?: number;   // 思考推理阶段消耗
+    outputTokens?: number;     // 生成回复消耗
+    modelName: string;         // 当前激活的模型标识
+}
 ```
 
-### 3. 原子化安全部署机制
-避免热写运行中进程的内存映射文件（V8 Bytecode Memory Mapping），独立 GUI 工具采用进程互斥检测与原子替换流程：
-`优雅退出进程 -> 释放文件锁定 -> 备份原版 asar -> 注入核心钩子 -> 原子封包 -> 部署生效 -> 自动唤起客户端`。
+#### 3. `window.__AGY_APPLY_THINKING_LEVEL__(level: 'off' | 'low' | 'med' | 'high')`
+程序化设置当前会话的思考等级。
+```javascript
+// 切换为高深度思考模式
+window.__AGY_APPLY_THINKING_LEVEL__('high');
+```
 
 ---
 
-## ⚖️ 免责声明 (Disclaimer)
+## 📝 软件更新变更日志
 
-- 本项目为社区开源项目，仅供技术交流与学习参考。
-- Antigravity 与 Google Gemini 是其对应所有者的商标。本项目与之无官方隶属关系。
-- 软件已提供一键还原官方功能，备份文件将始终保存在 `resources/app.asar.bak`。
+本项目遵循语义化版本递增规范（`v0.1.x` 逢十进一）：
+
+### [v0.1.2] - 2026-09-21
+- **界面与交互**：
+  - 重构 GUI 安装器为现代化圆角卡片视窗，全屏控件统一应用平滑圆角设计；
+  - 增加右上角「浅色明亮 / 深色极夜」双主题一键实时无缝切换；
+  - 优化 ClearType 高清文字排版与抗锯齿渲染，彻底解决半透明窗口下的字体发虚模糊；
+  - 重构复选框几何向量，实现对号绝对居中对齐；
+- **核心引擎**：
+  - 新增安装路径智能手动重新搜索按钮，保留原有手动浏览文件夹功能；
+  - 增强补丁部署与还原时的互斥进程识别与释放机制。
+
+### [v0.1.1] - 2026-09-20
+- **交互与功能增强**：
+  - 增加模型面板「思考能力 4 挡调节滑块（关闭 / 低 / 中 / 高）」；
+  - 引入底栏五段式真实上下文 Token 动态遥测与悬浮卡片；
+  - 接入侧边栏实时额度轮询看板；
+- **稳定性与性能**：
+  - 研发独创 DOM 缓存守卫（Cache Guard），彻底解决 `MutationObserver` 死循环导致的客户端卡死与闪退。
+
+### [v0.1.0] - 2026-09-19
+- **首发版本**：
+  - 实现了 Antigravity 官方桌面客户端的全界面原生深度汉化；
+  - 实现了基于 C# WPF 的独立安装引导程序；
+  - 支持原生 asar 解包、语法树分析、注入与无损还原。
 
 ---
 
-## 📄 开源许可证 (License)
+## 📜 许可证与安全声明
 
-本项目基于 [MIT License](LICENSE) 协议完全开源，允许自由使用、分发与二次修改。欢迎提交 PR 与 Issue！
+### 开源许可证
+本项目遵循 [MIT License](LICENSE) 许可协议开放源代码。您可以自由地使用、修改和分发本项目，但需保留原作者版权声明与许可申明。
+
+### 安全与隐私承诺
+- **100% 本地运行**：本工具的所有汉化、界面补丁和逻辑注入均在您的本机环境执行，不会上传任何用户的代码、聊天记录、API 密钥或账户信息至第三方服务器。
+- **纯粹的前端增强**：本扩展仅针对客户端界面呈现与前端交互进行优化，未修改任何后端加密通讯逻辑与协议签名。
+- **安全可溯源**：所有代码与打包脚本均公开可见，无任何暗桩、后门或混淆代码。
+
+### 免责声明
+- Google Antigravity 是 Google LLC 的商标。本项目为独立开源社区作品，与 Google LLC 及其关联实体不存在任何隶属、认可、赞助或官方合作关系。
+- 请在遵循相关服务条款与许可的前提下合理使用本工具。
