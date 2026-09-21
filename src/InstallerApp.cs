@@ -100,6 +100,14 @@ namespace AntigravityInstaller
             AllowsTransparency = true;
             Background = Brushes.Transparent;
 
+            // Enable pixel snapping and ClearType rendering for crisp text
+            UseLayoutRounding = true;
+            SnapsToDevicePixels = true;
+            TextOptions.SetTextFormattingMode(this, TextFormattingMode.Display);
+            TextOptions.SetTextRenderingMode(this, TextRenderingMode.ClearType);
+            RenderOptions.SetClearTypeHint(this, ClearTypeHint.Enabled);
+            FontFamily = new FontFamily("Microsoft YaHei UI, Segoe UI, sans-serif");
+
             BuildUI();
             ApplyTheme(isDarkMode);
             DetectPath(false);
@@ -114,8 +122,12 @@ namespace AntigravityInstaller
                 Margin = new Thickness(10), // Reserved outer space for smooth drop shadow without OS clipping
                 BorderThickness = new Thickness(1),
                 CornerRadius = new CornerRadius(16),
-                SnapsToDevicePixels = true
+                SnapsToDevicePixels = true,
+                UseLayoutRounding = true
             };
+            TextOptions.SetTextFormattingMode(rootBorder, TextFormattingMode.Display);
+            TextOptions.SetTextRenderingMode(rootBorder, TextRenderingMode.ClearType);
+            RenderOptions.SetClearTypeHint(rootBorder, ClearTypeHint.Enabled);
 
             var mainGrid = new Grid();
             mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(46) }); // Header
@@ -519,6 +531,7 @@ namespace AntigravityInstaller
                 txtLog.Foreground = new SolidColorBrush(Color.FromRgb(148, 163, 184));
 
                 chkAutoLaunch.Foreground = new SolidColorBrush(Color.FromRgb(203, 213, 225));
+                UpdateCheckBoxStyle(chkAutoLaunch, true);
 
                 UpdateButtonStyle(btnRestore,
                     new SolidColorBrush(Color.FromRgb(30, 41, 59)),
@@ -610,6 +623,7 @@ namespace AntigravityInstaller
                 txtLog.Foreground = new SolidColorBrush(Color.FromRgb(51, 65, 85));
 
                 chkAutoLaunch.Foreground = new SolidColorBrush(Color.FromRgb(51, 65, 85));
+                UpdateCheckBoxStyle(chkAutoLaunch, false);
 
                 UpdateButtonStyle(btnRestore,
                     new SolidColorBrush(Color.FromRgb(255, 255, 255)),
@@ -671,6 +685,74 @@ namespace AntigravityInstaller
             template.Triggers.Add(disabledTrigger);
 
             btn.Template = template;
+        }
+
+        private void UpdateCheckBoxStyle(CheckBox chk, bool isDark)
+        {
+            var template = new ControlTemplate(typeof(CheckBox));
+            var stack = new FrameworkElementFactory(typeof(StackPanel));
+            stack.SetValue(StackPanel.OrientationProperty, Orientation.Horizontal);
+            stack.SetValue(StackPanel.VerticalAlignmentProperty, VerticalAlignment.Center);
+
+            // Modern Rounded Checkbox Box
+            var boxBorder = new FrameworkElementFactory(typeof(Border));
+            boxBorder.Name = "checkBorder";
+            boxBorder.SetValue(Border.WidthProperty, 17.0);
+            boxBorder.SetValue(Border.HeightProperty, 17.0);
+            boxBorder.SetValue(Border.CornerRadiusProperty, new CornerRadius(4.5));
+            boxBorder.SetValue(Border.BorderThicknessProperty, new Thickness(1.5));
+            boxBorder.SetValue(Border.BackgroundProperty, isDark
+                ? new SolidColorBrush(Color.FromRgb(15, 23, 42))
+                : Brushes.White);
+            boxBorder.SetValue(Border.BorderBrushProperty, isDark
+                ? new SolidColorBrush(Color.FromRgb(71, 85, 105))
+                : new SolidColorBrush(Color.FromRgb(203, 213, 225)));
+            boxBorder.SetValue(Border.SnapsToDevicePixelsProperty, true);
+
+            // Modern Rounded Checkmark Vector Icon
+            var checkPath = new FrameworkElementFactory(typeof(System.Windows.Shapes.Path));
+            checkPath.Name = "checkMark";
+            checkPath.SetValue(System.Windows.Shapes.Path.DataProperty, Geometry.Parse("M 3.5,8.5 L 6.8,12 L 13.5,4.5"));
+            checkPath.SetValue(System.Windows.Shapes.Path.StrokeProperty, Brushes.White);
+            checkPath.SetValue(System.Windows.Shapes.Path.StrokeThicknessProperty, 1.8);
+            checkPath.SetValue(System.Windows.Shapes.Path.StrokeStartLineCapProperty, PenLineCap.Round);
+            checkPath.SetValue(System.Windows.Shapes.Path.StrokeEndLineCapProperty, PenLineCap.Round);
+            checkPath.SetValue(System.Windows.Shapes.Path.StrokeLineJoinProperty, PenLineJoin.Round);
+            checkPath.SetValue(System.Windows.Shapes.Path.VisibilityProperty, Visibility.Collapsed);
+            checkPath.SetValue(System.Windows.Shapes.Path.HorizontalAlignmentProperty, HorizontalAlignment.Center);
+            checkPath.SetValue(System.Windows.Shapes.Path.VerticalAlignmentProperty, VerticalAlignment.Center);
+
+            boxBorder.AppendChild(checkPath);
+            stack.AppendChild(boxBorder);
+
+            // Text Label Presenter
+            var content = new FrameworkElementFactory(typeof(ContentPresenter));
+            content.SetValue(ContentPresenter.VerticalAlignmentProperty, VerticalAlignment.Center);
+            content.SetValue(ContentPresenter.MarginProperty, new Thickness(8, 0, 0, 0));
+            content.SetValue(ContentPresenter.RecognizesAccessKeyProperty, true);
+            stack.AppendChild(content);
+
+            template.VisualTree = stack;
+
+            // Trigger: Checked state
+            var checkedTrigger = new Trigger { Property = CheckBox.IsCheckedProperty, Value = true };
+            checkedTrigger.Setters.Add(new Setter(Border.BackgroundProperty, isDark
+                ? new SolidColorBrush(Color.FromRgb(37, 99, 235))
+                : new SolidColorBrush(Color.FromRgb(15, 23, 42)), "checkBorder"));
+            checkedTrigger.Setters.Add(new Setter(Border.BorderBrushProperty, isDark
+                ? new SolidColorBrush(Color.FromRgb(37, 99, 235))
+                : new SolidColorBrush(Color.FromRgb(15, 23, 42)), "checkBorder"));
+            checkedTrigger.Setters.Add(new Setter(System.Windows.Shapes.Path.VisibilityProperty, Visibility.Visible, "checkMark"));
+            template.Triggers.Add(checkedTrigger);
+
+            // Trigger: Mouse hover state
+            var hoverTrigger = new Trigger { Property = CheckBox.IsMouseOverProperty, Value = true };
+            hoverTrigger.Setters.Add(new Setter(Border.BorderBrushProperty, isDark
+                ? new SolidColorBrush(Color.FromRgb(96, 165, 250))
+                : new SolidColorBrush(Color.FromRgb(71, 85, 105)), "checkBorder"));
+            template.Triggers.Add(hoverTrigger);
+
+            chk.Template = template;
         }
 
         private void UpdateWindowButtonStyle(Button btn, bool isClose, bool isDark)
