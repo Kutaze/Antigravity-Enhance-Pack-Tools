@@ -126,7 +126,37 @@ const tempOutAsar = path.join(__dirname, '.temp_patched.asar');
             fs.rmSync(tempSandbox, { recursive: true, force: true });
         }
         process.noAsar = false;
-        asar.extractAll(asarPath, tempSandbox);
+        // Always extract from official backup to avoid layering patches on top of each other
+        if (fs.existsSync(backupPath)) {
+            try {
+                asar.extractAll(backupPath, tempSandbox);
+            } catch(e) {
+                // bak.unpacked may be missing; fall back to live asar
+                if (fs.existsSync(tempSandbox)) fs.rmSync(tempSandbox, { recursive: true, force: true });
+                asar.extractAll(asarPath, tempSandbox);
+            }
+            // Copy the live unpacked dir into sandbox to supplement any missing native modules
+            const liveUnpacked = asarPath + '.unpacked';
+            const sandboxUnpacked = path.join(tempSandbox, 'node_modules');
+            if (fs.existsSync(liveUnpacked)) {
+                const copyDirSync = (src, dst) => {
+                    if (!fs.existsSync(dst)) fs.mkdirSync(dst, { recursive: true });
+                    for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
+                        const s = path.join(src, entry.name), d = path.join(dst, entry.name);
+                        if (entry.isDirectory()) copyDirSync(s, d);
+                        else if (!fs.existsSync(d)) try { fs.copyFileSync(s, d); } catch(e) {}
+                    }
+                };
+                // liveUnpacked contains node_modules subfolders - merge into sandbox node_modules
+                try {
+                    const nodeModsInUnpacked = path.join(liveUnpacked, 'node_modules');
+                    if (fs.existsSync(nodeModsInUnpacked)) copyDirSync(nodeModsInUnpacked, sandboxUnpacked);
+                    else copyDirSync(liveUnpacked, path.join(tempSandbox, 'unpacked_modules'));
+                } catch(e) {}
+            }
+        } else {
+            asar.extractAll(asarPath, tempSandbox);
+        }
         process.noAsar = true;
 
         // Ensure client official icon is always preserved (never replaced by custom project logo)
@@ -157,9 +187,13 @@ const tempOutAsar = path.join(__dirname, '.temp_patched.asar');
         // 6. Patch utils.js
         let utilsContent = fs.readFileSync(utilsJs, 'utf8');
 
-        // Remove old injectAntigravityI18n if exists
-        const topFuncRegex = /const injectAntigravityI18n =[\s\S]*?exports\.injectAntigravityI18n = injectAntigravityI18n;\s*/;
+        // Remove ALL previous AGY injection blocks to prevent stacking (use global replace)
+        const topFuncRegex = /const injectAntigravityI18n =[\s\S]*?exports\.injectAntigravityI18n = injectAntigravityI18n;\s*/g;
         utilsContent = utilsContent.replace(topFuncRegex, '');
+        // Also remove the IPC bridge block if present (global replace to catch all copies)
+        const ipcBridgeRegex = /\/\/ Antigravity Native Screenshot[\s\S]*?} catch\(e\) \{\}\s*/g;
+        utilsContent = utilsContent.replace(ipcBridgeRegex, '');
+
 
         const safeInjectFn = `
 const injectAntigravityI18n = (wc) => {
@@ -234,8 +268,8 @@ try {
                             seen.add(f);
                             const content = _fs.readFileSync(skillPath, 'utf8');
                             let desc = '';
-                            const mDesc = content.match(/description:\s*([^\r\n]+)/i);
-                            if (mDesc) desc = mDesc[1].trim().replace(/^['"]|['"]$/g, '');
+                            const descLine = content.split('\n').find(l => /^description:/i.test(l.trim()));
+                            if (descLine) desc = descLine.replace(/^description:\\s*/i, '').trim().replace(/^['""]|['""]$/g, '');
                             result.push({ id: f, name: f, description: desc });
                         }
                     }
@@ -331,7 +365,19 @@ try {
 
         // 9. Deploy to resources/app.asar
         console.log('\n[6/6] 正在部署增强包至客户端目录...');
-        fs.copyFileSync(tempOutAsar, asarPath);
+        // Use rename-swap to bypass Windows file locking (Electron may have app.asar open)
+        const oldAsarTmp = asarPath + '.old_deploy';
+        try { if (fs.existsSync(oldAsarTmp)) fs.unlinkSync(oldAsarTmp); } catch(e) {}
+        try {
+            // Try atomic rename swap: rename old -> .old_deploy, rename new -> app.asar
+            fs.renameSync(asarPath, oldAsarTmp);
+            fs.renameSync(tempOutAsar, asarPath);
+            try { fs.unlinkSync(oldAsarTmp); } catch(e) {}
+        } catch (renameErr) {
+            // Fallback: direct copy
+            try { if (fs.existsSync(oldAsarTmp)) fs.renameSync(oldAsarTmp, asarPath); } catch(e) {}
+            fs.copyFileSync(tempOutAsar, asarPath);
+        }
 
         // 10. Cleanup
         try {
