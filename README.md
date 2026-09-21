@@ -7,11 +7,11 @@
 
 **专为 Google Antigravity 官方桌面客户端打造的工业级深度汉化与原生 UI 交互增强套件。**
 
-[![Release](https://img.shields.io/badge/Release-v0.1.2-6366f1?style=for-the-badge)](https://github.com/Tsuenoku/Antigravity-Enhance-Pack-Tools/releases)
+[![Release](https://img.shields.io/badge/Release-v0.1.2-6366f1?style=for-the-badge)](https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases)
 [![License](https://img.shields.io/badge/License-MIT-10b981?style=for-the-badge)](LICENSE)
-[![Platform](https://img.shields.io/badge/Platform-Windows_10%2F11_(x64)-0284c7?style=for-the-badge)](https://github.com/Tsuenoku/Antigravity-Enhance-Pack-Tools)
-[![UI](https://img.shields.io/badge/UI-Dual_Theme_GUI-8b5cf6?style=for-the-badge)](https://github.com/Tsuenoku/Antigravity-Enhance-Pack-Tools)
-[![Runtime](https://img.shields.io/badge/Runtime-Zero_Dependency-f59e0b?style=for-the-badge)](https://github.com/Tsuenoku/Antigravity-Enhance-Pack-Tools)
+[![Platform](https://img.shields.io/badge/Platform-Windows_10%2F11_(x64)-0284c7?style=for-the-badge)](https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools)
+[![UI](https://img.shields.io/badge/UI-Dual_Theme_GUI-8b5cf6?style=for-the-badge)](https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools)
+[![Runtime](https://img.shields.io/badge/Runtime-Zero_Dependency-f59e0b?style=for-the-badge)](https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools)
 
 <p align="center">
   <a href="#-核心概念">核心概念</a> • 
@@ -145,7 +145,7 @@ graph TD
 
 ### 方式一：使用单文件 GUI 安装器 (强烈推荐)
 
-1. 前往项目的 [Releases 页面](https://github.com/Tsuenoku/Antigravity-Enhance-Pack-Tools/releases) 下载最新版本的 **`Antigravity增强与汉化工具.exe`**。
+1. 前往项目的 [Releases 页面](https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases) 下载最新版本的 **`Antigravity增强与汉化工具.exe`**。
 2. 双击直接运行（程序会自动寻找您的 Antigravity 安装目录）。
 3. 确认路径无误后，点击 **「🚀 一键安装 / 更新增强补丁」**。
 4. 安装完成后，程序将自动重新启动客户端，即可享受全新的全中文与增强交互体验！
@@ -165,7 +165,7 @@ graph TD
 
 ```bash
 # 1. 克隆本仓库到本地
-git clone https://github.com/Tsuenoku/Antigravity-Enhance-Pack-Tools.git
+git clone https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools.git
 cd Antigravity-Enhance-Pack-Tools
 
 # 2. 执行一键构建脚本 (自动完成资源压缩、嵌入与 C# 编译器调用)

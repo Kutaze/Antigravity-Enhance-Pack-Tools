@@ -4,7 +4,7 @@ title 推送代码到 GitHub (Antigravity Enhance Tools)
 cd /d "%~dp0"
 cls
 echo ======================================================================
-echo   正在准备推送到 GitHub: Tsuenoku/Antigravity-Enhance-Pack-Tools
+echo   正在准备推送到 GitHub: Kutaze/Antigravity-Enhance-Pack-Tools
 echo ======================================================================
 echo.
 echo [原因定位]：
@@ -30,14 +30,14 @@ if "%TOKEN%"=="" (
 ) else (
     echo.
     echo [正在配置凭据并推送到远程仓库...]
-    git push -u https://%TOKEN%@github.com/Tsuenoku/Antigravity-Enhance-Pack-Tools.git main
+    git push -u https://%TOKEN%@github.com/Kutaze/Antigravity-Enhance-Pack-Tools.git main
 )
 
 echo.
 if %errorlevel% equ 0 (
     echo ======================================================================
     echo   ✔ 恭喜！代码与新版文档已成功全部推送到 GitHub 仓库！
-    echo   仓库地址: https://github.com/Tsuenoku/Antigravity-Enhance-Pack-Tools
+    echo   仓库地址: https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools
     echo ======================================================================
 ) else (
     echo ======================================================================
