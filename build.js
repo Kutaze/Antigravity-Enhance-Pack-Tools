@@ -54,12 +54,24 @@ if (fs.existsSync(oldExe)) {
     try { fs.unlinkSync(oldExe); } catch(e) {}
 }
 
-const cscCmd = `"${csc}" /target:winexe /optimize+ /platform:anycpu /r:System.Xaml.dll /r:System.IO.Compression.FileSystem.dll /r:System.IO.Compression.dll /r:"C:/Windows/Microsoft.NET/Framework64/v4.0.30319/WPF/PresentationCore.dll" /r:"C:/Windows/Microsoft.NET/Framework64/v4.0.30319/WPF/PresentationFramework.dll" /r:"C:/Windows/Microsoft.NET/Framework64/v4.0.30319/WPF/WindowsBase.dll" /win32icon:"${icoPath}" /resource:"${payloadZip}",payload.zip /resource:"${iconPng}",icon.png /out:"${mainExe}" "${installerCs}"`;
+const tempCompiledExe = path.join(distDir, '_build_temp.exe');
+if (fs.existsSync(tempCompiledExe)) {
+    try { fs.unlinkSync(tempCompiledExe); } catch(e) {}
+}
+
+const cscCmd = `"${csc}" /target:winexe /optimize+ /platform:anycpu /r:System.Xaml.dll /r:System.IO.Compression.FileSystem.dll /r:System.IO.Compression.dll /r:"C:/Windows/Microsoft.NET/Framework64/v4.0.30319/WPF/PresentationCore.dll" /r:"C:/Windows/Microsoft.NET/Framework64/v4.0.30319/WPF/PresentationFramework.dll" /r:"C:/Windows/Microsoft.NET/Framework64/v4.0.30319/WPF/WindowsBase.dll" /win32icon:"${icoPath}" /resource:"${payloadZip}",payload.zip /resource:"${iconPng}",icon.png /out:"${tempCompiledExe}" "${installerCs}"`;
 try {
     execSync(cscCmd);
-    console.log('Compiled GUI Installer:', mainExe, 'Size:', fs.statSync(mainExe).size);
-    fs.copyFileSync(mainExe, path.join(distDir, 'Antigravity Enhance Tools.exe'));
-    fs.copyFileSync(mainExe, path.join(distDir, 'Antigravity-Enhance-Tools-v0.1.3.exe'));
+    console.log('Compiled GUI Installer successfully to temp file, Size:', fs.statSync(tempCompiledExe).size);
+    try { execSync('taskkill /F /IM "Antigravity Enhance Tools.exe" 2>nul || exit 0', { shell: 'cmd.exe' }); } catch(e) {}
+    try { execSync('taskkill /F /IM "Antigravity增强与汉化工具.exe" 2>nul || exit 0', { shell: 'cmd.exe' }); } catch(e) {}
+    
+    fs.copyFileSync(tempCompiledExe, mainExe);
+    fs.copyFileSync(tempCompiledExe, path.join(distDir, 'Antigravity Enhance Tools.exe'));
+    fs.copyFileSync(tempCompiledExe, path.join(distDir, 'Antigravity-Enhance-Tools-v0.1.3.exe'));
+    try { fs.unlinkSync(tempCompiledExe); } catch(e) {}
+    console.log('Successfully deployed to:', mainExe);
+    
     const oldDistExe = path.join(distDir, 'Antigravity增强与汉化工具.exe');
     if (fs.existsSync(oldDistExe)) {
         try { fs.unlinkSync(oldDistExe); } catch(e) {}

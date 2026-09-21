@@ -5089,10 +5089,25 @@
         scheduleMasterSync();
     });
 
-    window.__AGY_MASTER_OBSERVER__.observe(document.body, {
-        childList: true,
-        subtree: true
-    });
+    function attachMasterObserver() {
+        if (!document.body || !window.__AGY_MASTER_OBSERVER__) return;
+        try {
+            window.__AGY_MASTER_OBSERVER__.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+        } catch (e) {}
+    }
+
+    if (document.body) {
+        attachMasterObserver();
+    } else {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', attachMasterObserver, { once: true });
+        } else {
+            setTimeout(attachMasterObserver, 50);
+        }
+    }
 
     console.log('[Antigravity Guardian] Single Master UI Coordinator active and stable.');
 })();

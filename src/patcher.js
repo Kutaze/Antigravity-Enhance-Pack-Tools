@@ -268,8 +268,17 @@ try {
                             seen.add(f);
                             const content = _fs.readFileSync(skillPath, 'utf8');
                             let desc = '';
-                            const descLine = content.split('\n').find(l => /^description:/i.test(l.trim()));
-                            if (descLine) desc = descLine.replace(/^description:\\s*/i, '').trim().replace(/^['""]|['""]$/g, '');
+                            const lines = content.split(String.fromCharCode(10));
+                            for (let li = 0; li < lines.length; li++) {
+                                const tr = lines[li].trim();
+                                if (tr.toLowerCase().indexOf('description:') === 0) {
+                                    desc = tr.substring(12).trim();
+                                    if ((desc.startsWith('"') && desc.endsWith('"')) || (desc.startsWith("'") && desc.endsWith("'"))) {
+                                        desc = desc.substring(1, desc.length - 1).trim();
+                                    }
+                                    break;
+                                }
+                            }
                             result.push({ id: f, name: f, description: desc });
                         }
                     }
