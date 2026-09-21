@@ -340,6 +340,20 @@ try {
                 utilsContent = utilsContent.replace(createWinNeedle, winListeners + '\n    ' + createWinNeedle);
             }
         }
+
+        // Zoom safe clamping to prevent corrupt extreme zoom (e.g. 3.5x) from blowing up the window
+        const zoomApplyNeedle = "win.webContents.setZoomLevel(level);";
+        if (utilsContent.includes(zoomApplyNeedle)) {
+            utilsContent = utilsContent.replace(
+                zoomApplyNeedle,
+                "if (isNaN(level) || level > 1.5 || level < -1.5) level = 0;\n                    win.webContents.setZoomLevel(level);"
+            );
+        }
+        const webPrefNeedle = "webPreferences: {";
+        if (utilsContent.includes(webPrefNeedle) && !utilsContent.includes("zoomFactor: 1.0")) {
+            utilsContent = utilsContent.replace(webPrefNeedle, "webPreferences: {\n            zoomFactor: 1.0,");
+        }
+
         fs.writeFileSync(utilsJs, utilsContent, 'utf8');
 
         // 7. Patch preload.js to expose screenshot bridge & skills bridge
@@ -423,6 +437,19 @@ try {
         try {
             if (fs.existsSync(tempSandbox)) fs.rmSync(tempSandbox, { recursive: true, force: true });
             if (fs.existsSync(tempOutAsar)) fs.unlinkSync(tempOutAsar);
+        } catch(e) {}
+
+        // 11. Clean any corrupted per_host_zoom_levels from Chromium Preferences
+        try {
+            const prefPath = path.join(process.env.APPDATA || '', 'Antigravity', 'Preferences');
+            if (fs.existsSync(prefPath)) {
+                const prefData = JSON.parse(fs.readFileSync(prefPath, 'utf8'));
+                if (prefData.partition && prefData.partition.per_host_zoom_levels) {
+                    delete prefData.partition.per_host_zoom_levels;
+                    fs.writeFileSync(prefPath, JSON.stringify(prefData, null, 2), 'utf8');
+                    console.log('  ✔ 成功清理 Chromium 异常残留缩放缓存 (Preferences)');
+                }
+            }
         } catch(e) {}
 
         console.log('\n====================================================');

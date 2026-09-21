@@ -537,6 +537,7 @@
       toast.style.transform = 'translateX(-50%) translateY(10px)';
     }, 2500);
   }
+  window.__AGY_SHOW_TOAST__ = showToast;
 
   // Native Image inserter for Lexical editor
   function insertImageIntoChatBox(dataUrl) {
@@ -5420,6 +5421,62 @@
         } else {
             setTimeout(attachMasterObserver, 50);
         }
+    }
+
+    // Global Zoom Hotkeys & Safety Guard
+    if (!window.__AGY_ZOOM_GUARD_BOUND__) {
+        window.__AGY_ZOOM_GUARD_BOUND__ = true;
+
+        window.addEventListener('keydown', (e) => {
+            const isCtrl = e.ctrlKey || e.metaKey;
+            if (!isCtrl) return;
+
+            // Ctrl + 0: Reset zoom to 100%
+            if (e.key === '0' || e.code === 'Digit0' || e.code === 'Numpad0') {
+                e.preventDefault();
+                if (window.electronNative && typeof window.electronNative.resetZoom === 'function') {
+                    window.electronNative.resetZoom();
+                }
+                if (window.__AGY_SHOW_TOAST__) {
+                    window.__AGY_SHOW_TOAST__('🔍 界面缩放已重置为 100% 默认大小');
+                }
+                return;
+            }
+
+            // Ctrl + = / Ctrl + +: Zoom in
+            if (e.key === '=' || e.key === '+' || e.code === 'Equal' || e.code === 'NumpadAdd') {
+                e.preventDefault();
+                if (window.electronNative && typeof window.electronNative.zoomIn === 'function') {
+                    window.electronNative.zoomIn();
+                    setTimeout(() => {
+                        try {
+                            const factor = Math.round((window.electronNative.getZoomLevel() || 1) * 100);
+                            if (window.__AGY_SHOW_TOAST__) {
+                                window.__AGY_SHOW_TOAST__(`🔍 界面放大：${factor}% (按 Ctrl+0 可重置)`);
+                            }
+                        } catch(err) {}
+                    }, 60);
+                }
+                return;
+            }
+
+            // Ctrl + -: Zoom out
+            if (e.key === '-' || e.code === 'Minus' || e.code === 'NumpadSubtract') {
+                e.preventDefault();
+                if (window.electronNative && typeof window.electronNative.zoomOut === 'function') {
+                    window.electronNative.zoomOut();
+                    setTimeout(() => {
+                        try {
+                            const factor = Math.round((window.electronNative.getZoomLevel() || 1) * 100);
+                            if (window.__AGY_SHOW_TOAST__) {
+                                window.__AGY_SHOW_TOAST__(`🔍 界面缩小：${factor}% (按 Ctrl+0 可重置)`);
+                            }
+                        } catch(err) {}
+                    }, 60);
+                }
+                return;
+            }
+        }, true);
     }
 
     console.log('[Antigravity Guardian] Single Master UI Coordinator active and stable.');
