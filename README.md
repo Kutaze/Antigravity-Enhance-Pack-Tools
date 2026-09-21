@@ -14,21 +14,29 @@
 [![Runtime](https://img.shields.io/badge/Runtime-Zero_Dependency-f59e0b?style=for-the-badge)](https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools)
 
 <p align="center">
-  <a href="#-核心概念">核心概念</a> • 
-  <a href="#-支持项目">支持项目</a> • 
+  <b>简体中文</b> • 
+  <a href="README_EN.md">English</a> • 
+  <a href="README_JA.md">日本語</a>
+</p>
+
+<p align="center">
   <a href="#-功能特色">功能特色</a> • 
-  <a href="#-工作流程">工作流程</a> • 
   <a href="#-部署指南">部署指南</a> • 
-  <a href="#-型号与应用">型号与应用</a> • 
-  <a href="#-零配置资产与版本同步">零配置资产与版本同步</a> • 
+  <a href="#-工作流程">工作流程</a> • 
   <a href="#-api-参考">API 参考</a> • 
-  <a href="#-变更日志">变更日志</a> • 
-  <a href="#-许可证与安全声明">许可证与安全声明</a>
+  <a href="#-变更日志">变更日志</a>
 </p>
 
 </div>
 
 ---
+
+### 多语言简介 / Multilingual Overview / 多言語概要
+
+- **简体中文**：专为 Google Antigravity 官方桌面客户端打造的全界面原生深度汉化与交互增强套件。支持动态上下文用量遥测、4 挡思考调节滑块、零依赖双主题 GUI 安装器与防卡死守护。
+- **English**: Native UI localization and interaction enhancement suite designed for the Google Antigravity desktop client. Features real-time context token telemetry, 4-level thinking slider, standalone dual-theme GUI installer, and zero-jank DOM guard.
+- **日本語**: Google Antigravity 公式デスクトップクライアント向けに設計されたネイティブ多言語化およびUI機能拡張スイート。リアルタイムコンテキスト測定、思考深度スライダー、独立型デュアルテーマGUIインストーラー、フリーズ防止ガードを搭載。
+
 
 ## 🌟 视觉展示 (Showcase)
 
