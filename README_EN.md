@@ -35,7 +35,7 @@
 
 ## 🌟 Showcase
 
-### 1. Modern Dual-Theme GUI Installer (`Antigravity增强与汉化工具.exe`)
+### 1. Modern Dual-Theme GUI Installer (`Antigravity Enhance Tools.exe`)
 Features rounded corners, ClearType typography, intelligent directory auto-detection, and seamless one-click switching between Light and Dark themes:
 
 | Modern Light Mode (Default) | Dark Obsidian Mode (One-Click) |
@@ -91,7 +91,7 @@ Throughout the architectural conception and UX design of **Antigravity Enhance T
 ## 🚀 Installation
 
 ### 1. Windows
-- Download **`Antigravity增强与汉化工具.exe`** from [Releases](https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases).
+- Download **`Antigravity Enhance Tools.exe`** from [Releases](https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases).
 - Run the executable, confirm path, and click **「一键安装 / 更新增强补丁」** (Install / Update Patch).
 
 ### 2. macOS & Linux

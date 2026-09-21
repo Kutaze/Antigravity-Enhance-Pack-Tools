@@ -42,7 +42,7 @@
 
 ## 🌟 视觉展示 (Showcase)
 
-### 1. 现代化双主题 GUI 安装向导 (`Antigravity增强与汉化工具.exe`)
+### 1. 现代化双主题 GUI 安装向导 (`Antigravity Enhance Tools.exe`)
 内置平滑圆角卡片、ClearType 高清文字排版、目录智能自适应探测引擎，支持右上角一键无缝切换「浅色明亮」与「深色极夜」模式：
 
 | 现代浅色模式 (默认) | 深色极夜模式 (一键切换) |
@@ -177,7 +177,7 @@ graph TD
 ### 1. Windows 用户部署
 
 #### 方式一：使用独立双主题 GUI 安装器 (推荐)
-1. 前往项目的 [Releases 页面](https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases) 下载最新版本的 **`Antigravity增强与汉化工具.exe`**。
+1. 前往项目的 [Releases 页面](https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases) 下载最新版本的 **`Antigravity Enhance Tools.exe`**。
 2. 双击直接运行（程序会自动识别您的 Antigravity 安装目录）。
 3. 确认路径无误后，点击 **「一键安装 / 更新增强补丁」**。
 4. 安装完成后，程序将自动重新启动客户端，即可享受全新的全中文与增强交互体验！
@@ -187,7 +187,7 @@ graph TD
 
 #### 方式二：使用绿色离线扩展包
 1. 下载 **`Antigravity-Enhance-Pack.zip`** 压缩包。
-2. 解压至本地任意目录，直接双击运行其中的 `Antigravity增强与汉化工具.exe`。
+2. 解压至本地任意目录，直接双击运行其中的 `Antigravity Enhance Tools.exe`。
 
 ---
 
@@ -274,7 +274,7 @@ build.bat
 
 ### 2. 官方客户端更新兼容策略
 - 当 Google Antigravity 官方发布客户端升级（覆盖覆盖更新）后，您无需等待本工具发布新版本；
-- 再次启动 `Antigravity增强与汉化工具.exe` 点击「一键安装 / 更新增强补丁」，补丁引擎将针对新版本的 `workbench.desktop.main.js` 重新执行 AST 识别与安全锚点注入，秒级完成对新版本的支持。
+- 再次启动 `Antigravity Enhance Tools.exe` 点击「一键安装 / 更新增强补丁」，补丁引擎将针对新版本的 `workbench.desktop.main.js` 重新执行 AST 识别与安全锚点注入，秒级完成对新版本的支持。
 
 ---
 

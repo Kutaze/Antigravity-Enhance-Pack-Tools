@@ -179,6 +179,38 @@ const injectAntigravityI18n = (wc) => {
     }
 };
 exports.injectAntigravityI18n = injectAntigravityI18n;
+
+// Antigravity Native Screenshot & Clipboard Bridge
+try {
+    const { ipcMain: _ipc, clipboard: _clip } = require('electron');
+    const { exec: _exec } = require('child_process');
+    if (!global.__agy_screenshot_bound) {
+        global.__agy_screenshot_bound = true;
+        _ipc.handle('antigravity:screenshot', async () => {
+            try {
+                if (process.platform === 'win32') {
+                    _exec('start ms-screenclip:');
+                } else if (process.platform === 'darwin') {
+                    _exec('screencapture -i -c');
+                } else {
+                    _exec('gnome-screenshot -a -c || flameshot gui');
+                }
+                return { success: true };
+            } catch(err) {
+                return { success: false, error: err.message };
+            }
+        });
+        _ipc.handle('antigravity:clipboard-image', async () => {
+            try {
+                const img = _clip.readImage();
+                if (!img || img.isEmpty()) return null;
+                return img.toDataURL();
+            } catch(err) {
+                return null;
+            }
+        });
+    }
+} catch(e) {}
 `;
 
         const exportMarker = 'exports.setupNodeWrapper = setupNodeWrapper;';
@@ -201,7 +233,23 @@ exports.injectAntigravityI18n = injectAntigravityI18n;
         }
         fs.writeFileSync(utilsJs, utilsContent, 'utf8');
 
-        // 7. Patch main.js
+        // 7. Patch preload.js to expose screenshot bridge
+        const preloadJs = path.join(distDir, 'preload.js');
+        if (fs.existsSync(preloadJs)) {
+            let preloadContent = fs.readFileSync(preloadJs, 'utf8');
+            if (!preloadContent.includes('takeScreenshot:')) {
+                const targetNeedle = "revealInFilePicker: (path) => electron_1.ipcRenderer.invoke('shell:reveal-in-file-picker', path),";
+                if (preloadContent.includes(targetNeedle)) {
+                    const extraApis = `
+    takeScreenshot: () => electron_1.ipcRenderer.invoke('antigravity:screenshot'),
+    getClipboardImage: () => electron_1.ipcRenderer.invoke('antigravity:clipboard-image'),`;
+                    preloadContent = preloadContent.replace(targetNeedle, targetNeedle + extraApis);
+                    fs.writeFileSync(preloadJs, preloadContent, 'utf8');
+                }
+            }
+        }
+
+        // 8. Patch main.js
         let mainContent = fs.readFileSync(mainJs, 'utf8');
         if (!mainContent.includes("web-contents-created")) {
             const whenReadyNeedle = "electron_1.app\n    .whenReady()\n    .then(async () => {";
@@ -260,6 +308,7 @@ exports.injectAntigravityI18n = injectAntigravityI18n;
         console.log('  ✔ 真实上下文用量监测、精准分段占比条与居中压缩功能');
         console.log('  ✔ 模型思考能力 4 挡动态滑块 (最高挡专属紫粉渐变，动静态模型绑定)');
         console.log('  ✔ 自定义插件中心扩展');
+        console.log('  ✔ 聊天输入框原生截图工具唤起与剪贴板图像自动填入');
         console.log('  ✔ 防死循环与防卡死主控协调器 (Master Coordinator)');
         console.log('====================================================\n');
         process.exit(0);

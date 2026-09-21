@@ -539,11 +539,107 @@
     }, 2500);
   }
 
-  // 3. UI Button Mount & Handling
+  // Native Image inserter for Lexical editor
+  function insertImageIntoChatBox(dataUrl) {
+    const editor = document.querySelector('[data-lexical-editor="true"], div[contenteditable="true"], textarea');
+    if (!editor) return;
+
+    try {
+      const arr = dataUrl.split(',');
+      const mime = arr[0].match(/:(.*?);/)[1];
+      const bstr = atob(arr[1]);
+      let n = bstr.length;
+      const u8arr = new Uint8Array(n);
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+      }
+      const blob = new Blob([u8arr], { type: mime });
+      const file = new File([blob], 'screenshot_' + Date.now() + '.png', { type: mime });
+
+      editor.focus();
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      const pasteEvt = new ClipboardEvent('paste', {
+        clipboardData: dt,
+        bubbles: true,
+        cancelable: true
+      });
+      editor.dispatchEvent(pasteEvt);
+    } catch (err) {
+      console.error('[Antigravity Screenshot] Paste image error:', err);
+    }
+  }
+
+  let agyScreenshotPolling = null;
+
+  async function triggerScreenshotCapture() {
+    showToast('📸 正在启动截图工具，截取后将自动填入输入框...');
+
+    let initialImg = null;
+    try {
+      if (window.electronNative && typeof window.electronNative.getClipboardImage === 'function') {
+        initialImg = await window.electronNative.getClipboardImage();
+      }
+    } catch (e) {}
+
+    let launched = false;
+    if (window.electronNative && typeof window.electronNative.takeScreenshot === 'function') {
+      try {
+        const res = await window.electronNative.takeScreenshot();
+        if (res && res.success) launched = true;
+      } catch (e) {}
+    }
+
+    if (!launched) {
+      try {
+        window.open('ms-screenclip:');
+        launched = true;
+      } catch (e) {
+        try {
+          const a = document.createElement('a');
+          a.href = 'ms-screenclip:';
+          a.click();
+          launched = true;
+        } catch (err) {}
+      }
+    }
+
+    if (agyScreenshotPolling) {
+      clearInterval(agyScreenshotPolling);
+      agyScreenshotPolling = null;
+    }
+
+    // Auto-detect newly captured screenshot from system clipboard
+    let attempts = 0;
+    const maxAttempts = 40; // 20 seconds polling
+    agyScreenshotPolling = setInterval(async () => {
+      attempts++;
+      if (attempts > maxAttempts) {
+        clearInterval(agyScreenshotPolling);
+        agyScreenshotPolling = null;
+        return;
+      }
+
+      try {
+        let currentImg = null;
+        if (window.electronNative && typeof window.electronNative.getClipboardImage === 'function') {
+          currentImg = await window.electronNative.getClipboardImage();
+        }
+        if (currentImg && currentImg !== initialImg && currentImg.startsWith('data:image/')) {
+          clearInterval(agyScreenshotPolling);
+          agyScreenshotPolling = null;
+          insertImageIntoChatBox(currentImg);
+          showToast('✅ 截图已自动附加到对话框！');
+        }
+      } catch (e) {}
+    }, 500);
+  }
+  window.__AGY_TRIGGER_SCREENSHOT__ = triggerScreenshotCapture;
+
+  // 3. UI Buttons Mount & Handling (Office Uploader + Screenshot)
   function attachUploadButton() {
     const toolbar = document.querySelector('.flex.min-w-0.flex-1.items-center.gap-px');
     if (!toolbar) return;
-    if (document.getElementById('agy-office-upload-btn')) return;
 
     // Create file input
     let fileInput = document.getElementById('agy-office-file-input');
@@ -575,35 +671,132 @@
       });
     }
 
-    // Create custom button
-    const btn = document.createElement('button');
-    btn.id = 'agy-office-upload-btn';
-    btn.type = 'button';
-    btn.className = 'p-1.5 rounded-full text-secondary-foreground hover:bg-secondary cursor-pointer transition-colors';
-    btn.setAttribute('aria-label', '上传文档 (Word/PPT/Excel)');
-    btn.setAttribute('title', '上传文档 (Word / PPT / Excel / 文本)');
-    btn.innerHTML = `
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
-        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
-        <polyline points="14 2 14 8 20 8"/>
-        <line x1="12" y1="18" x2="12" y2="12"/>
-        <line x1="9" y1="15" x2="15" y2="15"/>
-      </svg>
-    `;
+    // Office upload button
+    let btn = document.getElementById('agy-office-upload-btn');
+    if (!btn) {
+      btn = document.createElement('button');
+      btn.id = 'agy-office-upload-btn';
+      btn.type = 'button';
+      btn.className = 'p-1.5 rounded-full text-secondary-foreground hover:bg-secondary cursor-pointer transition-colors';
+      btn.setAttribute('aria-label', '上传文档 (Word/PPT/Excel)');
+      btn.setAttribute('title', '上传文档 (Word / PPT / Excel / 文本)');
+      btn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+          <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="12" y1="18" x2="12" y2="12"/>
+          <line x1="9" y1="15" x2="15" y2="15"/>
+        </svg>
+      `;
 
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      fileInput.click();
-    });
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        fileInput.click();
+      });
 
-    // Insert next to Add Context button
-    const contextBtn = toolbar.querySelector('button[aria-label*="上下文"], button[aria-label*="context"]');
-    if (contextBtn) {
-      contextBtn.insertAdjacentElement('afterend', btn);
-    } else {
-      toolbar.appendChild(btn);
+      const contextBtn = toolbar.querySelector('button[aria-label*="上下文"], button[aria-label*="context"]');
+      if (contextBtn) {
+        contextBtn.insertAdjacentElement('afterend', btn);
+      } else {
+        toolbar.appendChild(btn);
+      }
+    }
+
+    // Quick screenshot toolbar button
+    let screenBtn = document.getElementById('agy-toolbar-screenshot-btn');
+    if (!screenBtn) {
+      screenBtn = document.createElement('button');
+      screenBtn.id = 'agy-toolbar-screenshot-btn';
+      screenBtn.type = 'button';
+      screenBtn.className = 'p-1.5 rounded-full text-secondary-foreground hover:bg-secondary cursor-pointer transition-colors';
+      screenBtn.setAttribute('aria-label', '屏幕截图 (调用 AI 识图)');
+      screenBtn.setAttribute('title', '屏幕截图 (Win+Shift+S / AI 识图)');
+      screenBtn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+          <path d="M3 7V5a2 2 0 0 1 2-2h2"/>
+          <path d="M17 3h2a2 2 0 0 1 2 2v2"/>
+          <path d="M21 17v2a2 2 0 0 1-2 2h-2"/>
+          <path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+      `;
+      screenBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        triggerScreenshotCapture();
+      });
+
+      if (btn && btn.parentElement) {
+        btn.insertAdjacentElement('afterend', screenBtn);
+      } else {
+        toolbar.appendChild(screenBtn);
+      }
     }
   }
+
+  // Inject Screenshot Item into "+ Add Context" Dropdown Menu
+  function mountScreenshotMenuItem() {
+    if (document.getElementById('agy-screenshot-menu-item')) return;
+
+    const allEls = document.querySelectorAll('button, [role="menuitem"], [role="option"], div');
+    let mediaItem = null;
+
+    for (let i = 0; i < allEls.length; i++) {
+      const el = allEls[i];
+      const text = (el.textContent || '').trim();
+      if (text === '媒体 / 图片' || text === 'Media') {
+        const item = el.closest('button, [role="menuitem"], [role="option"], [tabindex], div.cursor-pointer') || el.parentElement;
+        if (item && item.parentElement && item.parentElement.children.length >= 2) {
+          mediaItem = item;
+          break;
+        }
+      }
+    }
+
+    if (!mediaItem || !mediaItem.parentElement) return;
+
+    // Clone mediaItem to perfectly match theme styling, fonts, hover backgrounds
+    const screenshotItem = mediaItem.cloneNode(true);
+    screenshotItem.id = 'agy-screenshot-menu-item';
+
+    const existingSvg = screenshotItem.querySelector('svg');
+    const screenClipSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 shrink-0"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="9" x2="12" y2="9.01"/><line x1="12" y1="15" x2="12" y2="15.01"/><line x1="9" y1="12" x2="9.01" y2="12"/><line x1="15" y1="12" x2="15.01" y2="12"/></svg>';
+    if (existingSvg) {
+      existingSvg.outerHTML = screenClipSvg;
+    }
+
+    // Replace label text
+    const walker = document.createTreeWalker(screenshotItem, NodeFilter.SHOW_TEXT, null, false);
+    let tNode;
+    let foundText = false;
+    while ((tNode = walker.nextNode())) {
+      if (tNode.nodeValue.includes('媒体 / 图片') || tNode.nodeValue.includes('Media')) {
+        tNode.nodeValue = '屏幕截图 (Win+Shift+S)';
+        foundText = true;
+        break;
+      }
+    }
+    if (!foundText) {
+      const spans = screenshotItem.querySelectorAll('span, div');
+      if (spans.length > 0) {
+        spans[spans.length - 1].textContent = '屏幕截图 (Win+Shift+S)';
+      }
+    }
+
+    screenshotItem.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      // Dismiss menu popover
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      const popoverBackdrop = document.querySelector('[data-radix-popper-content-wrapper], [data-base-ui-popover]');
+      if (popoverBackdrop) popoverBackdrop.style.display = 'none';
+
+      triggerScreenshotCapture();
+    });
+
+    mediaItem.insertAdjacentElement('afterend', screenshotItem);
+  }
+  window.__AGY_MOUNT_SCREENSHOT_MENU_ITEM__ = mountScreenshotMenuItem;
 
   // 4. Global Drag & Drop Handler
   function setupDragAndDrop() {
@@ -3568,96 +3761,151 @@
             trigger.innerHTML = newHTML;
         }
 
-        let popover = null;
-        let closeTimer = null;
+        if (!trigger.__agyEventsBound) {
+            trigger.__agyEventsBound = true;
+            trigger.onmouseenter = () => {
+                agyIsOverTrigger = true;
+                showContextPopover(trigger);
+            };
+            trigger.onmouseleave = () => {
+                agyIsOverTrigger = false;
+                scheduleCloseContextPopover(150);
+            };
+            trigger.onclick = (e) => {
+                e.stopPropagation();
+                const pop = document.getElementById('agy-context-usage-popover');
+                if (pop) {
+                    closeContextPopoverDirectly();
+                } else {
+                    agyIsOverTrigger = true;
+                    showContextPopover(trigger);
+                }
+            };
+        }
+    }
 
-        function showPopover() {
-            if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
-            if (popover) return;
+    let agyContextCloseTimer = null;
+    let agyIsOverTrigger = false;
+    let agyIsOverPopover = false;
 
-            const liveData = getRealContextData();
+    function closeContextPopoverDirectly() {
+        if (agyContextCloseTimer) {
+            clearTimeout(agyContextCloseTimer);
+            agyContextCloseTimer = null;
+        }
+        agyIsOverTrigger = false;
+        agyIsOverPopover = false;
+        const existing = document.getElementById('agy-context-usage-popover');
+        if (existing) existing.remove();
+    }
 
+    function scheduleCloseContextPopover(delay = 150) {
+        if (agyContextCloseTimer) clearTimeout(agyContextCloseTimer);
+        agyContextCloseTimer = setTimeout(() => {
+            if (!agyIsOverTrigger && !agyIsOverPopover) {
+                closeContextPopoverDirectly();
+            }
+        }, delay);
+    }
+
+    function showContextPopover(trigger) {
+        if (agyContextCloseTimer) {
+            clearTimeout(agyContextCloseTimer);
+            agyContextCloseTimer = null;
+        }
+
+        const liveData = getRealContextData();
+        let popover = document.getElementById('agy-context-usage-popover');
+
+        let progSegs = '';
+        if (liveData.totalPctNum > 0) {
+            for (let i = 0; i < liveData.breakdown.length; i++) {
+                const b = liveData.breakdown[i];
+                if (b.numPct > 0) {
+                    progSegs += '<div style="flex: 0 0 ' + b.numPct + '%; width: ' + b.numPct + '%; max-width: ' + b.numPct + '%; background: ' + b.color + '; height: 100%;"></div>';
+                }
+            }
+        }
+
+        let listItems = '';
+        for (let i = 0; i < liveData.breakdown.length; i++) {
+            const b = liveData.breakdown[i];
+            const valueDisplay = b.tokens ? (b.tokens + (b.pct !== '0%' && !b.pct.includes(b.tokens) ? ' (' + b.pct + ')' : '')) : b.pct;
+            listItems += '<div class="agy-context-item"><div class="agy-context-item-left"><div class="agy-context-dot" style="background: ' + b.color + ';"></div><span>' + b.label + '</span></div><span class="agy-context-item-pct">' + valueDisplay + '</span></div>';
+        }
+
+        const innerContent = '<div class="agy-context-header"><span class="agy-context-title">当前会话上下文真实用量</span><span class="agy-context-close" id="agy-context-close-btn">✕</span></div>' +
+            '<div class="agy-context-stat-row"><span class="agy-context-pct">' + liveData.totalPctStr + '</span><span class="agy-context-tokens">已使用 ' + liveData.usedTokens + ' / ' + liveData.maxTokens + '</span></div>' +
+            '<div class="agy-context-progress">' + progSegs + '</div>' +
+            '<div class="agy-context-list">' + listItems + '</div>' +
+            '<button type="button" class="agy-context-action-btn" id="agy-compress-context-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"></polyline><polyline points="20 10 14 10 14 4"></polyline><line x1="14" y1="10" x2="21" y2="3"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg><span>压缩当前会话上下文 (/compact)</span></button>';
+
+        if (!popover) {
             popover = document.createElement('div');
             popover.id = 'agy-context-usage-popover';
             popover.className = 'agy-context-popover';
-
-            const rect = trigger.getBoundingClientRect();
-            popover.style.bottom = (window.innerHeight - rect.top + 8) + 'px';
-            popover.style.right = (window.innerWidth - rect.right) + 'px';
-
-            let progSegs = '';
-            if (liveData.totalPctNum > 0) {
-                for (let i = 0; i < liveData.breakdown.length; i++) {
-                    const b = liveData.breakdown[i];
-                    if (b.numPct > 0) {
-                        progSegs += '<div style="flex: 0 0 ' + b.numPct + '%; width: ' + b.numPct + '%; max-width: ' + b.numPct + '%; background: ' + b.color + '; height: 100%;"></div>';
-                    }
-                }
-            }
-
-            let listItems = '';
-            for (let i = 0; i < liveData.breakdown.length; i++) {
-                const b = liveData.breakdown[i];
-                const valueDisplay = b.tokens ? (b.tokens + (b.pct !== '0%' && !b.pct.includes(b.tokens) ? ' (' + b.pct + ')' : '')) : b.pct;
-                listItems += '<div class="agy-context-item"><div class="agy-context-item-left"><div class="agy-context-dot" style="background: ' + b.color + ';"></div><span>' + b.label + '</span></div><span class="agy-context-item-pct">' + valueDisplay + '</span></div>';
-            }
-
-            popover.innerHTML = '<div class="agy-context-header"><span class="agy-context-title">当前会话上下文真实用量</span><span class="agy-context-close" id="agy-context-close-btn">✕</span></div>' +
-                '<div class="agy-context-stat-row"><span class="agy-context-pct">' + liveData.totalPctStr + '</span><span class="agy-context-tokens">已使用 ' + liveData.usedTokens + ' / ' + liveData.maxTokens + '</span></div>' +
-                '<div class="agy-context-progress">' + progSegs + '</div>' +
-                '<div class="agy-context-list">' + listItems + '</div>' +
-                '<button type="button" class="agy-context-action-btn" id="agy-compress-context-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"></polyline><polyline points="20 10 14 10 14 4"></polyline><line x1="14" y1="10" x2="21" y2="3"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg><span>压缩当前会话上下文 (/compact)</span></button>';
-
             document.body.appendChild(popover);
 
             popover.onmouseenter = () => {
-                if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
+                agyIsOverPopover = true;
+                if (agyContextCloseTimer) {
+                    clearTimeout(agyContextCloseTimer);
+                    agyContextCloseTimer = null;
+                }
             };
             popover.onmouseleave = () => {
-                hidePopover();
+                agyIsOverPopover = false;
+                scheduleCloseContextPopover(150);
             };
+        }
 
-            const closeBtn = popover.querySelector('#agy-context-close-btn');
-            if (closeBtn) closeBtn.onclick = hidePopover;
+        const rect = trigger.getBoundingClientRect();
+        popover.style.bottom = (window.innerHeight - rect.top + 8) + 'px';
+        popover.style.right = (window.innerWidth - rect.right) + 'px';
+        popover.innerHTML = innerContent;
 
-            const compBtn = popover.querySelector('#agy-compress-context-btn');
-            if (compBtn) {
-                compBtn.onclick = () => {
-                    compBtn.innerText = '⏳ 正在优化上下文...';
-                    try {
-                        const inputEl = document.querySelector('div[contenteditable="true"], textarea, [data-lexical-editor="true"]');
-                        if (inputEl) {
-                            inputEl.focus();
-                            document.execCommand('insertText', false, '/compact');
-                            setTimeout(() => {
-                                const sendBtn = document.querySelector('button[type="submit"], [data-tooltip-id*="submit"], button[aria-label*="Send"]');
-                                if (sendBtn) sendBtn.click();
-                            }, 100);
-                        }
-                    } catch(e) {}
-                    compBtn.innerText = '✓ 已触发上下文压缩';
-                    setTimeout(hidePopover, 1200);
-                };
+        const closeBtn = popover.querySelector('#agy-context-close-btn');
+        if (closeBtn) {
+            closeBtn.onclick = (e) => {
+                e.stopPropagation();
+                closeContextPopoverDirectly();
+            };
+        }
+
+        const compBtn = popover.querySelector('#agy-compress-context-btn');
+        if (compBtn) {
+            compBtn.onclick = () => {
+                compBtn.innerText = '⏳ 正在优化上下文...';
+                try {
+                    const inputEl = document.querySelector('div[contenteditable="true"], textarea, [data-lexical-editor="true"]');
+                    if (inputEl) {
+                        inputEl.focus();
+                        document.execCommand('insertText', false, '/compact');
+                        setTimeout(() => {
+                            const sendBtn = document.querySelector('button[type="submit"], [data-tooltip-id*="submit"], button[aria-label*="Send"]');
+                            if (sendBtn) sendBtn.click();
+                        }, 100);
+                    }
+                } catch(e) {}
+                compBtn.innerText = '✓ 已触发上下文压缩';
+                setTimeout(closeContextPopoverDirectly, 1200);
+            };
+        }
+    }
+
+    if (!window.__AGY_CONTEXT_OUTSIDE_BOUND__) {
+        window.__AGY_CONTEXT_OUTSIDE_BOUND__ = true;
+        document.addEventListener('pointerdown', (e) => {
+            const p = document.getElementById('agy-context-usage-popover');
+            const t = document.getElementById('agy-context-usage-trigger');
+            if (p && !p.contains(e.target) && (!t || !t.contains(e.target))) {
+                closeContextPopoverDirectly();
             }
-        }
-
-        function hidePopover() {
-            if (closeTimer) clearTimeout(closeTimer);
-            closeTimer = setTimeout(() => {
-                if (popover) {
-                    popover.remove();
-                    popover = null;
-                }
-            }, 200);
-        }
-
-        trigger.onmouseenter = showPopover;
-        trigger.onmouseleave = hidePopover;
-        trigger.onclick = (e) => {
-            e.stopPropagation();
-            if (popover) hidePopover();
-            else showPopover();
-        };
+        }, true);
+        window.addEventListener('blur', closeContextPopoverDirectly);
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeContextPopoverDirectly();
+        });
     }
 
     window.__AGY_MOUNT_CONTEXT_USAGE__ = mountContextUsage;
@@ -4166,6 +4414,9 @@
             }
             if (typeof window.__AGY_SYNC_MODEL_TRIGGER_TEXT__ === 'function') {
                 window.__AGY_SYNC_MODEL_TRIGGER_TEXT__();
+            }
+            if (typeof window.__AGY_MOUNT_SCREENSHOT_MENU_ITEM__ === 'function') {
+                window.__AGY_MOUNT_SCREENSHOT_MENU_ITEM__();
             }
         } catch (e) {
             console.error('[Antigravity Master Sync] Error:', e);

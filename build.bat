@@ -24,7 +24,7 @@ echo [1/2] 正在运行构建脚本 build.js...
 if %errorlevel% equ 0 (
     echo.
     echo ========================================================
-    echo   ✔ 构建成功！Antigravity增强与汉化工具.exe 已生成就绪。
+    echo   ✔ 构建成功！Antigravity Enhance Tools.exe 已生成就绪。
     echo ========================================================
 ) else (
     echo.

@@ -45,17 +45,25 @@ const iconPng = path.join(repoRoot, 'core', 'icon.png');
 const distDir = path.join(repoRoot, 'dist');
 if (!fs.existsSync(distDir)) fs.mkdirSync(distDir, { recursive: true });
 
-const mainExe = path.join(repoRoot, 'Antigravity增强与汉化工具.exe');
+const mainExe = path.join(repoRoot, 'Antigravity Enhance Tools.exe');
 if (fs.existsSync(mainExe)) {
     try { fs.unlinkSync(mainExe); } catch(e) {}
+}
+const oldExe = path.join(repoRoot, 'Antigravity增强与汉化工具.exe');
+if (fs.existsSync(oldExe)) {
+    try { fs.unlinkSync(oldExe); } catch(e) {}
 }
 
 const cscCmd = `"${csc}" /target:winexe /optimize+ /platform:anycpu /r:System.Xaml.dll /r:System.IO.Compression.FileSystem.dll /r:System.IO.Compression.dll /r:"C:/Windows/Microsoft.NET/Framework64/v4.0.30319/WPF/PresentationCore.dll" /r:"C:/Windows/Microsoft.NET/Framework64/v4.0.30319/WPF/PresentationFramework.dll" /r:"C:/Windows/Microsoft.NET/Framework64/v4.0.30319/WPF/WindowsBase.dll" /win32icon:"${icoPath}" /resource:"${payloadZip}",payload.zip /resource:"${iconPng}",icon.png /out:"${mainExe}" "${installerCs}"`;
 try {
     execSync(cscCmd);
     console.log('Compiled GUI Installer:', mainExe, 'Size:', fs.statSync(mainExe).size);
-    fs.copyFileSync(mainExe, path.join(distDir, 'Antigravity增强与汉化工具.exe'));
+    fs.copyFileSync(mainExe, path.join(distDir, 'Antigravity Enhance Tools.exe'));
     fs.copyFileSync(mainExe, path.join(distDir, 'Antigravity-Enhance-Tools-v0.1.3.exe'));
+    const oldDistExe = path.join(distDir, 'Antigravity增强与汉化工具.exe');
+    if (fs.existsSync(oldDistExe)) {
+        try { fs.unlinkSync(oldDistExe); } catch(e) {}
+    }
 } catch(err) {
     console.error('CSC Error for ' + mainExe + ':\n', err.stdout ? err.stdout.toString() : err.message);
     throw err;

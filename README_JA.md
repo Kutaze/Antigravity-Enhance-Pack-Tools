@@ -35,7 +35,7 @@
 
 ## 🌟 プレビュー (Showcase)
 
-### 1. モダンデュアルテーマ GUI インストーラー (`Antigravity增强与汉化工具.exe`)
+### 1. モダンデュアルテーマ GUI インストーラー (`Antigravity Enhance Tools.exe`)
 丸角カードレイアウト、高精細 ClearType レンダリング、ディレクトリ自動検出エンジンを搭載し、右上ボタンで「ライト」と「ダーク」テーマを瞬時に切り替え可能：
 
 | ライトモード (デフォルト) | ダークモード (ワンクリック切替) |
@@ -91,7 +91,7 @@ DOM監視のループ振動を防止し、会話インタラクションにミ�
 ## 🚀 インストール
 
 ### 1. Windows 環境
-1. [Releases ページ](https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases) から最新の **`Antigravity增强与汉化工具.exe`** をダウンロード。
+1. [Releases ページ](https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases) から最新の **`Antigravity Enhance Tools.exe`** をダウンロード。
 2. 実行し、パスを確認後 **「一键安装 / 更新增强补丁」** (インストール/更新) をクリック。
 
 ### 2. macOS & Linux 環境
