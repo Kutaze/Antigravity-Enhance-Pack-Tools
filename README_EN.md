@@ -83,6 +83,16 @@ Throughout the architectural conception and UX design of **Antigravity Enhance T
 ### 4-Level Thinking Slider
 - **Embedded in Model Selector**: Seamlessly slide between `Off`, `Low`, `Medium`, and `High` reasoning modes.
 
+### Visual Skills Hub
+- **Dedicated Toolbar Trigger**: Direct access button on the chat input bar opening a modern, theme-adaptive skills selector.
+- **35+ Built-in & Ecosystem Skills**: Categorized into Architecture & Engineering, Design & UI, Review & Diagnosis, Documents, and Gemini Ecosystem, with instant fuzzy search.
+- **One-Click Invocation**: Click any skill card to insert `$skill-name` into the chat box with automatic cursor focus.
+- **Dynamic Skill Discovery**: Detects custom user skills from workspace and global directories.
+
+### Native Screenshot Integration
+- **"+" Context Menu Access**: Built-in screenshot item directly inside the "+" context menu (`Win+Shift+S`).
+- **Auto Clipboard Injection**: Automatically captures and injects new screenshots directly into the active prompt editor without saving to disk.
+
 ### Anti-Freeze DOM Cache Guard
 - **Fingerprint Verification**: Prevents recursive DOM mutation loops and client lockups.
 

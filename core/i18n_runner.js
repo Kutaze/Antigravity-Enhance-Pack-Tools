@@ -636,6 +636,648 @@
   }
   window.__AGY_TRIGGER_SCREENSHOT__ = triggerScreenshotCapture;
 
+
+  // ==========================================
+  // Antigravity Visual Skills Hub (技能中心)
+  // ==========================================
+  const AGY_BUILTIN_SKILLS = [
+  {
+    "id": "ask-engineer",
+    "name": "ask-engineer",
+    "description": "研发流程总路由与向导。当不确定当前场景该使用哪个工程技能、如何推进研发工作流、或需要会话边界管理建议时唤醒。",
+    "category": "架构与工程",
+    "icon": "⚡"
+  },
+  {
+    "id": "Chinesizing",
+    "name": "Chinesizing",
+    "description": "Electron 桌面端软件深度汉化、解包逆向、防崩溃与防卡死全流程工程规范。用于对 Electron / React 桌面应用进行界面国际化、安全打包部署、DOM 监听死循环规避、UI 组件键值反向透传与自动化门禁自检。",
+    "category": "设计与UI",
+    "icon": "🎨"
+  },
+  {
+    "id": "code-review",
+    "name": "code-review",
+    "description": "三轴代码与体验审查规范（Tri-Axis Review）。对比当前分支与基准点之间的差异，从“代码规范与坏味道”、“需求规约符合度”以及“UI/UX视觉与交互体验品质”三个相互独立的维度展开并行审查并汇总结构化报告。",
+    "category": "审查与诊断",
+    "icon": "🔍"
+  },
+  {
+    "id": "codebase-design",
+    "name": "codebase-design",
+    "description": "深层模块（Deep Module）设计准则与架构词汇。用于设计或优化模块接口、寻找架构深化机会、确定测试接缝位置、提升代码可测试性与心智杠杆率。",
+    "category": "架构与工程",
+    "icon": "⚡"
+  },
+  {
+    "id": "diagnosing-bugs",
+    "name": "diagnosing-bugs",
+    "description": "针对疑难 Bug 与性能回退的阶段门禁式诊断闭环。当用户说“调试/诊断”、“系统报错/抛出异常/挂死/变卡”时唤醒。",
+    "category": "审查与诊断",
+    "icon": "🔍"
+  },
+  {
+    "id": "domain-modeling",
+    "name": "domain-modeling",
+    "description": "建立与锐化项目统一领域语言（Ubiquitous Language）。在讨论术语、编写或编辑 CONTEXT.md、或起草架构决策记录（ADR）时唤醒。",
+    "category": "架构与工程",
+    "icon": "⚡"
+  },
+  {
+    "id": "grill-me",
+    "name": "grill-me",
+    "description": "纯会话态的深度审讯盘问。当用户需要对某个想法、写作方案、非代码决策进行严苛的压力测试且无需在本地落盘文档时使用。",
+    "category": "审查与诊断",
+    "icon": "🔍"
+  },
+  {
+    "id": "grill-with-docs",
+    "name": "grill-with-docs",
+    "description": "深度审讯式对齐并同步沉淀工程文档。在代码库中通过连环盘问榨干需求假设，同时就地更新 CONTEXT.md 领域词汇表与 ADR 架构决策记录。",
+    "category": "审查与诊断",
+    "icon": "🔍"
+  },
+  {
+    "id": "grilling",
+    "name": "grilling",
+    "description": "审讯式对齐元技能。将想法或计划建模为决策树，按轮次推进前沿问题集，智能体查清事实，由用户拍板决策。",
+    "category": "审查与诊断",
+    "icon": "🔍"
+  },
+  {
+    "id": "handoff",
+    "name": "handoff",
+    "description": "将当前会话的上下文成果精炼压缩为便携式交接文档（Handoff Document），以便全新会话、其他智能体工具或同事无缝接盘。",
+    "category": "架构与工程",
+    "icon": "⚡"
+  },
+  {
+    "id": "implement",
+    "name": "implement",
+    "description": "依据技术规约或工单进行高质量工程落地。驱动 TDD（测试驱动开发）与 VDD（视觉驱动开发）双核闭环，结合类型检查与三轴代码审查完成高质量交付。",
+    "category": "架构与工程",
+    "icon": "⚡"
+  },
+  {
+    "id": "improve-codebase-architecture",
+    "name": "improve-codebase-architecture",
+    "description": "扫描代码库中的深层模块重构机会，生成可视化 HTML 体检报告，并通过盘问推演重构方案。用于日常架构治理、消除技术债、提升可测试性与智能体理解效率。",
+    "category": "架构与工程",
+    "icon": "⚡"
+  },
+  {
+    "id": "prototype",
+    "name": "prototype",
+    "description": "构建抛弃型可运行原型以解答关键设计疑问。当用户想验证状态机/业务逻辑感觉是否合理，或者探索界面的多种交互与视觉形态时使用。",
+    "category": "设计与UI",
+    "icon": "🎨"
+  },
+  {
+    "id": "resolving-merge-conflicts",
+    "name": "resolving-merge-conflicts",
+    "description": "意图溯源式 Git 冲突解决规范。用于解决正在进行中的 git merge 或 rebase 冲突，追溯双方提交的一手意图，逐块化解，严禁擅自 abort。",
+    "category": "架构与工程",
+    "icon": "⚡"
+  },
+  {
+    "id": "tdd",
+    "name": "tdd",
+    "description": "测试驱动开发（TDD）工程规范。当需要以测试先行方式开发新特性、修复 Bug、实施红-绿-重构循环或编写稳健的接缝测试时唤醒。",
+    "category": "架构与工程",
+    "icon": "⚡"
+  },
+  {
+    "id": "to-spec",
+    "name": "to-spec",
+    "description": "将当前对话与共识合成为正式的技术规约（Spec），包含业务逻辑、UI/UX 交互规约与测试接缝决策，并发布至工单跟踪系统。",
+    "category": "架构与工程",
+    "icon": "⚡"
+  },
+  {
+    "id": "to-tickets",
+    "name": "to-tickets",
+    "description": "将规约、计划或对话拆解为一系列“曳光弹（Tracer-bullet）”垂直切片工单。明确标注阻断依赖关系与视觉验收准则（Visual AC），支持发布至本地文件或在线敏捷看板。",
+    "category": "架构与工程",
+    "icon": "⚡"
+  },
+  {
+    "id": "ui-craft",
+    "name": "ui-craft",
+    "description": "现代 UI/UX 工程与视觉交付全流程规范。用于界面概念设计、设计系统Tokens对齐、三变体原型推演、全状态防御设计、现代前端动效与VDD（视觉驱动开发）闭环。",
+    "category": "设计与UI",
+    "icon": "🎨"
+  },
+  {
+    "id": "wayfinder",
+    "name": "wayfinder",
+    "description": "迷雾破局者（Wayfinder）。当面临一个规模庞大、充满未知迷雾的大型项目（跨越多个会话也无法容纳）时，在工单看板建立“决策地图”，逐一破解决策盲点直至通往目标的路径清晰。",
+    "category": "架构与工程",
+    "icon": "⚡"
+  },
+  {
+    "id": "agy-customizations",
+    "name": "agy-customizations",
+    "description": "Comprehensive guide and reference for the Antigravity Customization System. Use to explain how customizations work, their loading priority, discovery mechanisms, and to guide the creation of skills, rules, plugins, hooks, and MCP servers.",
+    "category": "Gemini生态",
+    "icon": "✨"
+  },
+  {
+    "id": "antigravity_guide",
+    "name": "antigravity-guide",
+    "description": "Provides a comprehensive guide, quick reference, and sitemap for Google Antigravity (AGY), including the Antigravity CLI (agy), Antigravity 2.0, Antigravity IDE, Python SDK, slash commands, keybindings, and customizations (skills, rules, MCP, sidecars). Activate this skill when the user asks questions about how to use, configure, or customize Antigravity, AGY, the agy CLI, the Antigravity IDE, or Antigravity 2.0.",
+    "category": "架构与工程",
+    "icon": "⚡"
+  },
+  {
+    "id": "generative_ui",
+    "name": "generative_ui",
+    "description": "How to render rich interactive HTML widgets inline in the chat or as standalone artifacts. Use this skill when you want to show the user diagrams, data visualizations, interactive controls, educational walkthroughs, or any rich visual content beyond plain text and markdown.",
+    "category": "设计与UI",
+    "icon": "🎨"
+  },
+  {
+    "id": "migrate-workflows",
+    "name": "migrate-workflows",
+    "description": "Automatically migrate legacy workflows to modern skills across global and workspace configurations. Scans for existing workflows, creates target SKILL.md files, and safely archives old workflow files.",
+    "category": "Gemini生态",
+    "icon": "✨"
+  },
+  {
+    "id": "permissioned-github",
+    "name": "permissioned-github",
+    "description": "Guidelines for interacting with GitHub and request permissions from the user when commands fail due to restrictions in the agent environment.",
+    "category": "Gemini生态",
+    "icon": "✨"
+  },
+  {
+    "id": "documents",
+    "name": "documents",
+    "description": "Create, edit, redline, and comment on .docx, Word, and Google Docs-targeted document artifacts inside the container, with a strict render-and-verify workflow. Use render_docx.py to generate page PNGs (and optional PDF) for visual QA, then iterate until layout is flawless before delivering the final document.",
+    "category": "办公与文档",
+    "icon": "📊"
+  },
+  {
+    "id": "gemini-api-dev",
+    "name": "gemini-api-dev",
+    "description": "Use this skill when writing code that calls the Gemini API for text generation, multi-turn chat, multimodal understanding, image generation, video generation, streaming responses, background research tasks, function calling, structured output, or migrating from the old generateContent API. Covers SDK usage and best practices for Gemini models and agents in Python and TypeScript.",
+    "category": "Gemini生态",
+    "icon": "✨"
+  },
+  {
+    "id": "gemini-live-api-dev",
+    "name": "gemini-live-api-dev",
+    "description": "Use this skill when building real-time, bidirectional streaming applications with the Gemini Live API. Covers WebSocket-based audio/video/text streaming, voice activity detection (VAD), native audio features, function calling, session management, ephemeral tokens for client-side auth, live translation, and all Live API configuration options. SDKs covered - google-genai (Python), @google/genai (JavaScript/TypeScript).",
+    "category": "Gemini生态",
+    "icon": "✨"
+  },
+  {
+    "id": "gemini-omni-flash-api",
+    "name": "gemini-omni-flash-api",
+    "description": "Use this skill for generative video editing, text-to-video, image-referenced video generation, first-frame-to-video, first-and-last-frame transitions, and video extensions using Gemini Omni 1.1 Flash (gemini-omni-1.1-flash) via the official google-genai SDK. Includes workflows for pre-processing/optimizing high-resolution or long source videos with ffmpeg, stripping audio for full sound regeneration, and handling turn-by-turn video editing and parallel execution.",
+    "category": "Gemini生态",
+    "icon": "✨"
+  },
+  {
+    "id": "chrome-extensions",
+    "name": "chrome-extensions",
+    "description": "Build and publish Chrome Extensions using Manifest V3 best practices. Use this skill whenever the user asks to create, modify, debug, or understand Chrome browser extensions, add-ons, or anything involving the Chrome Extensions API. Trigger on mentions of: 'Chrome extension', 'browser extension', 'manifest.json', 'content script', 'service worker' (in browser context), 'popup' (in browser extension context), 'side panel', 'chrome. API', 'declarativeNetRequest', 'omnibox', 'context menu' (in extension context), 'userScripts', 'user script', 'script manager', or any request to build functionality that integrates with the Chrome browser UI. Also trigger for publishing to the Chrome Web Store: 'publish extension', preparing an extension for publishing, responding to a review rejection, writing permission justifications, or drafting a privacy policy.",
+    "category": "设计与UI",
+    "icon": "🎨"
+  },
+  {
+    "id": "modern-web-guidance",
+    "name": "modern-web-guidance",
+    "description": "Search tool for modern web development best practices. MANDATORY: Execute FIRST for all HTML/CSS and clientside JS tasks. Do NOT skip — web APIs evolve rapidly and training weights contain obsolete patterns.  Trigger immediately for: - UI/Layout: Modals, dialogs, popovers, Glassmorphism/backdrop-filters, anchor positioning, container queries, :has(), :user-valid. - Scroll/Motion: View Transitions, Scroll-driven animations, scroll parallax/reveals. - Performance: CWV (LCP, INP), content-visibility, Fetch Priority, image optimization. - System/APIs: Local filesystem access, WebUSB, WebSockets sync, WebAssembly widgets. - Frameworks: Adapting layout/styles in React, Vue, Angular. - General Frontend: Forms, autofill, advanced inputs, custom scrollbars, modern component states, etc.  DO NOT trigger for: - Backend: Database SQL, ORMs, Express API routes. - Pipelines: CI/CD deployment, Docker, Actions. - Generic: Local scripts (Python/Go tools), ESLint, Git.",
+    "category": "设计与UI",
+    "icon": "🎨"
+  },
+  {
+    "id": "pdf",
+    "name": "pdf",
+    "description": "Read, create, inspect, render, and verify PDF files where visual layout matters, including fillable AcroForms. Use Poppler rendering plus Python tools such as reportlab, pdfplumber, and pypdf for generation and extraction.",
+    "category": "办公与文档",
+    "icon": "📊"
+  },
+  {
+    "id": "presentations",
+    "name": "Presentations",
+    "description": "Read, create or edit PowerPoint or Google Slides decks. Use for presentation, slide deck, PowerPoint, PPT, PPTX, or Google Slides requests.",
+    "category": "办公与文档",
+    "icon": "📊"
+  },
+  {
+    "id": "excel-live-control",
+    "name": "excel-live-control",
+    "description": "Control an open or active Microsoft Excel workbook through the ChatGPT add-in or connected session. Use when the user tags the Microsoft Excel app in Codex or follows up on an established live Excel task. Do not use for standalone spreadsheet files or Google Sheets.",
+    "category": "办公与文档",
+    "icon": "📊"
+  },
+  {
+    "id": "spreadsheets",
+    "name": "Spreadsheets",
+    "description": "Create, edit, analyze, and verify standalone spreadsheet files or Google Sheets-ready workbooks, including .xlsx, .xls, .csv, and .tsv. Do not use for live controlling Microsoft Excel app or a live Excel session.",
+    "category": "办公与文档",
+    "icon": "📊"
+  },
+  {
+    "id": "template-creator",
+    "name": "template-creator",
+    "description": "Create or update a reusable personal Codex artifact-template skill. Use when the user invokes $template-creator or asks in natural language to create a reusable template from a reference document, presentation, spreadsheet, Google Docs, Slides, or Sheets link, ImageGen or Product Design image, email, Slack message, or Site project, or explicitly asks to edit or update a passed artifact-template skill. Do not use for one-off creation from an existing template.",
+    "category": "办公与文档",
+    "icon": "📊"
+  }
+];
+
+  let agyCurrentSkills = [...AGY_BUILTIN_SKILLS];
+  let agySelectedCategory = 'all';
+  let agySearchQuery = '';
+
+  function createSkillsHubModal() {
+    const modal = document.createElement('div');
+    modal.id = 'agy-skills-modal';
+    modal.style.cssText = `
+      position: fixed;
+      inset: 0;
+      z-index: 999999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      padding: 16px;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    `;
+
+    modal.innerHTML = `
+      <div id="agy-skills-container" style="
+        width: 100%;
+        max-width: 680px;
+        max-height: 82vh;
+        background: var(--background, #18181b);
+        color: var(--foreground, #fafafa);
+        border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+        border-radius: 16px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.05);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        animation: agyModalFadeIn 0.15s ease-out;
+      ">
+        <!-- Header -->
+        <div style="
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 16px 20px;
+          border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+          background: var(--muted, rgba(255, 255, 255, 0.02));
+        ">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="
+              width: 32px;
+              height: 32px;
+              border-radius: 10px;
+              background: linear-gradient(135deg, #6366f1, #a855f7);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: #ffffff;
+              font-size: 16px;
+              box-shadow: 0 4px 10px rgba(99, 102, 241, 0.35);
+            ">✨</div>
+            <div>
+              <div style="font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                <span>技能中心 (Skills Hub)</span>
+                <span id="agy-skills-count-badge" style="
+                  font-size: 11px;
+                  font-weight: 500;
+                  padding: 1px 7px;
+                  border-radius: 9999px;
+                  background: rgba(99, 102, 241, 0.15);
+                  color: #818cf8;
+                  border: 1px solid rgba(99, 102, 241, 0.25);
+                ">${skills.length} 个可用技能</span>
+              </div>
+              <div style="font-size: 12px; color: var(--muted-foreground, #94a3b8); margin-top: 2px;">
+                点击任意卡片一键填入指令并唤醒对应专家角色
+              </div>
+            </div>
+          </div>
+          <button id="agy-skills-close-btn" type="button" style="
+            background: transparent;
+            border: none;
+            color: var(--muted-foreground, #94a3b8);
+            cursor: pointer;
+            font-size: 18px;
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+          " onmouseover="this.style.background='rgba(255,255,255,0.1)';this.style.color='#fff';" onmouseout="this.style.background='transparent';this.style.color='var(--muted-foreground, #94a3b8)';">✕</button>
+        </div>
+
+        <!-- Search Bar & Filters -->
+        <div style="padding: 14px 20px 10px; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.05));">
+          <div style="position: relative; width: 100%;">
+            <input id="agy-skills-search-input" type="text" placeholder="🔍 搜索技能名称、描述或关键词 (如: UI、审查、TDD、文档、架构...)" style="
+              width: 100%;
+              box-sizing: border-box;
+              padding: 9px 14px;
+              background: var(--input, rgba(255, 255, 255, 0.05));
+              color: var(--foreground, #fafafa);
+              border: 1px solid var(--border, rgba(255, 255, 255, 0.15));
+              border-radius: 8px;
+              font-size: 13px;
+              outline: none;
+              transition: border-color 0.15s ease;
+            " onfocus="this.style.borderColor='#6366f1';" onblur="this.style.borderColor='var(--border, rgba(255, 255, 255, 0.15))';">
+          </div>
+          
+          <div id="agy-skills-category-bar" style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <!-- Category buttons injected by JS -->
+          </div>
+        </div>
+
+        <!-- Skills Cards Grid -->
+        <div id="agy-skills-cards-wrapper" style="
+          padding: 14px 20px 18px;
+          overflow-y: auto;
+          max-height: 440px;
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+          gap: 10px;
+          box-sizing: border-box;
+        ">
+        </div>
+
+        <!-- Footer -->
+        <div style="
+          padding: 10px 20px;
+          border-top: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+          background: var(--muted, rgba(255, 255, 255, 0.02));
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          font-size: 12px;
+          color: var(--muted-foreground, #94a3b8);
+        ">
+          <span>💡 提示：点击技能卡片后直接在对话框输入具体需求并发送</span>
+          <span style="font-size: 11px; opacity: 0.7;">Esc 或点击外围关闭</span>
+        </div>
+      </div>
+    `;
+
+    // Event listeners
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        closeSkillsHubModal();
+      }
+    });
+
+    const closeBtn = modal.querySelector('#agy-skills-close-btn');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeSkillsHubModal();
+      });
+    }
+
+    const searchInput = modal.querySelector('#agy-skills-search-input');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        agySearchQuery = e.target.value.trim().toLowerCase();
+        renderSkillsList();
+      });
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.style.display === 'flex') {
+        closeSkillsHubModal();
+      }
+    });
+
+    return modal;
+  }
+
+  function renderSkillsCategories() {
+    const bar = document.getElementById('agy-skills-category-bar');
+    if (!bar) return;
+
+    const categories = ['all', '架构与工程', '设计与UI', '审查与诊断', '办公与文档', 'Gemini生态'];
+    const catLabels = {
+      'all': '全部',
+      '架构与工程': '⚡ 架构与工程',
+      '设计与UI': '🎨 设计与UI',
+      '审查与诊断': '🔍 审查与诊断',
+      '办公与文档': '📊 办公与文档',
+      'Gemini生态': '✨ Gemini生态'
+    };
+
+    bar.innerHTML = categories.map(cat => {
+      const isActive = agySelectedCategory === cat;
+      const count = cat === 'all' 
+        ? agyCurrentSkills.length 
+        : agyCurrentSkills.filter(s => s.category === cat).length;
+
+      return `
+        <button type="button" data-category="${cat}" style="
+          padding: 4px 10px;
+          border-radius: 6px;
+          font-size: 12px;
+          cursor: pointer;
+          border: 1px solid ${isActive ? '#6366f1' : 'var(--border, rgba(255, 255, 255, 0.1))'};
+          background: ${isActive ? 'rgba(99, 102, 241, 0.2)' : 'rgba(255, 255, 255, 0.03)'};
+          color: ${isActive ? '#a5b4fc' : 'var(--foreground, #cbd5e1)'};
+          font-weight: ${isActive ? '600' : '400'};
+          transition: all 0.15s ease;
+        " onmouseover="if(!${isActive}) this.style.background='rgba(255,255,255,0.08)';" onmouseout="if(!${isActive}) this.style.background='rgba(255,255,255,0.03)';">${catLabels[cat] || cat} (${count})</button>
+      `;
+    }).join('');
+
+    bar.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        agySelectedCategory = btn.getAttribute('data-category');
+        renderSkillsCategories();
+        renderSkillsList();
+      });
+    });
+  }
+
+  function renderSkillsList() {
+    const wrapper = document.getElementById('agy-skills-cards-wrapper');
+    if (!wrapper) return;
+
+    renderSkillsCategories();
+
+    let filtered = agyCurrentSkills;
+    if (agySelectedCategory !== 'all') {
+      filtered = filtered.filter(s => s.category === agySelectedCategory);
+    }
+    if (agySearchQuery) {
+      filtered = filtered.filter(s => {
+        return s.id.toLowerCase().includes(agySearchQuery) ||
+               (s.name && s.name.toLowerCase().includes(agySearchQuery)) ||
+               (s.description && s.description.toLowerCase().includes(agySearchQuery)) ||
+               (s.category && s.category.toLowerCase().includes(agySearchQuery));
+      });
+    }
+
+    if (filtered.length === 0) {
+      wrapper.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 40px 10px; color: var(--muted-foreground, #94a3b8);">
+          <div style="font-size: 28px; margin-bottom: 8px;">🔍</div>
+          <div style="font-size: 14px; font-weight: 500;">未找到与 "${agySearchQuery}" 相关的技能</div>
+          <div style="font-size: 12px; margin-top: 4px; opacity: 0.7;">请尝试更换关键词搜索</div>
+        </div>
+      `;
+      return;
+    }
+
+    wrapper.innerHTML = filtered.map(skill => {
+      return `
+        <div class="agy-skill-card" data-skill-id="${skill.id}" style="
+          padding: 12px 14px;
+          border-radius: 10px;
+          border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+          background: rgba(255, 255, 255, 0.025);
+          cursor: pointer;
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+          box-sizing: border-box;
+        " onmouseover="
+          this.style.transform='translateY(-2px)';
+          this.style.borderColor='rgba(99, 102, 241, 0.6)';
+          this.style.background='rgba(99, 102, 241, 0.08)';
+          this.style.boxShadow='0 6px 16px -3px rgba(99, 102, 241, 0.15)';
+        " onmouseout="
+          this.style.transform='none';
+          this.style.borderColor='var(--border, rgba(255, 255, 255, 0.08))';
+          this.style.background='rgba(255, 255, 255, 0.025)';
+          this.style.boxShadow='none';
+        ">
+          <!-- Card Top: Icon, Name badge, Category -->
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+            <div style="display: flex; align-items: center; gap: 6px; min-width: 0;">
+              <span style="font-size: 15px;">${skill.icon || '⚡'}</span>
+              <span style="
+                font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+                font-size: 12px;
+                font-weight: 600;
+                color: #a5b4fc;
+                background: rgba(99, 102, 241, 0.15);
+                padding: 1px 6px;
+                border-radius: 4px;
+                border: 1px solid rgba(99, 102, 241, 0.3);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+              ">$${skill.id}</span>
+            </div>
+            <span style="
+              font-size: 10px;
+              color: var(--muted-foreground, #94a3b8);
+              background: rgba(255, 255, 255, 0.05);
+              padding: 1px 6px;
+              border-radius: 4px;
+              white-space: nowrap;
+            ">${skill.category || '通用'}</span>
+          </div>
+
+          <!-- Description -->
+          <div style="
+            font-size: 12px;
+            line-height: 1.45;
+            color: var(--muted-foreground, #cbd5e1);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          ">${skill.description || '暂无描述'}</div>
+        </div>
+      `;
+    }).join('');
+
+    wrapper.querySelectorAll('.agy-skill-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const skillId = card.getAttribute('data-skill-id');
+        if (skillId) {
+          insertIntoChatBox('$' + skillId + ' ');
+          closeSkillsHubModal();
+          showToast('✨ 已填入技能：$' + skillId);
+        }
+      });
+    });
+  }
+
+  function openSkillsHubModal() {
+    let modal = document.getElementById('agy-skills-modal');
+    if (!modal) {
+      modal = createSkillsHubModal();
+      document.body.appendChild(modal);
+    }
+    modal.style.display = 'flex';
+    
+    // Auto focus search input
+    const searchInput = document.getElementById('agy-skills-search-input');
+    if (searchInput) {
+      searchInput.value = '';
+      agySearchQuery = '';
+      setTimeout(() => searchInput.focus(), 60);
+    }
+    renderSkillsList();
+
+    // Dynamically query Electron IPC if available for any custom workspace skills
+    if (window.electronNative && typeof window.electronNative.getSkills === 'function') {
+      window.electronNative.getSkills().then((extra) => {
+        if (Array.isArray(extra) && extra.length > 0) {
+          const map = new Map(agyCurrentSkills.map(s => [s.id, s]));
+          for (const item of extra) {
+            if (!map.has(item.id)) {
+              map.set(item.id, {
+                id: item.id,
+                name: item.name || item.id,
+                description: item.description || '自定义扩展技能',
+                category: item.category || '扩展技能',
+                icon: item.icon || '🧩'
+              });
+            }
+          }
+          agyCurrentSkills = Array.from(map.values());
+          const badge = document.getElementById('agy-skills-count-badge');
+          if (badge) badge.innerText = agyCurrentSkills.length + ' 个可用技能';
+          renderSkillsList();
+        }
+      }).catch(() => {});
+    }
+  }
+
+  function closeSkillsHubModal() {
+    const modal = document.getElementById('agy-skills-modal');
+    if (modal) {
+      modal.style.display = 'none';
+    }
+  }
+
+  function toggleSkillsHubModal() {
+    const modal = document.getElementById('agy-skills-modal');
+    if (modal && modal.style.display === 'flex') {
+      closeSkillsHubModal();
+    } else {
+      openSkillsHubModal();
+    }
+  }
+
+
   // 3. UI Buttons Mount & Handling (Office Uploader + Screenshot)
   function attachUploadButton() {
     const toolbar = document.querySelector('.flex.min-w-0.flex-1.items-center.gap-px');
@@ -702,33 +1344,37 @@
       }
     }
 
-    // Quick screenshot toolbar button
-    let screenBtn = document.getElementById('agy-toolbar-screenshot-btn');
-    if (!screenBtn) {
-      screenBtn = document.createElement('button');
-      screenBtn.id = 'agy-toolbar-screenshot-btn';
-      screenBtn.type = 'button';
-      screenBtn.className = 'p-1.5 rounded-full text-secondary-foreground hover:bg-secondary cursor-pointer transition-colors';
-      screenBtn.setAttribute('aria-label', '屏幕截图 (调用 AI 识图)');
-      screenBtn.setAttribute('title', '屏幕截图 (Win+Shift+S / AI 识图)');
-      screenBtn.innerHTML = `
+    // Ensure toolbar screenshot button is removed (it belongs in '+' menu)
+    const oldScreenBtn = document.getElementById('agy-toolbar-screenshot-btn');
+    if (oldScreenBtn) oldScreenBtn.remove();
+
+    // Visual Skills Hub toolbar button
+    let skillsBtn = document.getElementById('agy-skills-btn');
+    if (!skillsBtn) {
+      skillsBtn = document.createElement('button');
+      skillsBtn.id = 'agy-skills-btn';
+      skillsBtn.type = 'button';
+      skillsBtn.className = 'p-1.5 rounded-full text-secondary-foreground hover:bg-secondary cursor-pointer transition-colors';
+      skillsBtn.setAttribute('aria-label', '技能中心 (Skills Hub)');
+      skillsBtn.setAttribute('title', '技能中心 (Skills Hub) - 可视化选择与调用技能');
+      skillsBtn.innerHTML = `
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
-          <path d="M3 7V5a2 2 0 0 1 2-2h2"/>
-          <path d="M17 3h2a2 2 0 0 1 2 2v2"/>
-          <path d="M21 17v2a2 2 0 0 1-2 2h-2"/>
-          <path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
-          <circle cx="12" cy="12" r="3"/>
+          <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+          <path d="M5 3v4"/>
+          <path d="M19 17v4"/>
+          <path d="M3 5h4"/>
+          <path d="M17 19h4"/>
         </svg>
       `;
-      screenBtn.addEventListener('click', (e) => {
+      skillsBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        triggerScreenshotCapture();
+        toggleSkillsHubModal();
       });
 
       if (btn && btn.parentElement) {
-        btn.insertAdjacentElement('afterend', screenBtn);
+        btn.insertAdjacentElement('afterend', skillsBtn);
       } else {
-        toolbar.appendChild(screenBtn);
+        toolbar.appendChild(skillsBtn);
       }
     }
   }

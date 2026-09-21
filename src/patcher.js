@@ -209,6 +209,42 @@ try {
                 return null;
             }
         });
+        _ipc.handle('antigravity:get-skills', async () => {
+            try {
+                const _os = require('os');
+                const home = _os.homedir();
+                const skillDirs = [
+                    _path.join(home, '.gemini', 'config', 'skills'),
+                    _path.join(home, '.gemini', 'antigravity', 'builtin', 'skills')
+                ];
+                const pluginBase = _path.join(home, '.gemini', 'config', 'plugins');
+                if (_fs.existsSync(pluginBase)) {
+                    for (const p of _fs.readdirSync(pluginBase)) {
+                        const pSkills = _path.join(pluginBase, p, 'skills');
+                        if (_fs.existsSync(pSkills)) skillDirs.push(pSkills);
+                    }
+                }
+                const result = [];
+                const seen = new Set();
+                for (const d of skillDirs) {
+                    if (!_fs.existsSync(d)) continue;
+                    for (const f of _fs.readdirSync(d)) {
+                        const skillPath = _path.join(d, f, 'SKILL.md');
+                        if (_fs.existsSync(skillPath) && !seen.has(f)) {
+                            seen.add(f);
+                            const content = _fs.readFileSync(skillPath, 'utf8');
+                            let desc = '';
+                            const mDesc = content.match(/description:\s*([^\r\n]+)/i);
+                            if (mDesc) desc = mDesc[1].trim().replace(/^['"]|['"]$/g, '');
+                            result.push({ id: f, name: f, description: desc });
+                        }
+                    }
+                }
+                return result;
+            } catch(err) {
+                return [];
+            }
+        });
     }
 } catch(e) {}
 `;
@@ -233,16 +269,23 @@ try {
         }
         fs.writeFileSync(utilsJs, utilsContent, 'utf8');
 
-        // 7. Patch preload.js to expose screenshot bridge
+        // 7. Patch preload.js to expose screenshot bridge & skills bridge
         const preloadJs = path.join(distDir, 'preload.js');
         if (fs.existsSync(preloadJs)) {
             let preloadContent = fs.readFileSync(preloadJs, 'utf8');
-            if (!preloadContent.includes('takeScreenshot:')) {
+            if (preloadContent.includes('takeScreenshot:') && !preloadContent.includes('getSkills:')) {
+                preloadContent = preloadContent.replace(
+                    "getClipboardImage: () => electron_1.ipcRenderer.invoke('antigravity:clipboard-image'),",
+                    "getClipboardImage: () => electron_1.ipcRenderer.invoke('antigravity:clipboard-image'),\n    getSkills: () => electron_1.ipcRenderer.invoke('antigravity:get-skills'),"
+                );
+                fs.writeFileSync(preloadJs, preloadContent, 'utf8');
+            } else if (!preloadContent.includes('takeScreenshot:')) {
                 const targetNeedle = "revealInFilePicker: (path) => electron_1.ipcRenderer.invoke('shell:reveal-in-file-picker', path),";
                 if (preloadContent.includes(targetNeedle)) {
                     const extraApis = `
     takeScreenshot: () => electron_1.ipcRenderer.invoke('antigravity:screenshot'),
-    getClipboardImage: () => electron_1.ipcRenderer.invoke('antigravity:clipboard-image'),`;
+    getClipboardImage: () => electron_1.ipcRenderer.invoke('antigravity:clipboard-image'),
+    getSkills: () => electron_1.ipcRenderer.invoke('antigravity:get-skills'),`;
                     preloadContent = preloadContent.replace(targetNeedle, targetNeedle + extraApis);
                     fs.writeFileSync(preloadJs, preloadContent, 'utf8');
                 }
