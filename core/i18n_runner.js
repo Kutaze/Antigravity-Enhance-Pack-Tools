@@ -958,7 +958,7 @@
                   background: rgba(99, 102, 241, 0.15);
                   color: #818cf8;
                   border: 1px solid rgba(99, 102, 241, 0.25);
-                ">${skills.length} 个可用技能</span>
+                ">${AGY_BUILTIN_SKILLS.length} 个可用技能</span>
               </div>
               <div style="font-size: 12px; color: var(--muted-foreground, #94a3b8); margin-top: 2px;">
                 点击任意卡片一键填入指令并唤醒对应专家角色
