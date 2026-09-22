@@ -8,7 +8,7 @@
 **An all-in-one UI and interaction enhancement suite tailored for the official Google Antigravity desktop client.**
 
 <p align="center">
-  <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases"><img src="https://img.shields.io/badge/Release-v0.1.4-6366f1?style=flat-square" alt="Release" /></a>
+  <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases"><img src="https://img.shields.io/badge/Release-v0.1.5-6366f1?style=flat-square" alt="Release" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-10b981?style=flat-square" alt="License" /></a>
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools"><img src="https://img.shields.io/badge/Platform-Windows_%7C_macOS_%7C_Linux-0284c7?style=flat-square" alt="Platform" /></a>
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools"><img src="https://img.shields.io/badge/UI-Dual_Theme_GUI-8b5cf6?style=flat-square" alt="UI" /></a>
@@ -55,18 +55,18 @@ Eliminates DOM oscillation loops, delivering sub-millisecond response to convers
 
 ### Design Philosophy & Inspiration
 
-Throughout the architectural conception and UX design of **Antigravity Enhance Tools**, the project has deeply studied industry-leading AI productivity tools and open source innovations:
+Throughout the architectural conception and UX design of **Antigravity Enhance Tools**, the project has deeply integrated best practices from leading tools and open source projects:
 
-1. **Codex-Inspired Interaction**:
-   - **Context Budget Transparency**: Transparent token consumption telemetry pill in the status bar and 5-tier breakdown card, giving developers full visibility into token usage and context limits.
-   - **Thinking Depth Control**: Smooth 4-tier slider embedded directly into the model selector to adjust reasoning depth without interrupting coding flow.
+1. **Antigravity Tools Concept Integration**: Inspired by the community's Antigravity tools project for account quota tracking and utility management; but instead of running a separate bloated standalone window, this project natively embeds all core multi-account management directly into Antigravity with zero overhead.
+2. **Codex-Inspired Interaction**: Transparent token consumption telemetry pill (5-tier breakdown card) and seamless thinking depth slider (4-tier control) eliminating context anxiety.
+3. **Workbuddy-Inspired UI/UX**: Minimalist aesthetic with rounded cards and subtle glow, paired with a proprietary DOM Cache Guard ensuring zero-jank fluid interaction.
+4. **Open Source Localization Reference**: Deeply inspired by [renkeshui/antigravity-chinese-locale](https://github.com/renkeshui/antigravity-chinese-locale) for its comprehensive terminology mapping and localization structure.
 
-2. **Workbuddy-Inspired UI/UX**:
-   - **Modern Aesthetic**: Rounded card layout, delicate glowing gradient logo, clear shadow layering, and high-fidelity typography matching host environments.
-   - **Zero-Jank Experience**: Proprietary DOM Cache Guard and event debounce engines preventing recursive DOM loops and re-render stutter.
-
-3. **Open Source Localization Reference**:
-   - Deeply inspired by the pioneering open-source project [renkeshui/antigravity-chinese-locale](https://github.com/renkeshui/antigravity-chinese-locale) for its comprehensive terminology mapping and localization structure.
+> [!IMPORTANT]
+> **🛡️ Security & Local Privacy Guarantee**
+> - **100% Local Storage**: No remote third-party servers; zero telemetry or telemetry tracking.
+> - **OS-Level Credential Isolation**: OAuth tokens, refresh tokens, and account profiles are stored **strictly inside your local operating system credential store** (Windows Credential Manager / macOS Keychain) and local private directory (`~/.gemini/account_profiles/`).
+> - **Direct Google Communication**: All authentication handshakes connect directly from your machine to official Google OAuth endpoints. Logging out triggers double confirmation and securely wipes credentials from system memory.
 
 ---
 
@@ -75,6 +75,12 @@ Throughout the architectural conception and UX design of **Antigravity Enhance T
 ### Native Full UI Localization
 - **100% Coverage**: Complete translation of menu bars, workspace views, sidebar panels, input fields, and dialogs.
 - **Developer-Calibrated Terminology**: Carefully tuned for LLMs, agentic workflows, and pair programming.
+
+### Dynamic Multi-Account Switcher
+- **Native Embedded Experience**: Eliminates the need for bloated standalone external tools by seamlessly embedding multi-account management directly into Antigravity's status bar.
+- **Unlimited Dynamic Profiles**: Fully dynamic architecture supporting unlimited Google accounts (PRO / ULTRA / FREE) with instant search and filter tabs.
+- **Instant Hot-Swapping**: One-click profile switching with automatic Access Token refresh and OS credential manager synchronization.
+- **Unified Avatar Interaction**: Click the bottom-bar avatar or display name to summon the management modal; includes double-confirmation logout with clean credential removal.
 
 ### Real-time Context Telemetry
 - **Status Bar Dynamic Capsule**: Displays exact consumed tokens and percentage (e.g. `6.4K / 250K (2.6%)`).
@@ -118,6 +124,19 @@ curl -fsSL https://raw.githubusercontent.com/Kutaze/Antigravity-Enhance-Pack-Too
 
 ## 📝 Changelog
 
+### [v0.1.5] - 2026-09-23
+- **Dynamic Multi-Account Management & Hot-Switching**:
+  - Embedded multi-account management natively into the status bar, removing external application bloat;
+  - Dynamic profile pool: Add, manage, and hot-switch unlimited Google accounts with real-time filtering;
+  - Security isolation: JWT email validation preventing credential pollution;
+  - Safe logout: Modal confirmation with OS credential cleanup;
+  - 100% local storage guarantee with zero remote telemetry.
+- **Unified Bottom-Bar User Interaction**:
+  - Merged user avatar and profile switch button into a seamless entrance;
+  - Redesigned compact quota badge with refined tooltip positioning.
+- **Deep Localization Expansion**:
+  - Added 437 new UI translation entries for dialogs, settings, and notifications.
+
 ### [v0.1.4] - 2026-09-21
 - **Skills Hub Overhaul**: Upgraded to 3-column responsive grid layout, high-contrast dark typography for both themes, auto new-chat invocation, and directory reveal.
 - **Startup Zoom Safety Guard**: Cleared corrupted Chromium zoom caches and implemented strict bounds clamping against abnormal UI magnifications; added global zoom hotkeys (`Ctrl+0` / `Ctrl+=` / `Ctrl+-`) with visual toast feedback.
@@ -133,4 +152,5 @@ curl -fsSL https://raw.githubusercontent.com/Kutaze/Antigravity-Enhance-Pack-Too
 
 - Licensed under the [MIT License](LICENSE).
 - Special thanks to [renkeshui/antigravity-chinese-locale](https://github.com/renkeshui/antigravity-chinese-locale) for pioneering localization work on Antigravity.
+- Special thanks to community project Antigravity tools for quota tracking and account management ideas, which inspired our native embedded design.
 - Google Antigravity is a trademark of Google LLC. This project is an independent community project.

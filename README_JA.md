@@ -8,7 +8,7 @@
 **Google Antigravity 公式デスクトップクライアント向けに特化したUIおよび操作性拡張スイート。**
 
 <p align="center">
-  <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases"><img src="https://img.shields.io/badge/Release-v0.1.4-6366f1?style=flat-square" alt="Release" /></a>
+  <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases"><img src="https://img.shields.io/badge/Release-v0.1.5-6366f1?style=flat-square" alt="Release" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-10b981?style=flat-square" alt="License" /></a>
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools"><img src="https://img.shields.io/badge/Platform-Windows_%7C_macOS_%7C_Linux-0284c7?style=flat-square" alt="Platform" /></a>
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools"><img src="https://img.shields.io/badge/UI-Dual_Theme_GUI-8b5cf6?style=flat-square" alt="UI" /></a>
@@ -57,16 +57,16 @@ DOM監視のループ振動を防止し、会話インタラクションにミ�
 
 本プロジェクトは、業界の先進的AIツールおよびオープンソースコミュニティの成果から深く学び構築されています：
 
-1. **Codex に学ぶ直感的なインタラクション**:
-   - **コンテキスト消費の可視化**: トークン使用量をステータスバーカプセルと5段階ホバーカードでリアルタイム表示し、コンテキスト溢れへの不安を解消。
-   - **思考深度のスムーズな制御**: モデル選択メニュー内に4段階の思考スライダーを配置し、作業の流れを止めずに推論深度を調整。
+1. **Antigravity tools の思想吸収とネイティブ内蔵化**: アカウント使用量枠や多機能管理の方向性を参考にしつつ、独立した外部アプリを別途起動する煩わしさとメモリ消費を排除するため、全機能を Antigravity クライアント内部へネイティブ統合。
+2. **Codex に学ぶ直感的なインタラクション**: トークン使用量をステータスバーカプセル（5段階カード）でリアルタイム可視化し、思考スライダーで推論深度を即座に調整。
+3. **Workbuddy に学ぶモダンなUI/UX**: 洗練された丸角デザインと独自の DOM キャッシュガード（Cache Guard）により、画面のちらつきやフリーズを根絶。
+4. **オープンソースへのリスペクト**: 先駆的オープンソースプロジェクト [renkeshui/antigravity-chinese-locale](https://github.com/renkeshui/antigravity-chinese-locale) の知見を深く参考にさせていただきました。
 
-2. **Workbuddy に学ぶモダンなUI/UX**:
-   - **洗練されたデザイン**: 微細な光沢グラデーションロゴ、階層構造のシャドウ、現代的な丸角スタイルを統一。
-   - **ゼロ・ジャンク体験**: 独自の DOM キャッシュガード（Cache Guard）を搭載し、Electron + React 環境特有の画面ちらつきやフリーズを根絶。
-
-3. **オープンソースへのリスペクト**:
-   - Antigravity クライアントの日本語・多言語化にあたり、先駆的オープンソースプロジェクト [renkeshui/antigravity-chinese-locale](https://github.com/renkeshui/antigravity-chinese-locale) の知見を深く参考にさせていただきました。
+> [!IMPORTANT]
+> **🛡️ アカウントセキュリティとローカルプライバシー保護宣言**
+> - **100% ローカル保存・外部送信ゼロ**: 外部サーバーは一切使用せず、データの第三者収集や通信は行いません。
+> - **OS水準の認証情報隔離**: アカウントのOAuthトークンや更新トークンは、すべてローカルOSのセキュアな認証情報マネージャー（Windows Credential Manager / macOS Keychain）および専用フォルダ（`~/.gemini/account_profiles/`）にのみ安全に保管されます。
+> - **公式直接通信と完全自律**: 認証およびトークン更新は端末から直接 Google 公式エンドポイントと行われます。ログアウト時の二次確認と端末内完全消去に対応。
 
 ---
 
@@ -75,6 +75,12 @@ DOM監視のループ振動を防止し、会話インタラクションにミ�
 ### ネイティブ全画面多言語化
 - メニューバー、サイドパネル、対話入力欄、設定画面などUI全域をカバー。
 - AIプログラミングやAgent共同作業に即した自然な専門用語調整。
+
+### 動的マルチアカウント即時切り替え (Multi-Account Switcher)
+- **ネイティブ内蔵化デザイン**: 肥大化した外部ツールを別途起動する必要なく、底面ステータスバーから直接切り替えと残量枠確認が可能。
+- **無制限動的プロファイル**: Google アカウント（PRO / ULTRA / FREE）を制限なく登録・管理・検索可能。
+- **ワンクリック即時切替**: Access Token の自動リフレッシュと OS 認証情報ストアの同期により、アカウント混線を徹底防止。
+- **アバター統合インタラクション**: アバターまたはユーザー名クリックで管理画面を展開。二段階確認付きログアウトと認証情報の完全削除をサポート。
 
 ### リアルタイムコンテキスト測定
 - ステータスバー常駐カプセルでトークン消費量と残量を動的表示（例: `6.4K / 250K (2.6%)`）。
@@ -117,6 +123,19 @@ curl -fsSL https://raw.githubusercontent.com/Kutaze/Antigravity-Enhance-Pack-Too
 
 ## 📝 更新履歴
 
+### [v0.1.5] - 2026-09-23
+- **動的マルチアカウント即時切り替えシステム**:
+  - 外部ツールの機能をクライアント内へ直接統合し、不要な常駐アプリの負荷を完全解消。
+  - 無制限の動的アカウント管理（PRO / ULTRA / FREE）と高速検索・フィルター対応。
+  - JWT署名検証によるアカウント間の認証情報混線防止。
+  - 二段階確認付きログアウトとOS認証情報ストア（Windows Credential Manager / Keychain）の完全削除。
+  - 100% ローカル保存のセキュリティ・プライバシー保証。
+- **底面ステータスバーのアバター統合**:
+  - アバターとアカウント切り替えボタンを統合し、シームレスなUI操作を実現。
+  - 残量枠バッジとツールチップの視認性を向上。
+- **UI多言語化の更なる拡充**:
+  - ダイアログや設定項目を中心に437件の翻訳データを追加。
+
 ### [v0.1.4] - 2026-09-21
 - **スキルハブ（Skills Hub）の刷新**：3列レスポンシブグリッドレイアウトへの全面改修、ダーク・ライト両テーマにおける高コントラストなテキスト表示、新規チャット自動遷移呼び出し、仕様フォルダ展開機能。
 - **起動時ズーム異常の安全ガード**：破損したChromiumキャッシュを自動クリアし、異常なUI拡大を防止するガードを実装。グローバルズームショートカット（`Ctrl+0` / `Ctrl+=` / `Ctrl+-`）とリアルタイムトースト通知を追加。
@@ -132,4 +151,5 @@ curl -fsSL https://raw.githubusercontent.com/Kutaze/Antigravity-Enhance-Pack-Too
 
 - 本プロジェクトは [MIT License](LICENSE) のもとで公開されています。
 - [renkeshui/antigravity-chinese-locale](https://github.com/renkeshui/antigravity-chinese-locale) プロジェクトに心より感謝申し上げます。
+- コミュニティプロジェクト Antigravity tools のアカウント枠管理およびツール統合の着想に深く感謝申し上げます。
 - Google Antigravity は Google LLC の商標です。本プロジェクトは独立したコミュニティによるオープンソースソフトウェアです。

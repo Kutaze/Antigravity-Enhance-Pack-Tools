@@ -8,7 +8,7 @@
 **专为 Google Antigravity 官方桌面客户端打造的汉化与原生 UI 交互增强套件。**
 
 <p align="center">
-  <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases"><img src="https://img.shields.io/badge/Release-v0.1.4-6366f1?style=flat-square" alt="Release" /></a>
+  <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases"><img src="https://img.shields.io/badge/Release-v0.1.5-6366f1?style=flat-square" alt="Release" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-10b981?style=flat-square" alt="License" /></a>
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools"><img src="https://img.shields.io/badge/Platform-Windows_%7C_macOS_%7C_Linux-0284c7?style=flat-square" alt="Platform" /></a>
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools"><img src="https://img.shields.io/badge/UI-Dual_Theme_GUI-8b5cf6?style=flat-square" alt="UI" /></a>
@@ -62,18 +62,18 @@
 
 ### 开发思路与设计灵感 (Design Philosophy & Inspiration)
 
-在软件架构构思、交互体系设计与本地化实现的开发全过程中，**Antigravity Enhance Tools** 深入学习并借鉴了业内两款标杆级 AI 生产力工具以及开源社区前沿项目的优秀经验：
+在软件架构构思与交互体系设计的全过程中，**Antigravity Enhance Tools** 深入借鉴了业内标杆工具与开源社区的实践经验：
 
-1. **学习 Codex 的深度交互逻辑 (Codex-Inspired Interaction)**：
-   - **上下文预算透明化与认知安全感**：Codex 强调让模型与代码环境之间的交互过程清晰、透明且可预期。本项目借鉴其对 Token 消耗与长程上下文管理的透传思维，开发了底栏实时动态度量胶囊与五段式用量遥测面板，使开发者在多轮代码生成、重构与工具调用过程中，对会话预算与上下文窗口占用一目了然，彻底消除“上下文溢出未知”的心理焦虑。
-   - **平滑即时的认知深度调控（Thinking Depth Control）**：吸收其对大语言模型推理深度按需调优的交互直觉，将模型思维链（Thinking）调控抽象为模型切换菜单内的 4 挡无级滑动调节，随心随手，不打断沉浸式编程心流。
+1. **汲取 Antigravity tools 思路并实现内嵌轻量化**：参考了开源社区 Antigravity tools 项目关于账号配额与多工具管理的方向；但因深感独立外部程序单独打开过于臃肿繁琐，本项目选择将其核心能力以零额外进程、极轻量化的方式直接深度集成进 Antigravity 客户端内部，实现原生内嵌式丝滑体验。
+2. **学习 Codex 的深度交互逻辑**：引入上下文预算透明化理念（五段式用量遥测面板）与即时思考深度调控（4 挡思考滑块），消除长程对话焦虑。
+3. **学习 Workbuddy 的界面交互美学**：吸收圆角卡片、柔和微光渐变与现代排版，并设计独创「DOM 缓存守卫（Cache Guard）」，兼具现代视觉与零震荡高流畅度。
+4. **致敬开源项目 renkeshui/antigravity-chinese-locale 的汉化实践**：充分参考其本地化词条全景映射与术语校准沉淀，并升级运行时防卡死机制，带来母语级编程体验。
 
-2. **学习 Workbuddy 的界面交互体验 (Workbuddy-Inspired UI/UX)**：
-   - **现代呼吸感视觉与极简美学**：Workbuddy 在桌面端交互界面中展现了极高水准的克制美学。本项目在原生 GUI 安装向导以及内嵌增强 UI 体系中，全面吸收其圆角卡片、柔和微光渐变徽标、层次清晰的阴影层叠与高品质排版体系，彻底摒弃传统插件粗糙突兀的高反差视觉，与宿主官方现代暗色/亮色环境浑然天成。
-   - **防震荡与高流畅度体验（Zero-Jank Experience）**：不仅在视觉风格上对齐 Workbuddy 的现代丝滑交互，更在底层设计了独创的「DOM 缓存守卫（Cache Guard）」与事件防抖节流引擎，杜绝 Electron + React 复杂长会话频繁重绘引发的界面抖动与递归死循环，确保每一步点击与滑动都如 Workbuddy 般轻盈流畅。
-
-3. **学习并致敬开源项目 renkeshui/antigravity-chinese-locale 的汉化实践 (Open Source Localization)**：
-   - **全景本地化词条与工程经验**：在客户端汉化模块的构建中，本项目深入学习并借鉴了优秀开源项目 [renkeshui/antigravity-chinese-locale](https://github.com/renkeshui/antigravity-chinese-locale) 的汉化理念与工程实践。充分参考其在 Antigravity 客户端本地化词条全面覆盖、复杂界面文本映射以及关键技术术语本地化调优方面的沉淀，并在其基础上进一步升级了 DOM 缓存守卫与运行时防卡死机制，为国内开发者带来兼具高覆盖度与高稳定性的母语级编程体验。
+> [!IMPORTANT]
+> **🛡️ 账号安全与本地隐私承诺 (Security & Privacy First)**
+> - **100% 本地存储，绝无云端中转**：本扩展**无任何第三方服务器**，不搜集、不上报任何用户隐私与交互数据。
+> - **系统级凭据隔离**：多账号的 OAuth 令牌、Refresh Token 及个人标签**仅存储在您本机的操作系统级安全凭据库**（Windows Credential Manager / macOS Keychain）以及本地专属私有目录（`~/.gemini/account_profiles/`）。
+> - **官方直连与绝对自主**：所有登录与令牌刷新均直接由用户本机与 Google 官方端点通信；退出登录支持一键二次确认并物理擦除系统凭据，数据完全由您自主掌控。
 
 ---
 
@@ -107,6 +107,12 @@
 - **词条 100% 深度覆盖**：全面汉化客户端菜单栏、工作区视窗、侧边栏导航、对话输入框、配置面板及各组件提示语。
 - **汲取开源社区实践**：汉化体系深度借鉴并学习了开源先驱项目 [renkeshui/antigravity-chinese-locale](https://github.com/renkeshui/antigravity-chinese-locale)，结合专业 AI 编程与 Agent 交互语境完成全量词典校对与母语级精细润色。
 - **专业级术语润色**：针对大语言模型、上下文预算、Agent 智能体、结对编程场景进行精细校准，彻底告别机器翻译的生硬感。
+
+### 动态多账号无缝秒切与配额管理 (Multi-Account Switcher)
+- **原生内嵌化融合设计**：不再需要单独启动臃肿的外部独立工具，直接将多账号切换与配额管理无缝整合到 Antigravity 客户端底部状态栏。
+- **动态无限账号池**：完全通用的动态架构，支持无上限添加多个 Google 账号（PRO / ULTRA / FREE），支持动态搜索与分类过滤。
+- **一键极速秒切**：点击即切，自动同步刷新 Access Token 并写入系统凭据库，彻底避免跨账号凭证串号或会话混乱。
+- **头像一体化快捷交互**：底栏用户头像与切换按钮双向融合，点击头像或昵称即可直接呼出账号管理面板；支持退出登录二次确认与本地凭据深度注销。
 
 ### 真实上下文动态遥测
 - **底栏常驻高灵敏胶囊**：实时显示当前对话消耗的 Token 精确数值与使用百分比（如 `6.4K / 250K (2.6%)`）。
@@ -329,6 +335,19 @@ window.__AGY_APPLY_THINKING_LEVEL__('high');
 
 ## 📝 变更日志
 
+### [v0.1.5] - 2026-09-23
+- **多账号原生动态管理与无缝秒切体系**：
+  - 将外部独立工具的配额与账号管理能力直接深度内嵌到客户端内部，告别多开外部软件的臃肿与繁琐；
+  - 动态账号池架构：支持无上限添加、管理与一键秒切多个 Google 账号（PRO / ULTRA / FREE），内置动态搜索与分类筛选；
+  - 注入 JWT 签名验真机制与凭据防污染防护，实现不同账号凭证的绝对物理隔离；
+  - 退出登录支持弹窗二次确认与系统级凭据（Windows Credential Manager / Keychain）物理注销；
+  - 安全声明：所有账号数据 100% 仅保存在用户本地设备，零云端中转。
+- **底栏状态交互一体化重构**：
+  - 头像与账号切换入口合二为一，点击头像或昵称即可直达账号管理面板；
+  - 配额指示窗重构为紧凑精致的圆角悬浮设计，带来清晰精准的 Hover Tooltip 体验。
+- **全景汉化深度扩充**：
+  - 新增 437 条深度界面汉化词条，进一步完善设置项与提示弹窗的母语级覆盖。
+
 ### [v0.1.4] - 2026-09-21
 - **技能中心 (Skills Hub) 体验全面升级**：
   - 排版重构为更整齐舒适的 3 列响应式网格布局，卡片层次分明；
@@ -387,6 +406,7 @@ window.__AGY_APPLY_THINKING_LEVEL__('high');
 
 ### 致谢与开源参考
 - 特别鸣谢开源项目 [renkeshui/antigravity-chinese-locale](https://github.com/renkeshui/antigravity-chinese-locale) 在 Antigravity 客户端汉化探索上的宝贵先驱实践，本项目汉化模块的设计与词条体系深受其启发。
+- 特别鸣谢开源社区项目 Antigravity tools 在账号配额与工具集成思路上的探索，本项目吸收其方向并深度内嵌至客户端，避免了外部独立程序的臃肿与多开负担。
 
 ### 免责声明
 - Google Antigravity 是 Google LLC 的商标。本项目为独立开源社区作品，与 Google LLC 及其关联实体不存在任何隶属、认可、赞助或官方合作关系。
