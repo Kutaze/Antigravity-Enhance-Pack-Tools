@@ -6521,9 +6521,12 @@
                     await window.__AGY_REFRESH_QUOTA__();
                 }
                 await syncCurrentAccount();
+                if (window.electronNative && typeof window.electronNative.refreshAllAccountQuotas === 'function') {
+                    await window.electronNative.refreshAllAccountQuotas();
+                }
                 await loadProfilesAndRender();
                 if (window.__AGY_SHOW_TOAST__) {
-                    window.__AGY_SHOW_TOAST__('🔍 已完成本地账号存档检测与状态同步');
+                    window.__AGY_SHOW_TOAST__('🔍 已完成所有本地账号的实时额度探测与同步');
                 }
             } finally {
                 if (btn) btn.classList.remove('agy-spinning');
@@ -6562,29 +6565,54 @@
         const c5h = quota?.claude?.fiveHour;
         const cWk = quota?.claude?.weekly;
 
-        const g5hPct = (typeof g5h?.percent === 'number') ? g5h.percent : 100;
-        let g5hReset = g5h?.resetText ? g5h.resetText.replace(' 重置', '').trim() : '4h 59m';
-        if (!g5hReset || g5hReset.includes('d')) {
-            g5hReset = '4h 59m';
+        function computeBucketCountdown(b, defaultText, is5h) {
+            if (!b) return { pct: 100, resetText: defaultText };
+            let pct = (typeof b.percent === 'number') ? b.percent : 100;
+            let resetText = '';
+            let resetMs = 0;
+            if (b.resetTime) {
+                resetMs = typeof b.resetTime === 'number' ? b.resetTime : Date.parse(b.resetTime);
+            }
+            if (resetMs > 0) {
+                const diffMs = resetMs - Date.now();
+                if (diffMs <= 0) {
+                    pct = 100;
+                    resetText = '刚刚已重置';
+                } else {
+                    const totalMins = Math.floor(diffMs / 60000);
+                    const days = Math.floor(totalMins / 1440);
+                    const hours = Math.floor((totalMins % 1440) / 60);
+                    const mins = totalMins % 60;
+                    if (days > 0) {
+                        resetText = hours > 0 ? `${days}d ${hours}h` : `${days}d`;
+                    } else if (hours > 0) {
+                        resetText = mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
+                    } else {
+                        resetText = `${mins}m`;
+                    }
+                }
+            } else if (b.resetText) {
+                resetText = b.resetText.replace(' 重置', '').trim();
+            }
+            if (!resetText) resetText = defaultText;
+            if (is5h && resetText.includes('d')) resetText = defaultText;
+            if (!is5h && resetText.includes('h') && !resetText.includes('d')) resetText = defaultText;
+            return { pct, resetText };
         }
 
-        const gWkPct = (typeof gWk?.percent === 'number') ? gWk.percent : 100;
-        let gWkReset = gWk?.resetText ? gWk.resetText.replace(' 重置', '').trim() : '6d 23h';
-        if (!gWkReset || (gWkReset.includes('h') && !gWkReset.includes('d'))) {
-            gWkReset = '6d 23h';
-        }
+        const g5hInfo = computeBucketCountdown(g5h, '4h 59m', true);
+        const gWkInfo = computeBucketCountdown(gWk, '6d 23h', false);
+        const c5hInfo = computeBucketCountdown(c5h, '4h 59m', true);
+        const cWkInfo = computeBucketCountdown(cWk, '6d 23h', false);
 
-        const c5hPct = (typeof c5h?.percent === 'number') ? c5h.percent : 100;
-        let c5hReset = c5h?.resetText ? c5h.resetText.replace(' 重置', '').trim() : '4h 59m';
-        if (!c5hReset || c5hReset.includes('d')) {
-            c5hReset = '4h 59m';
-        }
-
-        const cWkPct = (typeof cWk?.percent === 'number') ? cWk.percent : 100;
-        let cWkReset = cWk?.resetText ? cWk.resetText.replace(' 重置', '').trim() : '6d 23h';
-        if (!cWkReset || (cWkReset.includes('h') && !cWkReset.includes('d'))) {
-            cWkReset = '6d 23h';
-        }
+        const g5hPct = g5hInfo.pct;
+        const g5hReset = g5hInfo.resetText;
+        const gWkPct = gWkInfo.pct;
+        const gWkReset = gWkInfo.resetText;
+        const c5hPct = c5hInfo.pct;
+        const c5hReset = c5hInfo.resetText;
+        const cWkPct = cWkInfo.pct;
+        const cWkReset = cWkInfo.resetText;
 
         const getStatusClass = (pct) => {
             if (pct <= 20) return 'low';
@@ -6784,18 +6812,27 @@
         });
 
         // 2. Refresh single
-        body.querySelectorAll('.agy-as-btn-refresh-single').forEach(btn => {
+        body.querySelectorAll('.agy-as-card-btn-refresh-single').forEach(btn => {
             btn.onclick = async (e) => {
                 e.stopPropagation();
                 const em = btn.getAttribute('data-email');
+                if (!em) return;
                 btn.classList.add('agy-spinning');
                 try {
-                    if (em.toLowerCase() === currentActiveEmail.toLowerCase() && typeof window.__AGY_REFRESH_QUOTA__ === 'function') {
-                        await window.__AGY_REFRESH_QUOTA__();
-                        await syncCurrentAccount();
+                    if (em.toLowerCase() === currentActiveEmail.toLowerCase()) {
+                        if (typeof window.__AGY_REFRESH_QUOTA__ === 'function') {
+                            await window.__AGY_REFRESH_QUOTA__();
+                            await syncCurrentAccount();
+                        }
+                    } else {
+                        if (window.electronNative && typeof window.electronNative.refreshAccountQuota === 'function') {
+                            await window.electronNative.refreshAccountQuota(em);
+                        }
                     }
                     await loadProfilesAndRender();
-                    if (window.__AGY_SHOW_TOAST__) window.__AGY_SHOW_TOAST__(`⚡ 账号 ${em} 配额已更新`);
+                    if (window.__AGY_SHOW_TOAST__) window.__AGY_SHOW_TOAST__(`⚡ 账号 ${em} 实时配额已同步`);
+                } catch(err) {
+                    console.error('[Account Switcher] Refresh failed:', err);
                 } finally {
                     btn.classList.remove('agy-spinning');
                 }
@@ -7513,10 +7550,14 @@
             console.error('[Account Switcher] loadProfiles error:', e);
         }
         try {
+            const refreshTasks = [];
             if (typeof window.__AGY_REFRESH_QUOTA__ === 'function') {
-                await window.__AGY_REFRESH_QUOTA__();
+                refreshTasks.push(window.__AGY_REFRESH_QUOTA__().then(() => syncCurrentAccount()).catch(() => {}));
             }
-            await syncCurrentAccount();
+            if (window.electronNative && typeof window.electronNative.refreshAllAccountQuotas === 'function') {
+                refreshTasks.push(window.electronNative.refreshAllAccountQuotas().catch(() => {}));
+            }
+            await Promise.allSettled(refreshTasks);
             await loadProfilesAndRender();
         } catch(e) {}
     }

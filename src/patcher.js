@@ -637,6 +637,131 @@ try {
             } catch(e) {}
         }
 
+        async function _fetchRemoteAccountQuota(email) {
+            try {
+                if (!email) return null;
+                _ensureProfilesDir();
+                const accDir = _path.join(_profilesDir, _safeEmailKey(email));
+                const oauthFile = _path.join(accDir, 'oauth_creds.json');
+                if (!_fs.existsSync(oauthFile)) return null;
+                let creds = _readJsonSafe(oauthFile, null);
+                if (!creds || !creds.refresh_token) return null;
+
+                let accessToken = creds.access_token;
+                const now = Date.now();
+                if (!accessToken || !creds.expiry_date || now >= creds.expiry_date - 180000) {
+                    const refreshed = await _refreshGoogleAccessToken(creds.refresh_token);
+                    if (refreshed && refreshed.access_token) {
+                        accessToken = refreshed.access_token;
+                        creds.access_token = accessToken;
+                        creds.expiry_date = now + ((refreshed.expires_in || 3600) * 1000);
+                        _writeJsonSafe(oauthFile, creds);
+                    } else if (!accessToken) {
+                        return null;
+                    }
+                }
+
+                const https = require('https');
+                const quotaData = await new Promise((resolve) => {
+                    const req = https.request({
+                        hostname: 'daily-cloudcode-pa.sandbox.googleapis.com',
+                        path: '/v1internal:retrieveUserQuotaSummary',
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'Bearer ' + accessToken,
+                            'Content-Type': 'application/json',
+                            'User-Agent': 'antigravity/0.1.5'
+                        },
+                        timeout: 6000
+                    }, (res) => {
+                        let d = '';
+                        res.on('data', chunk => d += chunk);
+                        res.on('end', () => {
+                            try { resolve(JSON.parse(d)); } catch(e) { resolve(null); }
+                        });
+                    });
+                    req.on('error', () => resolve(null));
+                    req.on('timeout', () => { req.destroy(); resolve(null); });
+                    req.write(JSON.stringify({}));
+                    req.end();
+                });
+
+                if (!quotaData || !Array.isArray(quotaData.groups)) return null;
+
+                const groups = quotaData.groups;
+                const geminiGroup = groups.find(g => (g.displayName && g.displayName.toLowerCase().includes('gemini')) || (g.name && g.name.toLowerCase().includes('gemini')));
+                const claudeGroup = groups.find(g => (g.displayName && (g.displayName.toLowerCase().includes('claude') || g.displayName.toLowerCase().includes('gpt'))) || (g.name && g.name.toLowerCase().includes('claude')));
+
+                function parseApiBucket(b, win) {
+                    if (!b) return null;
+                    let frac = typeof b.remainingFraction === 'number' ? b.remainingFraction : 1;
+                    let pct = Math.round(frac * 100);
+                    let resetText = '';
+                    let resetMs = 0;
+                    if (b.resetTime) {
+                        resetMs = Date.parse(b.resetTime) || 0;
+                        if (resetMs > 0) {
+                            const diffMs = resetMs - Date.now();
+                            if (diffMs <= 0) {
+                                pct = 100;
+                                frac = 1.0;
+                                resetText = '已重置';
+                            } else {
+                                const totalMins = Math.floor(diffMs / 60000);
+                                const days = Math.floor(totalMins / 1440);
+                                const hours = Math.floor((totalMins % 1440) / 60);
+                                const mins = totalMins % 60;
+                                if (days > 0) {
+                                    resetText = hours > 0 ? (days + 'd ' + hours + 'h') : (days + 'd');
+                                } else if (hours > 0) {
+                                    resetText = mins > 0 ? (hours + 'h ' + mins + 'm') : (hours + 'h');
+                                } else {
+                                    resetText = mins + 'm';
+                                }
+                            }
+                        }
+                    }
+                    return {
+                        id: b.bucketId || (win + '-bucket'),
+                        window: win,
+                        fraction: frac,
+                        percent: pct,
+                        resetTime: b.resetTime || (resetMs ? new Date(resetMs).toISOString() : ''),
+                        resetText: resetText ? (resetText + ' 重置') : (win === '5h' ? '4h 59m 重置' : '6d 23h 重置')
+                    };
+                }
+
+                function getBuckets(grp) {
+                    if (!grp || !Array.isArray(grp.buckets)) return { weekly: null, fiveHour: null };
+                    const b = grp.buckets;
+                    const wk = b.find(x => x.window === 'weekly' || (x.bucketId && x.bucketId.includes('week')));
+                    const fh = b.find(x => x.window === '5h' || (x.bucketId && (x.bucketId.includes('5h') || x.bucketId.includes('hour'))));
+                    return {
+                        weekly: parseApiBucket(wk, 'weekly'),
+                        fiveHour: parseApiBucket(fh, '5h')
+                    };
+                }
+
+                const gBuckets = getBuckets(geminiGroup);
+                const cBuckets = getBuckets(claudeGroup);
+
+                return {
+                    gemini: {
+                        name: 'Gemini 系列',
+                        weekly: gBuckets.weekly,
+                        fiveHour: gBuckets.fiveHour
+                    },
+                    claude: {
+                        name: 'Claude / GPT 系列',
+                        weekly: cBuckets.weekly,
+                        fiveHour: cBuckets.fiveHour
+                    }
+                };
+            } catch(e) {
+                return null;
+            }
+        }
+
         _ipc.handle('antigravity:get-account-profiles', async () => {
             try {
                 _ensureProfilesDir();
@@ -924,6 +1049,55 @@ try {
                 return { success: true };
             } catch(err) {
                 return { success: false, error: err.message };
+            }
+        });
+
+        _ipc.handle('antigravity:refresh-account-quota', async (_e, email) => {
+            try {
+                if (!email) return { success: false, error: 'Email is required' };
+                const q = await _fetchRemoteAccountQuota(email);
+                if (!q) return { success: false, error: 'Failed to fetch quota from server' };
+                _ensureProfilesDir();
+                let meta = _readJsonSafe(_metaFile, { active: '', profiles: [] });
+                let p = (meta.profiles || []).find(x => x.email && x.email.toLowerCase() === email.toLowerCase());
+                if (p) {
+                    p.quota = q;
+                    _writeJsonSafe(_metaFile, meta);
+                }
+                return { success: true, email, quota: q, profiles: meta.profiles };
+            } catch(e) {
+                return { success: false, error: e.message };
+            }
+        });
+
+        _ipc.handle('antigravity:refresh-all-quotas', async () => {
+            try {
+                _ensureProfilesDir();
+                let meta = _readJsonSafe(_metaFile, { active: '', profiles: [] });
+                const currentAcc = _readJsonSafe(_activeAccFile, {}) || {};
+                const activeEmail = (currentAcc.active || meta.active || '').toLowerCase();
+                const profiles = meta.profiles || [];
+                let updatedCount = 0;
+
+                const refreshTasks = profiles.map(async (p) => {
+                    if (!p || !p.email) return;
+                    if (p.email.toLowerCase() === activeEmail) return;
+                    try {
+                        const q = await _fetchRemoteAccountQuota(p.email);
+                        if (q) {
+                            p.quota = q;
+                            updatedCount++;
+                        }
+                    } catch(err) {}
+                });
+
+                await Promise.allSettled(refreshTasks);
+                if (updatedCount > 0) {
+                    _writeJsonSafe(_metaFile, meta);
+                }
+                return { success: true, updatedCount, profiles: meta.profiles };
+            } catch(e) {
+                return { success: false, error: e.message };
             }
         });
 
@@ -1333,6 +1507,8 @@ try {
     bindDeviceFingerprint: (email, fingerprint, applyNow) => electron_1.ipcRenderer.invoke('antigravity:bind-device-fingerprint', { email, fingerprint, applyNow }),
     openAccountFolder: (email) => electron_1.ipcRenderer.invoke('antigravity:open-account-folder', email),
     exportAccountProfile: (email) => electron_1.ipcRenderer.invoke('antigravity:export-account-profile', email),
+    refreshAccountQuota: (email) => electron_1.ipcRenderer.invoke('antigravity:refresh-account-quota', email),
+    refreshAllAccountQuotas: () => electron_1.ipcRenderer.invoke('antigravity:refresh-all-quotas'),
     relaunchApp: () => electron_1.ipcRenderer.invoke('antigravity:relaunch-app'),`;
 
             if (preloadContent.includes('takeScreenshot:') && !preloadContent.includes('getAccountProfiles:')) {
@@ -1344,7 +1520,7 @@ try {
             } else if (preloadContent.includes('getAccountProfiles:') && !preloadContent.includes('startOAuthFlow:')) {
                 preloadContent = preloadContent.replace(
                     "getAccountProfiles: () => electron_1.ipcRenderer.invoke('antigravity:get-account-profiles'),",
-                    "getAccountProfiles: () => electron_1.ipcRenderer.invoke('antigravity:get-account-profiles'),\n    startOAuthFlow: () => electron_1.ipcRenderer.invoke('antigravity:start-oauth-flow'),\n    checkOAuthStatus: () => electron_1.ipcRenderer.invoke('antigravity:check-oauth-status'),\n    cancelOAuthFlow: () => electron_1.ipcRenderer.invoke('antigravity:cancel-oauth-flow'),\n    updateAccountTag: (email, tag) => electron_1.ipcRenderer.invoke('antigravity:update-account-tag', { email, tag }),\n    getDeviceFingerprint: (email) => electron_1.ipcRenderer.invoke('antigravity:get-device-fingerprint', email),\n    bindDeviceFingerprint: (email, fingerprint, applyNow) => electron_1.ipcRenderer.invoke('antigravity:bind-device-fingerprint', { email, fingerprint, applyNow }),\n    openAccountFolder: (email) => electron_1.ipcRenderer.invoke('antigravity:open-account-folder', email),\n    exportAccountProfile: (email) => electron_1.ipcRenderer.invoke('antigravity:export-account-profile', email),"
+                    "getAccountProfiles: () => electron_1.ipcRenderer.invoke('antigravity:get-account-profiles'),\n    startOAuthFlow: () => electron_1.ipcRenderer.invoke('antigravity:start-oauth-flow'),\n    checkOAuthStatus: () => electron_1.ipcRenderer.invoke('antigravity:check-oauth-status'),\n    cancelOAuthFlow: () => electron_1.ipcRenderer.invoke('antigravity:cancel-oauth-flow'),\n    updateAccountTag: (email, tag) => electron_1.ipcRenderer.invoke('antigravity:update-account-tag', { email, tag }),\n    getDeviceFingerprint: (email) => electron_1.ipcRenderer.invoke('antigravity:get-device-fingerprint', email),\n    bindDeviceFingerprint: (email, fingerprint, applyNow) => electron_1.ipcRenderer.invoke('antigravity:bind-device-fingerprint', { email, fingerprint, applyNow }),\n    openAccountFolder: (email) => electron_1.ipcRenderer.invoke('antigravity:open-account-folder', email),\n    exportAccountProfile: (email) => electron_1.ipcRenderer.invoke('antigravity:export-account-profile', email),\n    refreshAccountQuota: (email) => electron_1.ipcRenderer.invoke('antigravity:refresh-account-quota', email),\n    refreshAllAccountQuotas: () => electron_1.ipcRenderer.invoke('antigravity:refresh-all-quotas'),"
                 );
                 fs.writeFileSync(preloadJs, preloadContent, 'utf8');
             } else if (!preloadContent.includes('takeScreenshot:')) {
@@ -1358,6 +1534,14 @@ try {
                 preloadContent = preloadContent.replace(
                     "deleteAccountProfile: (email) => electron_1.ipcRenderer.invoke('antigravity:delete-account-profile', email),",
                     "deleteAccountProfile: (email) => electron_1.ipcRenderer.invoke('antigravity:delete-account-profile', email),\n    logoutCurrentAccount: () => electron_1.ipcRenderer.invoke('antigravity:logout-current-account'),"
+                );
+                fs.writeFileSync(preloadJs, preloadContent, 'utf8');
+            }
+
+            if (preloadContent.includes('logoutCurrentAccount:') && !preloadContent.includes('refreshAccountQuota:')) {
+                preloadContent = preloadContent.replace(
+                    "logoutCurrentAccount: () => electron_1.ipcRenderer.invoke('antigravity:logout-current-account'),",
+                    "logoutCurrentAccount: () => electron_1.ipcRenderer.invoke('antigravity:logout-current-account'),\n    refreshAccountQuota: (email) => electron_1.ipcRenderer.invoke('antigravity:refresh-account-quota', email),\n    refreshAllAccountQuotas: () => electron_1.ipcRenderer.invoke('antigravity:refresh-all-quotas'),"
                 );
                 fs.writeFileSync(preloadJs, preloadContent, 'utf8');
             }
