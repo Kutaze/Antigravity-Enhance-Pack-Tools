@@ -499,22 +499,98 @@
     }
   }
 
-  // 2. Lexical Safe Inserter
+  // 2. Lexical & Chat Editor Safe Inserter
   function insertIntoChatBox(text) {
-    const editor = document.querySelector('[data-lexical-editor="true"]');
+    const editor = document.querySelector('[data-lexical-editor="true"], div[contenteditable="true"], textarea.chat-input, textarea');
     if (!editor) {
       alert('未找到聊天输入框，请确保处于对话界面。');
       return;
     }
     editor.focus();
-    const dt = new DataTransfer();
-    dt.setData('text/plain', text);
-    const pasteEvt = new ClipboardEvent('paste', {
-      clipboardData: dt,
-      bubbles: true,
-      cancelable: true
-    });
-    editor.dispatchEvent(pasteEvt);
+    let inserted = false;
+    try {
+      const dt = new DataTransfer();
+      dt.setData('text/plain', text);
+      const pasteEvt = new ClipboardEvent('paste', {
+        clipboardData: dt,
+        bubbles: true,
+        cancelable: true
+      });
+      editor.dispatchEvent(pasteEvt);
+      inserted = true;
+    } catch(e) {}
+    if (!inserted) {
+      try {
+        document.execCommand('insertText', false, text);
+        inserted = true;
+      } catch(e) {
+        if (typeof editor.value === 'string') {
+          editor.value = text;
+          editor.dispatchEvent(new Event('input', { bubbles: true }));
+          inserted = true;
+        }
+      }
+    }
+  }
+
+  function safeClickElement(el) {
+    if (!el) return;
+    try {
+      el.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true }));
+      el.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, cancelable: true }));
+      el.click();
+    } catch(e) {
+      try { el.click(); } catch(err) {}
+    }
+  }
+
+  function triggerNewChatAndInstallSkill(promptText, skillName) {
+    // 1. Click New Chat button
+    try {
+      const allElements = Array.from(document.querySelectorAll('*'));
+      const textMatch = allElements.find(el => {
+        if (el.children && el.children.length > 2) return false;
+        const t = (el.textContent || '').trim();
+        return t === '新建会话' || t === '+ 新建会话' || t === 'New Chat' || t === '+ New Chat' || t === '新对话';
+      });
+      if (textMatch) {
+        const targetBtn = textMatch.closest('button, [role="button"]') || textMatch;
+        safeClickElement(targetBtn);
+      } else {
+        const plusBtn = document.querySelector('button[aria-label*="新建"], button[aria-label*="New"], [data-testid*="new-chat"], button[title*="新建会话"]');
+        if (plusBtn) safeClickElement(plusBtn);
+      }
+    } catch(e) {
+      console.warn('Error clicking new chat:', e);
+    }
+
+    // 2. Poll waiting for new chat editor to mount
+    let attempts = 0;
+    const maxAttempts = 40;
+    const pollTimer = setInterval(() => {
+      attempts++;
+      const editor = document.querySelector('[data-lexical-editor="true"], div[contenteditable="true"], textarea.chat-input, textarea');
+      if (editor || attempts >= maxAttempts) {
+        clearInterval(pollTimer);
+        if (editor) {
+          insertIntoChatBox(promptText);
+          showToast('🚀 已开启新会话并自动输入技能安装指令！');
+          setTimeout(() => {
+            try {
+              const sendBtn = editor.closest('form, div.relative, div[class*="chat-input"]')?.querySelector('button[type="submit"], button[aria-label*="Send"], button[aria-label*="发送"], button:has(svg.lucide-arrow-up)');
+              if (sendBtn && !sendBtn.disabled) {
+                safeClickElement(sendBtn);
+              } else {
+                editor.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
+              }
+            } catch(e) {}
+          }, 400);
+        } else {
+          if (navigator.clipboard) navigator.clipboard.writeText(promptText);
+          showToast('已复制安装指令到剪贴板，请在会话中粘贴发送', false);
+        }
+      }
+    }, 100);
   }
 
   // Toast feedback helper
@@ -888,6 +964,38 @@
   }
 ];
 
+  AGY_BUILTIN_SKILLS.forEach(s => { s.origin = 'builtin'; });
+
+  function inferSkillCategory(id, desc) {
+    const text = ((id || '') + ' ' + (desc || '')).toLowerCase();
+    if (text.includes('gemini') || text.includes('omni') || text.includes('live-api') || text.includes('flash-api')) {
+      return 'Gemini生态';
+    }
+    if (text.includes('doc') || text.includes('word') || text.includes('slide') || text.includes('presentation') || 
+        text.includes('ppt') || text.includes('sheet') || text.includes('excel') || text.includes('pdf') || 
+        text.includes('template') || text.includes('office') || text.includes('文档') || text.includes('表格') || text.includes('幻灯片')) {
+      return '办公与文档';
+    }
+    if (text.includes('review') || text.includes('diagnos') || text.includes('grill') || text.includes('tdd') || 
+        text.includes('test') || text.includes('audit') || text.includes('审查') || text.includes('诊断') || 
+        text.includes('测试') || text.includes('排查') || text.includes('体检')) {
+      return '审查与诊断';
+    }
+    if (text.includes('ui') || text.includes('design') || text.includes('style') || text.includes('css') || 
+        text.includes('frontend') || text.includes('chinesizing') || text.includes('banner') || text.includes('brand') || 
+        text.includes('icon') || text.includes('logo') || text.includes('前端') || text.includes('设计') || 
+        text.includes('汉化') || text.includes('视觉') || text.includes('样式')) {
+      return '设计与UI';
+    }
+    if (text.includes('engineer') || text.includes('architect') || text.includes('codebase') || text.includes('domain') || 
+        text.includes('model') || text.includes('implement') || text.includes('handoff') || text.includes('merge') || 
+        text.includes('git') || text.includes('refactor') || text.includes('架构') || text.includes('工程') || 
+        text.includes('重构') || text.includes('研发') || text.includes('领域')) {
+      return '架构与工程';
+    }
+    return '其他';
+  }
+
   let agyCurrentSkills = [...AGY_BUILTIN_SKILLS];
   let agySelectedCategory = 'all';
   let agySearchQuery = '';
@@ -1033,6 +1141,7 @@
         }
       </style>
       <div id="agy-skills-container" style="
+        position: relative;
         width: 95%;
         max-width: 960px;
         max-height: 85vh;
@@ -1143,9 +1252,161 @@
           justify-content: space-between;
           font-size: 12px;
           color: var(--sk-footer-text);
+          flex-wrap: wrap;
+          gap: 10px;
         ">
-          <span>💡 提示：点击技能卡片后直接在对话框输入具体需求并发送</span>
-          <span style="font-size: 11px; opacity: 0.8;">Esc 或点击外围关闭</span>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span>💡 提示：点击技能卡片后直接在对话框输入具体需求并发送</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <button id="agy-skills-add-btn" type="button" style="
+              display: inline-flex;
+              align-items: center;
+              gap: 6px;
+              padding: 5px 13px;
+              border-radius: 7px;
+              font-size: 12px;
+              font-weight: 600;
+              color: #ffffff;
+              background: linear-gradient(135deg, #10b981, #059669);
+              border: 1px solid rgba(255, 255, 255, 0.2);
+              cursor: pointer;
+              box-shadow: 0 2px 7px rgba(16, 185, 129, 0.35);
+              transition: all 0.15s ease;
+            " onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 12px rgba(16,185,129,0.45)';" onmouseout="this.style.transform='none';this.style.boxShadow='0 2px 7px rgba(16,185,129,0.35)';">
+              <span style="font-size: 13px;">➕</span>
+              <span>从 GitHub 添加技能</span>
+            </button>
+            <span style="font-size: 11px; opacity: 0.8;">Esc 或点击外围关闭</span>
+          </div>
+        </div>
+
+        <!-- Skill Install from GitHub Dialog Overlay (Hidden by default) -->
+        <div id="agy-skills-add-dialog" style="
+          position: absolute;
+          inset: 0;
+          background: var(--sk-bg);
+          z-index: 50;
+          display: none;
+          flex-direction: column;
+          padding: 24px 28px;
+          box-sizing: border-box;
+          border-radius: 16px;
+        ">
+          <!-- Dialog Header -->
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="
+                width: 36px;
+                height: 36px;
+                border-radius: 10px;
+                background: linear-gradient(135deg, #10b981, #059669);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #ffffff;
+                font-size: 18px;
+                box-shadow: 0 4px 10px rgba(16, 185, 129, 0.35);
+              ">📥</div>
+              <div>
+                <div style="font-size: 15px; font-weight: 600; color: var(--sk-text);">从 GitHub 安装与部署新技能 (Skill)</div>
+                <div style="font-size: 12px; color: var(--sk-subtext); margin-top: 2px;">
+                  分享 GitHub 仓库链接，系统将自动发起新会话并引导 Gemini 将其安装部署至本地技能库
+                </div>
+              </div>
+            </div>
+            <button id="agy-skill-add-close-btn" type="button" style="
+              background: transparent;
+              border: none;
+              color: var(--sk-subtext);
+              cursor: pointer;
+              font-size: 18px;
+              width: 30px;
+              height: 30px;
+              border-radius: 8px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              transition: all 0.15s ease;
+            " onmouseover="this.style.background='rgba(99,102,241,0.1)';this.style.color='#6366f1';" onmouseout="this.style.background='transparent';this.style.color='var(--sk-subtext)';">✕</button>
+          </div>
+
+          <!-- Dialog Body -->
+          <div style="display: flex; flex-direction: column; gap: 16px; flex: 1;">
+            <div>
+              <label style="display: block; font-size: 12.5px; font-weight: 600; color: var(--sk-text); margin-bottom: 7px;">
+                GitHub 仓库链接 / Skill 地址
+              </label>
+              <input id="agy-skill-github-input" type="text" placeholder="例如: https://github.com/owner/skill-repo 或 owner/repo" style="
+                width: 100%;
+                box-sizing: border-box;
+                padding: 11px 14px;
+                background: var(--sk-input-bg);
+                color: var(--sk-input-text);
+                border: 1px solid var(--sk-input-border);
+                border-radius: 8px;
+                font-size: 13px;
+                outline: none;
+                transition: border-color 0.15s ease;
+              " onfocus="this.style.borderColor='#10b981';" onblur="this.style.borderColor='var(--sk-input-border)';" />
+            </div>
+
+            <!-- Deployment Flow Guide Card -->
+            <div style="
+              padding: 14px 16px;
+              border-radius: 10px;
+              background: var(--sk-card-bg);
+              border: 1px solid var(--sk-card-border);
+              font-size: 12px;
+              color: var(--sk-subtext);
+              line-height: 1.65;
+            ">
+              <div style="font-weight: 600; color: var(--sk-text); margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                <span>⚡</span>
+                <span>自动化安装流程说明</span>
+              </div>
+              <div style="margin-bottom: 3px;">1. 点击确认后，系统将自动跳转至<b>全新对话会话</b>，并自动录入专业部署指引；</div>
+              <div style="margin-bottom: 3px;">2. Gemini 智能体将解析该仓库中的 <code>SKILL.md</code> 规范并将其克隆部署至本地配置目录：<code>~/.gemini/config/skills/</code>；</div>
+              <div style="margin-bottom: 3px;">3. 部署完成后，该技能将标注为<b>「用户添加」</b>，若未能自动匹配已知分区，将智能归入<b>「📦 其他」</b>分页；</div>
+              <div>4. 随后在对话中输入 <code>$技能名</code> 即可随时唤醒该专业技能。</div>
+            </div>
+          </div>
+
+          <!-- Dialog Footer -->
+          <div style="
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+            padding-top: 14px;
+            border-top: 1px solid var(--sk-border);
+          ">
+            <button id="agy-skill-add-cancel-btn" type="button" style="
+              padding: 7px 15px;
+              border-radius: 7px;
+              font-size: 12.5px;
+              font-weight: 500;
+              cursor: pointer;
+              background: var(--sk-filter-bg);
+              color: var(--sk-filter-text);
+              border: 1px solid var(--sk-filter-border);
+              transition: all 0.15s ease;
+            " onmouseover="this.style.opacity='0.85';" onmouseout="this.style.opacity='1';">取消</button>
+            <button id="agy-skill-add-submit-btn" type="button" style="
+              padding: 7px 18px;
+              border-radius: 7px;
+              font-size: 12.5px;
+              font-weight: 600;
+              cursor: pointer;
+              background: linear-gradient(135deg, #10b981, #059669);
+              color: #ffffff;
+              border: 1px solid rgba(255, 255, 255, 0.2);
+              box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+              transition: all 0.15s ease;
+            " onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 12px rgba(16,185,129,0.45)';" onmouseout="this.style.transform='none';this.style.boxShadow='0 2px 8px rgba(16,185,129,0.35)';">
+              🚀 开启新会话并自动安装
+            </button>
+          </div>
         </div>
       </div>
     `;
@@ -1173,9 +1434,79 @@
       });
     }
 
+    // Add Skill Dialog Events
+    const addBtn = modal.querySelector('#agy-skills-add-btn');
+    const addDialog = modal.querySelector('#agy-skills-add-dialog');
+    const addCloseBtn = modal.querySelector('#agy-skill-add-close-btn');
+    const addCancelBtn = modal.querySelector('#agy-skill-add-cancel-btn');
+    const addSubmitBtn = modal.querySelector('#agy-skill-add-submit-btn');
+    const githubInput = modal.querySelector('#agy-skill-github-input');
+
+    const closeAddDialog = () => {
+      if (addDialog) addDialog.style.display = 'none';
+    };
+
+    if (addBtn && addDialog) {
+      addBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        addDialog.style.display = 'flex';
+        if (githubInput) {
+          githubInput.value = '';
+          setTimeout(() => githubInput.focus(), 60);
+        }
+      });
+    }
+
+    if (addCloseBtn) addCloseBtn.addEventListener('click', closeAddDialog);
+    if (addCancelBtn) addCancelBtn.addEventListener('click', closeAddDialog);
+
+    const handleInstallSubmit = () => {
+      let rawUrl = (githubInput ? githubInput.value : '').trim();
+      if (!rawUrl) {
+        showToast('请输入有效的 GitHub 仓库链接！', false);
+        if (githubInput) githubInput.focus();
+        return;
+      }
+
+      let cleanUrl = rawUrl;
+      if (!cleanUrl.startsWith('http://') && !cleanUrl.startsWith('https://') && !cleanUrl.startsWith('git@')) {
+        cleanUrl = 'https://github.com/' + cleanUrl.replace(/^github\.com\//, '');
+      }
+
+      let repoName = 'custom-skill';
+      try {
+        const parts = cleanUrl.replace(/\.git$/, '').split('/');
+        if (parts.length > 0 && parts[parts.length - 1]) {
+          repoName = parts[parts.length - 1];
+        }
+      } catch(e) {}
+
+      const deployPrompt = `请帮我安装并部署这个技能 (Agent Skill)：\n仓库地址：${cleanUrl}\n\n具体执行指引：\n1. 请深入分析该仓库中的 SKILL.md 规范与实现文件；\n2. 将该技能完整克隆并放置在本机技能目录中：\n   - 目标部署路径：~/.gemini/config/skills/${repoName}\n3. 检查并适配其所需的脚本、配置与运行环境；\n4. 部署完成后，请向我汇报该技能的核心功能与具体调用指令（如：$${repoName}）。`;
+
+      closeAddDialog();
+      closeSkillsHubModal();
+      triggerNewChatAndInstallSkill(deployPrompt, repoName);
+    };
+
+    if (addSubmitBtn) {
+      addSubmitBtn.addEventListener('click', handleInstallSubmit);
+    }
+    if (githubInput) {
+      githubInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          handleInstallSubmit();
+        }
+      });
+    }
+
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && modal.style.display === 'flex') {
-        closeSkillsHubModal();
+        if (addDialog && addDialog.style.display === 'flex') {
+          closeAddDialog();
+        } else {
+          closeSkillsHubModal();
+        }
       }
     });
 
@@ -1186,21 +1517,28 @@
     const bar = document.getElementById('agy-skills-category-bar');
     if (!bar) return;
 
-    const categories = ['all', '架构与工程', '设计与UI', '审查与诊断', '办公与文档', 'Gemini生态'];
+    const standardCats = ['架构与工程', '设计与UI', '审查与诊断', '办公与文档', 'Gemini生态'];
+    const categories = ['all', ...standardCats, '其他'];
     const catLabels = {
       'all': '全部',
       '架构与工程': '⚡ 架构与工程',
       '设计与UI': '🎨 设计与UI',
       '审查与诊断': '🔍 审查与诊断',
       '办公与文档': '📊 办公与文档',
-      'Gemini生态': '✨ Gemini生态'
+      'Gemini生态': '✨ Gemini生态',
+      '其他': '📦 其他'
     };
 
     bar.innerHTML = categories.map(cat => {
       const isActive = agySelectedCategory === cat;
-      const count = cat === 'all' 
-        ? agyCurrentSkills.length 
-        : agyCurrentSkills.filter(s => s.category === cat).length;
+      let count = 0;
+      if (cat === 'all') {
+        count = agyCurrentSkills.length;
+      } else if (cat === '其他') {
+        count = agyCurrentSkills.filter(s => s.category === '其他' || !standardCats.includes(s.category)).length;
+      } else {
+        count = agyCurrentSkills.filter(s => s.category === cat).length;
+      }
 
       return `
         <button type="button" data-category="${cat}" style="
@@ -1233,16 +1571,23 @@
 
     renderSkillsCategories();
 
+    const standardCats = ['架构与工程', '设计与UI', '审查与诊断', '办公与文档', 'Gemini生态'];
     let filtered = agyCurrentSkills;
-    if (agySelectedCategory !== 'all') {
+    if (agySelectedCategory === '其他') {
+      filtered = filtered.filter(s => s.category === '其他' || !standardCats.includes(s.category));
+    } else if (agySelectedCategory !== 'all') {
       filtered = filtered.filter(s => s.category === agySelectedCategory);
     }
     if (agySearchQuery) {
       filtered = filtered.filter(s => {
+        const isCustom = s.origin === 'custom' || s.type === 'custom';
+        const isPlugin = s.origin === 'plugin' || s.type === 'plugin';
+        const originText = isCustom ? '用户添加 自定义' : (isPlugin ? '插件扩展 插件' : '原生自带 官方自带 内置');
         return s.id.toLowerCase().includes(agySearchQuery) ||
                (s.name && s.name.toLowerCase().includes(agySearchQuery)) ||
                (s.description && s.description.toLowerCase().includes(agySearchQuery)) ||
-               (s.category && s.category.toLowerCase().includes(agySearchQuery));
+               (s.category && s.category.toLowerCase().includes(agySearchQuery)) ||
+               originText.toLowerCase().includes(agySearchQuery);
       });
     }
 
@@ -1250,14 +1595,26 @@
       wrapper.innerHTML = `
         <div style="grid-column: 1 / -1; text-align: center; padding: 40px 10px; color: var(--sk-subtext, #94a3b8);">
           <div style="font-size: 28px; margin-bottom: 8px;">🔍</div>
-          <div style="font-size: 14px; font-weight: 500;">未找到与 "${agySearchQuery}" 相关的技能</div>
-          <div style="font-size: 12px; margin-top: 4px; opacity: 0.7;">请尝试更换关键词搜索</div>
+          <div style="font-size: 14px; font-weight: 500;">未找到${agySearchQuery ? '与 "' + agySearchQuery + '" ' : ''}相关的技能</div>
+          <div style="font-size: 12px; margin-top: 4px; opacity: 0.7;">请尝试更换关键词搜索，或点击底部按钮从 GitHub 安装新技能</div>
         </div>
       `;
       return;
     }
 
     wrapper.innerHTML = filtered.map(skill => {
+      const isCustom = skill.origin === 'custom' || skill.type === 'custom';
+      const isPlugin = skill.origin === 'plugin' || skill.type === 'plugin';
+      const originLabel = isCustom ? '用户添加' : (isPlugin ? '插件扩展' : '原生自带');
+      
+      const originStyle = isCustom
+        ? 'color: #059669; background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.28);'
+        : (isPlugin
+          ? 'color: #7c3aed; background: rgba(124, 58, 237, 0.12); border: 1px solid rgba(124, 58, 237, 0.25);'
+          : 'color: #4f46e5; background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.22);');
+
+      const catDisplay = standardCats.includes(skill.category) ? skill.category : '其他';
+
       return `
         <div class="agy-skill-card" data-skill-id="${skill.id}" style="
           padding: 12px 14px;
@@ -1269,11 +1626,11 @@
           transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
           box-sizing: border-box;
         ">
-          <!-- Card Top: Icon, Name badge, Category -->
+          <!-- Card Top: Icon, Name badge, Origin Tag, Category Tag -->
           <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
-            <div style="display: flex; align-items: center; gap: 6px; min-width: 0;">
-              <span style="font-size: 15px; flex-shrink: 0;">${skill.icon || '⚡'}</span>
-              <span class="agy-skill-badge" style="
+            <div style="display: flex; align-items: center; gap: 6px; min-width: 0; flex: 1;">
+              <span style="font-size: 15px; flex-shrink: 0;">${skill.icon || (isCustom ? '🧩' : '⚡')}</span>
+              <span class="agy-skill-badge" title="$${skill.id}" style="
                 font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
                 font-size: 12px;
                 font-weight: 600;
@@ -1287,17 +1644,30 @@
                 text-overflow: ellipsis;
               ">$${skill.id}</span>
             </div>
-            <span class="agy-skill-cat" style="
-              font-size: 10.5px;
-              color: var(--sk-cat-color);
-              background: var(--sk-cat-bg);
-              border: 1px solid var(--sk-cat-border);
-              padding: 1px 6px;
-              border-radius: 4px;
-              white-space: nowrap;
-              flex-shrink: 0;
-              font-weight: 500;
-            ">${skill.category || '通用'}</span>
+
+            <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
+              <!-- Origin Tag (原生自带 vs 用户添加) -->
+              <span class="agy-skill-origin" style="
+                font-size: 10px;
+                padding: 1px 5px;
+                border-radius: 4px;
+                white-space: nowrap;
+                font-weight: 600;
+                ${originStyle}
+              ">${originLabel}</span>
+
+              <!-- Category Tag -->
+              <span class="agy-skill-cat" style="
+                font-size: 10px;
+                color: var(--sk-cat-color);
+                background: var(--sk-cat-bg);
+                border: 1px solid var(--sk-cat-border);
+                padding: 1px 5px;
+                border-radius: 4px;
+                white-space: nowrap;
+                font-weight: 500;
+              ">${catDisplay}</span>
+            </div>
           </div>
 
           <!-- Description (high-contrast readable dark text) -->
@@ -1369,19 +1739,31 @@
         if (Array.isArray(extra) && extra.length > 0) {
           const map = new Map(agyCurrentSkills.map(s => [s.id, s]));
           for (const item of extra) {
+            const isBuiltin = item.type === 'builtin';
+            const isPlugin = item.type === 'plugin';
+            const origin = isBuiltin ? 'builtin' : (isPlugin ? 'plugin' : 'custom');
+
             if (!map.has(item.id)) {
+              const inferredCat = inferSkillCategory(item.id, item.description || '');
               map.set(item.id, {
                 id: item.id,
                 name: item.name || item.id,
                 description: item.description || '自定义扩展技能',
-                category: item.category || '扩展技能',
-                icon: item.icon || '🧩'
+                category: inferredCat,
+                origin: origin,
+                type: item.type || 'custom',
+                icon: item.icon || (origin === 'custom' ? '🧩' : (inferredCat === 'Gemini生态' ? '✨' : '⚡'))
               });
+            } else {
+              const existing = map.get(item.id);
+              if (item.type) existing.type = item.type;
+              if (!existing.origin) existing.origin = origin;
             }
           }
           agyCurrentSkills = Array.from(map.values());
           const badge = document.getElementById('agy-skills-count-badge');
           if (badge) badge.innerText = agyCurrentSkills.length + ' 个可用技能';
+          renderSkillsCategories();
           renderSkillsList();
         }
       }).catch(() => {});
