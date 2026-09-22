@@ -125,17 +125,23 @@ curl -fsSL https://raw.githubusercontent.com/Kutaze/Antigravity-Enhance-Pack-Too
 ## 📝 Changelog
 
 ### [v0.1.5] - 2026-09-23
-- **Dynamic Multi-Account Management & Hot-Switching**:
-  - Embedded multi-account management natively into the status bar, removing external application bloat;
-  - Dynamic profile pool: Add, manage, and hot-switch unlimited Google accounts with real-time filtering;
-  - Security isolation: JWT email validation preventing credential pollution;
-  - Safe logout: Modal confirmation with OS credential cleanup;
-  - 100% local storage guarantee with zero remote telemetry.
-- **Unified Bottom-Bar User Interaction**:
-  - Merged user avatar and profile switch button into a seamless entrance;
-  - Redesigned compact quota badge with refined tooltip positioning.
-- **Deep Localization Expansion**:
-  - Added 437 new UI translation entries for dialogs, settings, and notifications.
+- **Dynamic Multi-Account System (Major Overhaul vs v0.1.4)**:
+  - **Native Embedded Architecture**: Completely eliminated external standalone window bloat by natively embedding quota telemetry and profile switching into Antigravity's status bar;
+  - **Unlimited Dynamic Pool**: Fully overhauled profile management supporting arbitrary numbers of Google accounts (PRO / ULTRA / FREE) with instant fuzzy search, status filters, and per-profile quota meters;
+  - **JWT Signature Validation & Anti-Pollution Isolation**: Injected JWT verification to ensure all OAuth tokens are physically segregated into `~/.gemini/account_profiles/<safe_email>/`, preventing cross-account token pollution during rapid switching;
+  - **Two-Step Logout & Deep Credential Purge**: Added a refined logout modal with double-confirmation, followed by clean physical deletion from OS stores (Windows Credential Manager / macOS Keychain);
+  - **100% Local Privacy Guarantee**: All credentials remain strictly on local disk with zero remote telemetry or middle-layer servers.
+- **Bottom-Bar UX & UI Refinement (Visual Overhaul vs v0.1.4)**:
+  - **Unified Profile Entrance**: Merged previously separated avatar and switch buttons into a single cohesive profile card;
+  - **High-Fidelity Frosted Glass Tooltip**: Redesigned tooltip from scratch to match the modern dark frosted-glass aesthetic with smooth fade-in/out transitions;
+  - **Anti-Overlap Geometry**: Optimized layout spacing between status bar capsules to prevent element squishing on narrow viewports.
+- **Stability & Keybinding Hardening (Fixes vs v0.1.4)**:
+  - **`Ctrl + I` Hotkey Fix**: Fixed shortcut interception issue to guarantee instant triggering of inline code composer;
+  - **Runtime Freeze Prevention**: Reinforced DOM Cache Guard and concurrency re-entrance locks to prevent Electron renderer freezes during network hiccups or rapid profile switches.
+- **Localization Expansion**:
+  - Added **437 new UI entries** covering account management, confirmation dialogs, and model fine-tuning hints.
+- **Packaging & Tooling**:
+  - Upgraded standalone installer `Antigravity Enhance Tools.exe` to v0.1.5 and refreshed both offline archives (`.zip` and `.tar.gz`).
 
 ### [v0.1.4] - 2026-09-21
 - **Skills Hub Overhaul**: Upgraded to 3-column responsive grid layout, high-contrast dark typography for both themes, auto new-chat invocation, and directory reveal.
