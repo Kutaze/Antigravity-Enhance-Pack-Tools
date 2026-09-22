@@ -8,11 +8,17 @@
 **An all-in-one UI and interaction enhancement suite tailored for the official Google Antigravity desktop client.**
 
 <p align="center">
+  <a href="https://discord.gg/QRsPcNrSB"><img src="https://img.shields.io/badge/Discord-Community_Chat-5865F2?style=flat-square&logo=discord&logoColor=white" alt="Discord Community" /></a>
+  <a href="https://discord.gg/QRsPcNrSB"><b>👉 Join our Discord Community (https://discord.gg/QRsPcNrSB)</b></a>
+</p>
+
+<p align="center">
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases"><img src="https://img.shields.io/badge/Release-v0.1.5-6366f1?style=flat-square" alt="Release" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-10b981?style=flat-square" alt="License" /></a>
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools"><img src="https://img.shields.io/badge/Platform-Windows_%7C_macOS_%7C_Linux-0284c7?style=flat-square" alt="Platform" /></a>
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools"><img src="https://img.shields.io/badge/UI-Dual_Theme_GUI-8b5cf6?style=flat-square" alt="UI" /></a>
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools"><img src="https://img.shields.io/badge/Runtime-Zero_Dependency-f59e0b?style=flat-square" alt="Runtime" /></a>
+  <a href="https://discord.gg/QRsPcNrSB"><img src="https://img.shields.io/badge/Discord-Join%20Chat-5865F2?style=flat-square&logo=discord&logoColor=white" alt="Discord" /></a>
 </p>
 
 <p align="center">
@@ -27,12 +33,15 @@
   <a href="#-workflow">Workflow</a> • 
   <a href="#-api-reference">API Reference</a> • 
   <a href="#-changelog">Changelog</a> • 
-  <a href="#-star-history">Star History</a>
+  <a href="#-star-history">Star History</a> • 
+  <a href="https://discord.gg/QRsPcNrSB">Discord Community</a>
 </p>
 
 </div>
 
 ---
+
+> 💬 **Community & Discussion**: Welcome to join our official Discord server at [https://discord.gg/QRsPcNrSB](https://discord.gg/QRsPcNrSB) to discuss tips, showcase workflows, and get community support.
 
 ## 🌟 Showcase
 
