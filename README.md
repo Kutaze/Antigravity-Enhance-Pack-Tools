@@ -26,7 +26,7 @@
   <a href="#-部署指南">部署指南</a> • 
   <a href="#-工作流程">工作流程</a> • 
   <a href="#-api-参考">API 参考</a> • 
-  <a href="#-变更日志">变更日志</a> • 
+  <a href="#-更新日志">更新日志</a> • 
   <a href="#-star-history">Star History</a>
 </p>
 
@@ -365,7 +365,7 @@ window.__AGY_APPLY_THINKING_LEVEL__('high');
 
 ---
 
-## 📝 变更日志
+## 📝 更新日志
 
 ### [v0.1.5] - 2026-09-23
 - **多账号原生动态管理体系（对比 v0.1.4 深度重构）**：
