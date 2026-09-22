@@ -58,11 +58,18 @@ Seamless account switching, dynamic profile pool, quota telemetry, and integrate
 | <img src="assets/verified_account_switcher_live.png" width="450" /> | <img src="assets/verified_bottom_profile_tooltip_live.png" width="450" /> |
 
 ### 4. Visual Skills Hub Showcase
-Direct access button on the chat input bar opening a modern, theme-adaptive skills selector:
+Direct access button on the chat input bar opening a modern, theme-adaptive skills selector with category filters, origin badges, and one-click GitHub installation:
 
-| Visual Skills Hub (42+ Built-in & Ecosystem Development Skills) |
+| Visual Skills Hub (35+ Built-in & Custom Skills, Origin Badges, and One-Click GitHub Deployment) |
 | :---: |
 | <img src="assets/verified_skills_hub_live.png" width="750" /> |
+
+### 5. Sidebar Plugin Ecosystem Center Showcase
+Native "@ Plugins" hub in the left navigation sidebar, bridging OpenAI Codex local extensions and Antigravity native plugins:
+
+| Sidebar Plugin Ecosystem Center (Documents, Presentations, Spreadsheets, PDF Tools, Template Creator & Gemini API Kit) |
+| :---: |
+| <img src="assets/verified_plugin_center_live.png" width="750" /> |
 
 ---
 
@@ -124,13 +131,23 @@ Throughout the architectural conception and UX design of **Antigravity Enhance T
 
 ### Visual Skills Hub
 - **Dedicated Toolbar Trigger**: Direct access button on the chat input bar opening a modern, theme-adaptive skills selector.
-- **42+ Built-in & Ecosystem Skills**: Categorized into Architecture & Engineering, Design & UI, Review & Diagnosis, Documents, and Gemini Ecosystem, with instant fuzzy search.
+- **35+ Built-in & Custom Skills**: Categorized into Architecture & Engineering, Design & UI, Review & Diagnosis, Documents, Gemini Ecosystem, and a new dynamic "📦 Others" category.
+- **Origin Badges**: Clear badges on each card indicating "Built-in" vs "User-Added" for instant identification.
+- **One-Click GitHub Deployment**: Built-in "➕ Add Skill from GitHub" gradient button to automatically invoke a setup session from any GitHub URL.
 - **One-Click Invocation**: Click any skill card to insert `$skill-name` into the chat box with automatic cursor focus.
-- **Dynamic Skill Discovery**: Detects custom user skills from workspace and global directories.
 
-| Visual Skills Hub (42+ Built-in & Ecosystem Development Skills) |
+| Visual Skills Hub (35+ Built-in & Custom Skills, Origin Badges, and One-Click GitHub Deployment) |
 | :---: |
 | <img src="assets/verified_skills_hub_live.png" width="750" /> |
+
+### Sidebar Plugin Ecosystem Center
+- **Sidebar Integration**: Dedicated "@ Plugins" tab seamlessly mounted in the sidebar navigation alongside chats and history.
+- **Dual Ecosystem Bridge**: Automatically discovers and interfaces with local OpenAI Codex plugins and native Antigravity extensions.
+- **Instant Invocation**: Filter by All, Installed, Codex Local, and Open-Source Recommendations; open plugin folders, sync with Codex, or call directly into active chats.
+
+| Sidebar Plugin Ecosystem Center (9 Core Plugins, Category Filters, and In-Chat Invocation) |
+| :---: |
+| <img src="assets/verified_plugin_center_live.png" width="750" /> |
 
 ### Native Screenshot Integration
 - **"+" Context Menu Access**: Built-in screenshot item directly inside the "+" context menu (`Win+Shift+S`).

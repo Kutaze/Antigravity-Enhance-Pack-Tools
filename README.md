@@ -65,11 +65,18 @@
 | <img src="assets/verified_account_switcher_live.png" width="450" /> | <img src="assets/verified_bottom_profile_tooltip_live.png" width="450" /> |
 
 ### 4. 可视化技能中心 (Skills Hub) 实测
-输入框工具栏一键呼出，按分类快速检索并调用 42+ 款工程与设计技能：
+输入框工具栏一键呼出，按分类快速检索并调用 35+ 款工程与设计技能，支持「原生自带 / 用户添加」标签与一键从 GitHub 添加：
 
-| 可视化技能中心面板 (内置 42 项生态技能分类与即时检索) |
+| 可视化技能中心面板 (内置 35 项生态技能分类、双维度标签与 GitHub 快捷添加) |
 | :---: |
 | <img src="assets/verified_skills_hub_live.png" width="750" /> |
+
+### 5. 侧边栏插件生态中心 (Plugin Center) 实测
+侧边栏新增「@ 插件」专属生态入口，深度兼容 OpenAI Codex 本地插件与 Antigravity 原生扩展（支持在对话中一键调用）：
+
+| 侧边栏插件生态中心 (展示 Documents / Presentations / Spreadsheets / PDF Tools 等 9 款核心插件与本地/开源分类) |
+| :---: |
+| <img src="assets/verified_plugin_center_live.png" width="750" /> |
 
 ---
 
@@ -157,13 +164,23 @@
 
 ### 可视化技能中心 (Skills Hub)
 - **输入框专属技能入口**：聊天工具栏常驻技能中心入口，点击即可呼出优雅的主题自适应技能弹窗。
-- **42+ 项精选生态技能**：涵盖「架构与工程」、「设计与UI」、「审查与诊断」、「办公与文档」、「Gemini生态」五大分类，支持按名称、描述与关键词实时检索。
+- **35+ 项精选生态技能与全部分类**：涵盖「架构与工程」、「设计与UI」、「审查与诊断」、「办公与文档」、「Gemini生态」以及全新自适应「📦 其他」分类分页。
+- **双维度来源识别标签**：每张技能卡片清晰标注「原生自带 (蓝标)」与「用户添加 (绿标)」，技能来源与归属一目了然。
+- **一键 GitHub 技能安装部署**：底部常驻「➕ 从 GitHub 添加技能」渐变按钮，输入 GitHub 技能仓库链接即可自动唤起新会话并引导 AI 完成部署。
 - **一键调用与智能填充**：点击卡片一键在输入框中填入 `$skill-name` 并自动聚焦光标，轻松衔接后续提示词。
-- **扩展与自定义兼容**：支持自动发现工作区与本地扩展的自定义技能，动态增量刷新。
 
-| 可视化技能中心面板 (内置 42 项专业开发技能分类与即时检索) |
+| 可视化技能中心面板 (内置 35 项专业开发技能、来源标签与 GitHub 一键部署) |
 | :---: |
 | <img src="assets/verified_skills_hub_live.png" width="750" /> |
+
+### 侧边栏插件生态中心 (Plugin Center)
+- **侧边栏原生挂载入口**：左侧导航栏深度嵌入「@ 插件」入口，与新建会话、历史会话平级集成。
+- **OpenAI Codex & Antigravity 双生态兼容**：自动识别并纳管本地安装的 Codex 插件生态与 Antigravity 原生扩展（Documents、Presentations、Spreadsheets、PDF Tools、Template Creator、Gemini API Dev Kit 等）。
+- **多维度筛选与一键调用**：支持按「全部 (9) / 已安装 (7) / Codex 本地生态 (5) / 开源推荐 (2)」即时筛选，支持一键同步 Codex、从 GitHub 安装、查看本地目录以及「在对话中调用」。
+
+| 侧边栏插件生态中心 (展示 9 款实用插件、分类过滤与一键在对话中调用) |
+| :---: |
+| <img src="assets/verified_plugin_center_live.png" width="750" /> |
 
 ### 上下文原生截图唤起
 - **「+」菜单原生集成**：在对话框左侧「+」上下文菜单中原生提供「屏幕截图 (Win+Shift+S)」选项。

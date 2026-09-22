@@ -1786,6 +1786,10 @@
     }
   }
 
+  window.__AGY_OPEN_SKILLS_HUB__ = openSkillsHubModal;
+  window.__AGY_CLOSE_SKILLS_HUB__ = closeSkillsHubModal;
+  window.__AGY_TOGGLE_SKILLS_HUB__ = toggleSkillsHubModal;
+
 
   // 3. UI Buttons Mount & Handling (Office Uploader + Screenshot)
   function attachUploadButton() {
