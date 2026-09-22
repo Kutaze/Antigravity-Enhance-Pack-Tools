@@ -217,20 +217,17 @@ curl -fsSL https://raw.githubusercontent.com/Kutaze/Antigravity-Enhance-Pack-Too
  
 本プロジェクトのために知恵と情熱を注いでくださったすべての開発者に心より感謝申し上げます。
 
-<details>
-<summary><b>🤝 謝辞プロジェクト (Special Thanks) - クリックして展開</b></summary>
+### 🤝 謝辞プロジェクト (Special Thanks)
 
 本プロジェクトの開発過程において、以下の優れたオープンソースプロジェクトの着想や設計を参考にさせていただきました（順不同）：
 
-- [lbjlaq/Antigravity-Manager](https://github.com/lbjlaq/Antigravity-Manager): プロフェッショナルな Antigravity アカウント管理・切替ツール（Antigravity Tools）。マルチアカウント枠監視と切替の着想に多大な示唆をいただきました。本プロジェクトでは外部アプリ常駐の負担をなくし、クライアント内部へネイティブ統合・軽量化を実現しています。
+- [lbjlaq/Antigravity-Manager](https://github.com/lbjlaq/Antigravity-Manager): プロフェッショナルな Antigravity アカウント管理・切替ツール（Antigravity Tools）。マルチアカウント枠監視と切替の着想に多大な示唆をいただきました。本プロジェクトでは外部アプリ常驻の負担をなくし、クライアント内部へネイティブ統合・軽量化を実現しています。
 - [renkeshui/antigravity-chinese-locale](https://github.com/renkeshui/antigravity-chinese-locale): Antigravity クライアント全画面多言語化の先駆的プロジェクト。辞書マッピングと用語体系の基盤として深く参考にさせていただきました。
 
 ---
 
 - **著作権ライセンス**: [MIT License](LICENSE) に基づき公開。著作権表示を保持し、いかなる形式の商用転売も禁止します。
 - **セキュリティ声明**: 本アプリのすべてのアカウント情報は、ローカルOSの認証マネージャー（Windows Credential Manager / macOS Keychain）および専用フォルダに厳格に暗号化保管され、外部クラウド中継サーバーは一切介在しません。データが端末外へ送信されることはありません。
-
-</details>
 
 ### 免責事項
 - Google Antigravity は Google LLC の商標です。本プロジェクトは独立したコミュニティによるオープンソースプロジェクトであり、Google LLC と提携・公認・後援の関係はありません。

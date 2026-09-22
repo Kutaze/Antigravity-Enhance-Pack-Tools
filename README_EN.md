@@ -218,9 +218,8 @@ curl -fsSL https://raw.githubusercontent.com/Kutaze/Antigravity-Enhance-Pack-Too
 
 Thanks to all developers who contributed their dedication and wisdom to the open-source community.
 
-<details>
-<summary><b>🤝 Special Thanks - Click to Expand</b></summary>
-
+### 🤝 Special Thanks
+ 
 This project referenced concepts and implementations from the following open-source projects during development (in no particular order):
 
 - [lbjlaq/Antigravity-Manager](https://github.com/lbjlaq/Antigravity-Manager): Professional Antigravity Account Manager & Switcher (Antigravity Tools), which provided excellent ideas for multi-account quota monitoring and switching. Instead of requiring a standalone external application, this project natively embeds these capabilities directly into Antigravity with zero background processes.
@@ -230,8 +229,6 @@ This project referenced concepts and implementations from the following open-sou
 
 - **License**: Licensed under the [MIT License](LICENSE). Retain copyright and license notices; commercial resale is strictly prohibited.
 - **Security Declaration**: All account credentials and profiles are strictly encrypted and stored in your local operating system credential store (Windows Credential Manager / macOS Keychain) and local private directory; zero remote servers or telemetry.
-
-</details>
 
 ### Disclaimer
 - Google Antigravity is a trademark of Google LLC. This project is an independent community project and is not affiliated with, endorsed by, or sponsored by Google LLC.

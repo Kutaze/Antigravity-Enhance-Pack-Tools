@@ -460,8 +460,7 @@ window.__AGY_APPLY_THINKING_LEVEL__('high');
 
 感谢所有为本项目付出汗水与智慧的开发者。
 
-<details>
-<summary><b>🤝 鸣谢项目 (Special Thanks) - 点击展开</b></summary>
+### 🤝 鸣谢项目 (Special Thanks)
 
 本项目在开发过程中参考或借鉴了以下优秀开源项目的思路或代码，排名不分先后：
 
@@ -473,7 +472,6 @@ window.__AGY_APPLY_THINKING_LEVEL__('high');
 - **版权许可**：基于 [MIT License](LICENSE) 许可，保留原作者版权声明与许可申明，严禁任何形式的商业转售行为。
 - **安全声明**：本应用所有账号数据严格加密存储于本地操作系统凭据库（Windows Credential Manager / macOS Keychain）与本机私有目录，无任何第三方云端中转服务器，数据绝不离开您的设备。
 
-</details>
 
 ### 免责声明
 - Google Antigravity 是 Google LLC 的商标。本项目为独立开源社区作品，与 Google LLC 及其关联实体不存在任何隶属、认可、赞助或官方合作关系。
