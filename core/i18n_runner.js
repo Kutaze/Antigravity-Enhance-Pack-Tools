@@ -2356,19 +2356,34 @@
                 transition: stroke-dashoffset 0.4s ease;
             }
             .agy-profile-tier-badge {
-                font-size: 9px;
-                font-weight: 600;
+                font-size: 8px;
+                font-weight: 700;
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
-                padding: 1px 4.5px;
-                border-radius: 4px;
-                line-height: 1.2;
-                margin-left: 4px;
-                margin-bottom: 7px;
+                padding: 0px 3.5px;
+                border-radius: 3px;
+                line-height: 1.1;
+                margin: 0;
                 display: inline-block;
-                vertical-align: super;
+                vertical-align: middle;
+                flex-shrink: 0;
                 box-shadow: none;
                 transition: all 0.15s ease;
+                align-self: flex-start;
+            }
+            .agy-profile-user-name {
+                font-size: 12px;
+                font-weight: 600;
+                color: var(--foreground, #18181b);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 100%;
+                line-height: 1.2;
+            }
+            body.theme-dark .agy-profile-user-name,
+            html.dark .agy-profile-user-name {
+                color: #f4f4f5 !important;
             }
             .agy-profile-tier-badge.pro {
                 background: rgba(99, 102, 241, 0.09);
@@ -2400,8 +2415,92 @@
                 color: #7dd3fc;
                 border-color: rgba(56, 189, 248, 0.28);
             }
+
+            /* Modern Floating Tooltip (matching Antigravity native style - Image 2) */
+            .agy-modern-tooltip {
+                position: fixed;
+                z-index: 2147483647;
+                display: none;
+                align-items: center;
+                gap: 6px;
+                padding: 4px 8px;
+                font-size: 12px;
+                line-height: 1.35;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                border-radius: 6px;
+                background: #ffffff;
+                color: #18181b;
+                border: 1px solid rgba(0, 0, 0, 0.08);
+                box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+                pointer-events: none;
+                white-space: nowrap;
+                opacity: 0;
+                transform: translateY(3px);
+                transition: opacity 0.12s cubic-bezier(0.16, 1, 0.3, 1), transform 0.12s cubic-bezier(0.16, 1, 0.3, 1);
+                user-select: none;
+            }
+            body.theme-dark .agy-modern-tooltip,
+            :root.dark .agy-modern-tooltip,
+            html.dark .agy-modern-tooltip {
+                background: #1f1f23;
+                color: #f4f4f5;
+                border-color: rgba(255, 255, 255, 0.12);
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.2);
+            }
         `;
         document.head.appendChild(styleEl);
+    }
+
+    // Modern Tooltip Singleton
+    let modernTooltipEl = null;
+    function showModernTooltip(anchorEl, contentHtml) {
+        if (!anchorEl) return;
+        if (!modernTooltipEl) {
+            modernTooltipEl = document.createElement('div');
+            modernTooltipEl.id = 'agy-modern-tooltip';
+            modernTooltipEl.className = 'agy-modern-tooltip';
+            document.body.appendChild(modernTooltipEl);
+        }
+        modernTooltipEl.innerHTML = contentHtml;
+        modernTooltipEl.style.display = 'inline-flex';
+        modernTooltipEl.style.opacity = '0';
+        modernTooltipEl.style.transform = 'translateY(3px)';
+
+        const rect = anchorEl.getBoundingClientRect();
+        const tooltipRect = modernTooltipEl.getBoundingClientRect();
+
+        let top = rect.top - tooltipRect.height - 6;
+        let left = rect.left;
+
+        if (top < 8) {
+            top = rect.bottom + 6;
+        }
+        if (left < 8) left = 8;
+        if (left + tooltipRect.width > window.innerWidth - 8) {
+            left = window.innerWidth - tooltipRect.width - 8;
+        }
+
+        modernTooltipEl.style.top = `${top}px`;
+        modernTooltipEl.style.left = `${left}px`;
+
+        requestAnimationFrame(() => {
+            if (modernTooltipEl) {
+                modernTooltipEl.style.opacity = '1';
+                modernTooltipEl.style.transform = 'translateY(0)';
+            }
+        });
+    }
+
+    function hideModernTooltip() {
+        if (modernTooltipEl) {
+            modernTooltipEl.style.opacity = '0';
+            modernTooltipEl.style.transform = 'translateY(3px)';
+            setTimeout(() => {
+                if (modernTooltipEl && modernTooltipEl.style.opacity === '0') {
+                    modernTooltipEl.style.display = 'none';
+                }
+            }, 120);
+        }
     }
 
     // Quota State
@@ -2432,13 +2531,22 @@
     }
 
     // Helper: Parse raw quota protobuf response
-    function parseBucket(b) {
+    function parseBucket(b, fallbackWindow = '') {
         if (!b) return null;
         const frac = b.remaining?.case === 'remainingFraction' ? b.remaining.value : (typeof b.remaining?.value === 'number' ? b.remaining.value : 1);
         const pct = Math.round(frac * 100);
         let resetText = '';
+        let resetMs = 0;
         if (b.resetTime?.seconds) {
-            const resetMs = Number(b.resetTime.seconds) * 1000;
+            resetMs = Number(b.resetTime.seconds) * 1000;
+        } else if (typeof b.resetTime === 'number') {
+            resetMs = b.resetTime < 1e11 ? b.resetTime * 1000 : b.resetTime;
+        } else if (typeof b.resetTime === 'string') {
+            const parsed = Date.parse(b.resetTime);
+            if (!isNaN(parsed)) resetMs = parsed;
+        }
+
+        if (resetMs > 0) {
             const diffMs = resetMs - Date.now();
             if (diffMs <= 0) {
                 resetText = '<1m';
@@ -2455,13 +2563,55 @@
                     resetText = `${mins}m`;
                 }
             }
+        } else if (b.resetText) {
+            resetText = b.resetText.replace(' 重置', '').trim();
         }
+
+        const win = b.window || fallbackWindow;
         return {
-            id: b.bucketId,
-            window: b.window,
+            id: b.bucketId || (win ? `${win}-bucket` : ''),
+            window: win,
             fraction: Math.max(0, Math.min(1, frac)),
             percent: pct,
             resetText: resetText ? `${resetText} 重置` : ''
+        };
+    }
+
+    function extractBucketsFromGroup(group) {
+        if (!group || !Array.isArray(group.buckets)) return { weekly: null, fiveHour: null };
+        const buckets = group.buckets;
+        let wk = buckets.find(b => b.window === 'weekly' || (b.bucketId && b.bucketId.toLowerCase().includes('week')));
+        let fh = buckets.find(b => b.window === '5h' || (b.bucketId && (b.bucketId.toLowerCase().includes('5h') || b.bucketId.toLowerCase().includes('hour'))));
+
+        if (!wk || !fh) {
+            if (buckets.length >= 2) {
+                const getMs = (b) => {
+                    if (b?.resetTime?.seconds) return Number(b.resetTime.seconds) * 1000;
+                    if (typeof b?.resetTime === 'number') return b.resetTime < 1e11 ? b.resetTime * 1000 : b.resetTime;
+                    if (typeof b?.resetTime === 'string') return Date.parse(b.resetTime) || 0;
+                    return 0;
+                };
+                const ms0 = getMs(buckets[0]);
+                const ms1 = getMs(buckets[1]);
+                if (ms0 && ms1) {
+                    if (ms0 > ms1) {
+                        if (!wk) wk = buckets[0];
+                        if (!fh) fh = buckets[1];
+                    } else {
+                        if (!wk) wk = buckets[1];
+                        if (!fh) fh = buckets[0];
+                    }
+                } else {
+                    if (!fh) fh = buckets[0];
+                    if (!wk) wk = buckets[1];
+                }
+            } else if (buckets.length === 1) {
+                if (!fh) fh = buckets[0];
+            }
+        }
+        return {
+            weekly: parseBucket(wk, 'weekly'),
+            fiveHour: parseBucket(fh, '5h')
         };
     }
 
@@ -2483,19 +2633,26 @@
             const geminiGroup = groups.find(g => g.displayName?.toLowerCase().includes('gemini') || g.description?.toLowerCase().includes('flash'));
             const claudeGroup = groups.find(g => g.displayName?.toLowerCase().includes('claude') || g.displayName?.toLowerCase().includes('gpt'));
 
+            const geminiBuckets = extractBucketsFromGroup(geminiGroup);
+            const claudeBuckets = extractBucketsFromGroup(claudeGroup);
+
             quotaData = {
                 gemini: {
                     name: 'Gemini 系列',
-                    weekly: parseBucket(geminiGroup?.buckets?.find(b => b.window === 'weekly' || b.bucketId?.includes('weekly'))),
-                    fiveHour: parseBucket(geminiGroup?.buckets?.find(b => b.window === '5h' || b.bucketId?.includes('5h')))
+                    weekly: geminiBuckets.weekly,
+                    fiveHour: geminiBuckets.fiveHour
                 },
                 claude: {
                     name: 'Claude / GPT 系列',
-                    weekly: parseBucket(claudeGroup?.buckets?.find(b => b.window === 'weekly' || b.bucketId?.includes('weekly'))),
-                    fiveHour: parseBucket(claudeGroup?.buckets?.find(b => b.window === '5h' || b.bucketId?.includes('5h')))
+                    weekly: claudeBuckets.weekly,
+                    fiveHour: claudeBuckets.fiveHour
                 }
             };
+            window.__AGY_GET_QUOTA_DATA__ = () => quotaData;
             renderWidget();
+            if (typeof window.__AGY_SYNC_CURRENT_ACCOUNT__ === 'function') {
+                window.__AGY_SYNC_CURRENT_ACCOUNT__();
+            }
         } catch (err) {
             console.error('[Antigravity Quota] Fetch failed:', err);
         } finally {
@@ -2504,6 +2661,7 @@
         }
     }
     window.__AGY_REFRESH_QUOTA__ = fetchQuota;
+    window.__AGY_GET_QUOTA_DATA__ = () => quotaData;
 
     function updateRefreshButtonSpin(spinning) {
         const btn = document.getElementById('agy-quota-refresh-btn');
@@ -2639,9 +2797,10 @@
                         else if (str.includes('pro')) tier = 'PRO';
                         else if (str.includes('plus')) tier = 'PLUS';
 
+                        const defActive = window.__AGY_BOOTSTRAP_PROFILES__?.active || localStorage.getItem('__AGY_ACTIVE_EMAIL__') || '';
                         const profile = {
-                            name: u.name || '乐禾泽',
-                            email: u.email || '',
+                            name: u.name || (defActive ? defActive.split('@')[0] : '用户'),
+                            email: u.email || defActive,
                             avatar: u.profilePictureUrl || '',
                             tier: tier || 'PRO'
                         };
@@ -2661,16 +2820,18 @@
                 if (profile && profile.name) return profile;
             }
 
+            const defActive = window.__AGY_BOOTSTRAP_PROFILES__?.active || localStorage.getItem('__AGY_ACTIVE_EMAIL__') || '';
             return {
-                name: '乐禾泽',
-                email: 'time3207486260@Outlook.com',
+                name: (defActive ? defActive.split('@')[0] : '用户'),
+                email: defActive,
                 avatar: '',
                 tier: 'PRO'
             };
         } catch(e) {
+            const defActive = window.__AGY_BOOTSTRAP_PROFILES__?.active || localStorage.getItem('__AGY_ACTIVE_EMAIL__') || '';
             return {
-                name: '乐禾泽',
-                email: 'time3207486260@Outlook.com',
+                name: (defActive ? defActive.split('@')[0] : '用户'),
+                email: defActive,
                 avatar: '',
                 tier: 'PRO'
             };
@@ -2711,7 +2872,7 @@
 
         bottomRow.style.cssText = 'display: flex; align-items: center; justify-content: space-between; width: 100%; margin-top: 6px; height: 36px; padding: 0; box-sizing: border-box; user-select: none;';
 
-        // 3. User Profile Widget
+        // 3. User Profile Widget (Integrated with Switch Account Trigger & Modern Tooltip)
         let profileWidget = document.getElementById('agy-sidebar-user-profile');
         if (!profileWidget) {
             profileWidget = document.createElement('div');
@@ -2726,16 +2887,21 @@
                 badgeHtml = `<span class="agy-profile-tier-badge ${tierClass}">${user.tier}</span>`;
             }
 
-            profileWidget.style.cssText = 'display: flex; align-items: center; gap: 8px; min-width: 0; padding: 4px 6px; border-radius: 8px; cursor: pointer; transition: background 0.15s ease; user-select: none;';
-            profileWidget.title = `${user.name}${user.email ? ' (' + user.email + ')' : ''}${user.tier ? ' · ' + user.tier + ' 订阅' : ''} - 点击查看账户设置`;
+            profileWidget.style.cssText = 'display: flex; align-items: center; gap: 7px; min-width: 0; max-width: calc(100% - 66px); padding: 3px 6px; border-radius: 8px; cursor: pointer; transition: background 0.15s ease; user-select: none; overflow: hidden; flex: 1 1 auto;';
+            profileWidget.removeAttribute('title');
 
             profileWidget.innerHTML = `
                 <div style="width: 26px; height: 26px; border-radius: 50%; overflow: hidden; flex-shrink: 0; background: var(--sidebar-secondary, #e4e4e7); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 1px var(--border, rgba(0,0,0,0.12));">
-                    ${user.avatar ? `<img id="agy-profile-avatar-img" alt="${user.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;">` : `<span style="font-size: 12px; font-weight: 600; color: var(--foreground, #18181b);">${user.name.charAt(0)}</span>`}
+                    ${user.avatar ? `<img id="agy-profile-avatar-img" alt="${user.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;">` : `<span style="font-size: 11px; font-weight: 600; color: var(--foreground, #18181b);">${user.name.charAt(0)}</span>`}
                 </div>
-                <div style="display: inline-flex; align-items: center; position: relative;">
-                    <span style="font-size: 13px; font-weight: 500; color: var(--foreground, #18181b); white-space: nowrap; line-height: 1.2;">${user.name}</span>
+                <div style="display: flex; flex-direction: column; justify-content: center; align-items: flex-start; min-width: 0; overflow: hidden; gap: 1px; flex: 1;">
                     ${badgeHtml}
+                    <span class="agy-profile-user-name" style="font-size: 12px; font-weight: 600; color: var(--foreground, #18181b); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; line-height: 1.2;">${user.name}</span>
+                </div>
+                <div class="agy-profile-switch-icon" style="display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; color: var(--muted-foreground, #71717a); flex-shrink: 0; opacity: 0.7; transition: opacity 0.15s ease, transform 0.15s ease; margin-left: 2px;">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M7 16V4M7 4L3 8M7 4L11 8M17 8V20M17 20L21 16M17 20L13 16"/>
+                    </svg>
                 </div>
             `;
 
@@ -2747,29 +2913,93 @@
             }
 
             profileWidget.onclick = () => {
-                settingsBtn.click();
-                setTimeout(() => {
-                    const accBtn = document.querySelector('[data-testid="settings-nav-item-Account"]');
-                    if (accBtn) accBtn.click();
-                }, 200);
+                hideModernTooltip();
+                if (typeof window.__AGY_OPEN_ACCOUNT_SWITCHER__ === 'function') {
+                    window.__AGY_OPEN_ACCOUNT_SWITCHER__();
+                } else {
+                    settingsBtn.click();
+                }
             };
 
             profileWidget.onmouseenter = () => {
                 profileWidget.style.backgroundColor = 'var(--sidebar-muted, rgba(0, 0, 0, 0.06))';
+                const sIcon = profileWidget.querySelector('.agy-profile-switch-icon');
+                if (sIcon) {
+                    sIcon.style.opacity = '1';
+                    sIcon.style.color = 'var(--foreground, #18181b)';
+                }
+                const curU = getUserProfile();
+                const tipHtml = `
+                    <span style="font-weight: 500; color: var(--foreground, #18181b);">${curU.name}${curU.email ? ' (' + curU.email + ')' : ''}${curU.tier ? ' · ' + curU.tier + ' 订阅' : ''}</span>
+                    <span style="color: var(--muted-foreground, #71717a); font-size: 11.5px; margin-left: 5px;">点击切换账号</span>
+                `;
+                showModernTooltip(profileWidget, tipHtml);
             };
             profileWidget.onmouseleave = () => {
                 profileWidget.style.backgroundColor = 'transparent';
+                const sIcon = profileWidget.querySelector('.agy-profile-switch-icon');
+                if (sIcon) {
+                    sIcon.style.opacity = '0.7';
+                    sIcon.style.color = 'var(--muted-foreground, #71717a)';
+                }
+                hideModernTooltip();
             };
         } else if (profileWidget.parentElement !== bottomRow) {
             bottomRow.prepend(profileWidget);
         }
 
-        // 4. Move settingsBtn to the right of bottomRow
-        if (settingsBtn.parentElement !== bottomRow) {
-            bottomRow.appendChild(settingsBtn);
+        if (profileWidget) {
+            profileWidget.removeAttribute('title');
+            profileWidget.style.maxWidth = 'calc(100% - 66px)';
+            const curU = getUserProfile();
+            const nEl = profileWidget.querySelector('.agy-profile-user-name');
+            if (nEl) {
+                nEl.removeAttribute('title');
+                if (curU.name && nEl.textContent !== curU.name) {
+                    nEl.textContent = curU.name;
+                }
+            }
+            const bEl = profileWidget.querySelector('.agy-profile-tier-badge');
+            if (bEl && curU.tier) {
+                bEl.className = `agy-profile-tier-badge ${curU.tier.toLowerCase()}`;
+                bEl.textContent = curU.tier;
+            }
+            const aEl = profileWidget.querySelector('#agy-profile-avatar-img');
+            if (aEl && curU.avatar && aEl.src !== curU.avatar) aEl.src = curU.avatar;
+
+            // Ensure integrated switch icon is present
+            if (!profileWidget.querySelector('.agy-profile-switch-icon')) {
+                const sDiv = document.createElement('div');
+                sDiv.className = 'agy-profile-switch-icon';
+                sDiv.style.cssText = 'display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; color: var(--muted-foreground, #71717a); flex-shrink: 0; opacity: 0.7; transition: opacity 0.15s ease, transform 0.15s ease; margin-left: 2px;';
+                sDiv.innerHTML = `
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M7 16V4M7 4L3 8M7 4L11 8M17 8V20M17 20L21 16M17 20L13 16"/>
+                    </svg>
+                `;
+                profileWidget.appendChild(sDiv);
+            }
+        }
+
+        // 4. Actions Wrap Container on right (Switch Account + Settings)
+        let actionsWrap = document.getElementById('agy-sidebar-actions-wrap');
+        if (!actionsWrap) {
+            actionsWrap = document.createElement('div');
+            actionsWrap.id = 'agy-sidebar-actions-wrap';
+            bottomRow.appendChild(actionsWrap);
+        }
+        actionsWrap.style.cssText = 'display: inline-flex !important; flex-direction: row !important; flex-wrap: nowrap !important; align-items: center !important; white-space: nowrap !important; gap: 3px !important; flex-shrink: 0 !important; margin-left: auto !important;';
+
+        if (settingsBtn.parentElement !== actionsWrap) {
+            actionsWrap.appendChild(settingsBtn);
             settingsBtn.classList.remove('w-full', 'flex-1', 'justify-start');
             settingsBtn.classList.add('w-fit');
-            settingsBtn.style.cssText = 'margin-left: auto !important; width: fit-content !important; min-width: 0 !important; max-width: fit-content !important; flex: 0 0 auto !important; flex-grow: 0 !important; flex-shrink: 0 !important; justify-content: center !important; padding: 5px 8px !important; margin-right: 0 !important; border-radius: 8px !important; gap: 4px !important; display: inline-flex !important; align-items: center !important; font-size: 13px !important; font-weight: 500 !important;';
+            settingsBtn.style.cssText = 'margin: 0 !important; width: fit-content !important; min-width: 0 !important; max-width: fit-content !important; flex: 0 0 auto !important; flex-grow: 0 !important; flex-shrink: 0 !important; justify-content: center !important; padding: 4px 6px !important; border-radius: 6px !important; gap: 3px !important; display: inline-flex !important; align-items: center !important; font-size: 12.5px !important; font-weight: 500 !important;';
+        }
+
+        // 4.1 Mount switchAccountBtn inside actionsWrap
+        if (typeof window.__AGY_MOUNT_SWITCH_ACCOUNT_BTN__ === 'function') {
+            window.__AGY_MOUNT_SWITCH_ACCOUNT_BTN__();
         }
 
         // 5. Ensure correct vertical order: card then bottomRow
@@ -2791,6 +3021,7 @@
 
     // Expose mount function for the Master Coordinator
     window.__AGY_MOUNT_SIDEBAR_FOOTER__ = mount;
+    window.__AGY_GET_USER_PROFILE__ = getUserProfile;
 
     console.log('[Antigravity Quota] Widget mounted successfully');
 })();
@@ -5338,6 +5569,2011 @@
 })();
 
 // ==========================================
+// ANTIGRAVITY MULTI-ACCOUNT & QUOTA SWITCHER (GRID VIEW & OAUTH 2.0)
+// High-fidelity grid layout matching user screenshot
+// Independent Web OAuth authorization without logging out active session
+// Real percentage progress bars, device fingerprint management & search filter
+// ==========================================
+(function() {
+    // 1. Inject Comprehensive Theme-Aware Stylesheet
+    const styleId = 'agy-account-switcher-style';
+    let style = document.getElementById(styleId);
+    if (!style) {
+        style = document.createElement('style');
+        style.id = styleId;
+        document.head.appendChild(style);
+    }
+    style.textContent = `
+        :root {
+            --as-overlay-bg: rgba(15, 23, 42, 0.45);
+            --as-modal-bg: #ffffff;
+            --as-modal-border: #e2e8f0;
+            --as-card-bg: #ffffff;
+            --as-card-border: #e2e8f0;
+            --as-card-hover-border: #cbd5e1;
+            --as-text-main: #0f172a;
+            --as-text-muted: #64748b;
+            --as-active-border: #2563eb;
+            --as-active-bg: linear-gradient(145deg, #f0f7ff 0%, #e0f2fe 55%, #f8faff 100%);
+            --as-active-glow: 0 0 0 1.5px rgba(37, 99, 235, 0.25), 0 10px 25px -5px rgba(37, 99, 235, 0.15);
+            --as-bar-track: #f1f5f9;
+            --as-bar-fill-gemini: rgba(34, 197, 94, 0.22);
+            --as-bar-text-gemini: #15803d;
+            --as-bar-fill-claude: rgba(249, 115, 22, 0.20);
+            --as-bar-text-claude: #c2410c;
+            --as-bar-fill-low: rgba(239, 68, 68, 0.22);
+            --as-bar-text-low: #dc2626;
+            --as-tag-bg: #eff6ff;
+            --as-tag-text: #2563eb;
+            --as-tag-border: #bfdbfe;
+            --as-btn-bg: #ffffff;
+            --as-btn-border: #cbd5e1;
+            --as-btn-text: #1e293b;
+            --as-btn-hover: #f8fafc;
+            --as-input-bg: #ffffff;
+            --as-input-border: #cbd5e1;
+            --as-code-bg: #f8fafc;
+        }
+
+        html.dark, html.dark-theme, body.dark, body.theme-dark, [data-theme="dark"], [data-color-mode="dark"], .vscode-dark {
+            --as-overlay-bg: rgba(0, 0, 0, 0.75);
+            --as-modal-bg: #141416;
+            --as-modal-border: #27272a;
+            --as-card-bg: #18181b;
+            --as-card-border: #27272a;
+            --as-card-hover-border: #3f3f46;
+            --as-text-main: #f4f4f5;
+            --as-text-muted: #a1a1aa;
+            --as-active-border: #3b82f6;
+            --as-active-bg: linear-gradient(145deg, rgba(30, 58, 138, 0.35) 0%, rgba(30, 64, 175, 0.18) 55%, rgba(24, 24, 27, 0.95) 100%);
+            --as-active-glow: 0 0 0 1.5px rgba(59, 130, 246, 0.3), 0 12px 28px -5px rgba(59, 130, 246, 0.2);
+            --as-bar-track: #202024;
+            --as-bar-fill-gemini: rgba(34, 197, 94, 0.26);
+            --as-bar-text-gemini: #4ade80;
+            --as-bar-fill-claude: rgba(249, 115, 22, 0.26);
+            --as-bar-text-claude: #fb923c;
+            --as-bar-fill-low: rgba(239, 68, 68, 0.28);
+            --as-bar-text-low: #f87171;
+            --as-tag-bg: rgba(59, 130, 246, 0.15);
+            --as-tag-text: #60a5fa;
+            --as-tag-border: rgba(59, 130, 246, 0.3);
+            --as-btn-bg: #202024;
+            --as-btn-border: #2e2e34;
+            --as-btn-text: #f4f4f5;
+            --as-btn-hover: #2a2a30;
+            --as-input-bg: #18181b;
+            --as-input-border: #2e2e34;
+            --as-code-bg: #111113;
+        }
+
+        /* Sidebar Account Switcher Button (Aligned with Settings) */
+        #agy-sidebar-actions-wrap {
+            display: inline-flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            align-items: center !important;
+            white-space: nowrap !important;
+            gap: 3px !important;
+            flex-shrink: 0 !important;
+            margin-left: auto !important;
+        }
+
+        #agy-sidebar-switch-account-btn {
+            margin: 0 !important;
+            width: 26px !important;
+            min-width: 26px !important;
+            max-width: 26px !important;
+            height: 26px !important;
+            flex: 0 0 26px !important;
+            flex-grow: 0 !important;
+            flex-shrink: 0 !important;
+            justify-content: center !important;
+            padding: 0 !important;
+            border-radius: 6px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            font-size: 12.5px !important;
+            white-space: nowrap !important;
+            background: transparent !important;
+            border: none !important;
+            cursor: pointer !important;
+            outline: none !important;
+            color: inherit !important;
+            line-height: 1 !important;
+            user-select: none !important;
+            transition: background 0.15s ease !important;
+        }
+
+        #agy-sidebar-switch-account-btn:hover {
+            background: var(--sidebar-muted, rgba(128, 128, 128, 0.15)) !important;
+        }
+
+        #agy-sidebar-switch-account-btn svg {
+            flex-shrink: 0 !important;
+            display: inline-block !important;
+            margin: 0 !important;
+        }
+
+        #agy-sidebar-switch-account-btn span {
+            display: none !important;
+        }
+
+        #agy-as-modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--as-overlay-bg);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 999999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: agyAsFadeIn 0.18s ease-out forwards;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+
+        @keyframes agyAsFadeIn {
+            from { opacity: 0; transform: scale(0.985); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .agy-as-card {
+            background: var(--as-modal-bg);
+            border: 1px solid var(--as-modal-border);
+            border-radius: 14px;
+            width: 960px;
+            max-width: 95vw;
+            height: 88vh;
+            max-height: 860px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+            overflow: hidden;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .agy-as-header {
+            padding: 18px 24px 14px 24px;
+            border-bottom: 1px solid var(--as-modal-border);
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            flex-shrink: 0;
+            background: var(--as-modal-bg);
+        }
+
+        .agy-as-title-box h3 {
+            margin: 0;
+            font-size: 16.5px;
+            font-weight: 600;
+            color: var(--as-text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .agy-as-title-box p {
+            margin: 4px 0 0 0;
+            font-size: 12px;
+            color: var(--as-text-muted);
+        }
+
+        .agy-as-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .agy-as-btn {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12.5px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid var(--as-btn-border);
+            background: var(--as-btn-bg);
+            color: var(--as-btn-text);
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            outline: none;
+            user-select: none;
+        }
+
+        .agy-as-btn:hover {
+            background: var(--as-btn-hover);
+            border-color: #3b82f6;
+        }
+
+        .agy-as-btn-primary {
+            background: #2563eb !important;
+            border-color: #2563eb !important;
+            color: #ffffff !important;
+        }
+        .agy-as-btn-primary:hover {
+            background: #1d4ed8 !important;
+            border-color: #1d4ed8 !important;
+        }
+
+        /* Toolbar: Search & Filter Tabs */
+        .agy-as-toolbar {
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            border-bottom: 1px solid var(--as-modal-border);
+            background: var(--as-modal-bg);
+            flex-shrink: 0;
+        }
+
+        .agy-as-search-box {
+            position: relative;
+            flex: 1;
+            max-width: 380px;
+            display: flex;
+            align-items: center;
+        }
+
+        .agy-as-search-box svg {
+            position: absolute;
+            left: 10px;
+            color: var(--as-text-muted);
+            pointer-events: none;
+        }
+
+        .agy-as-search-input {
+            width: 100%;
+            height: 32px;
+            padding: 0 12px 0 32px;
+            border-radius: 8px;
+            border: 1px solid var(--as-input-border);
+            background: var(--as-input-bg);
+            color: var(--as-text-main);
+            font-size: 12.5px;
+            outline: none;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .agy-as-search-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
+        .agy-as-modal-input {
+            width: 100%;
+            height: 36px;
+            padding: 0 12px !important;
+            border-radius: 8px;
+            border: 1px solid var(--as-input-border);
+            background: var(--as-input-bg);
+            color: var(--as-text-main);
+            font-size: 13px;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+            text-align: left !important;
+        }
+
+        .agy-as-modal-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
+        .agy-as-filter-tabs {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .agy-as-filter-pill {
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid var(--as-btn-border);
+            background: var(--as-btn-bg);
+            color: var(--as-text-muted);
+            transition: all 0.15s ease;
+            user-select: none;
+        }
+
+        .agy-as-filter-pill.active {
+            background: rgba(37, 99, 235, 0.15);
+            border-color: rgba(37, 99, 235, 0.4);
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        html.dark .agy-as-filter-pill.active {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: rgba(59, 130, 246, 0.4);
+            color: #60a5fa;
+        }
+
+        /* Body & Grid */
+        .agy-as-body {
+            padding: 20px 24px;
+            overflow-y: auto;
+            flex: 1;
+            background: var(--as-modal-bg);
+        }
+
+        .agy-as-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+            gap: 16px;
+        }
+
+        /* Account Card (Matching User Screenshot 2) */
+        .agy-as-account-card {
+            background: var(--as-card-bg);
+            border: 1px solid var(--as-card-border);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: all 0.2s ease;
+            position: relative;
+            user-select: none;
+        }
+
+        .agy-as-account-card:hover {
+            border-color: var(--as-card-hover-border);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Active Card Blue Border, Light Blue Gradient & Glow */
+        .agy-as-account-card.active {
+            background: var(--as-active-bg) !important;
+            border: 2px solid var(--as-active-border) !important;
+            box-shadow: var(--as-active-glow);
+        }
+        .agy-as-account-card.active .agy-as-bar-track {
+            background: rgba(255, 255, 255, 0.65);
+        }
+        html.dark .agy-as-account-card.active .agy-as-bar-track,
+        body.theme-dark .agy-as-account-card.active .agy-as-bar-track {
+            background: rgba(0, 0, 0, 0.32);
+        }
+
+        .agy-as-card-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .agy-as-card-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .agy-as-card-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .agy-as-card-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .agy-as-card-user-info {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .agy-as-card-name {
+            font-size: 13.5px;
+            font-weight: 600;
+            color: var(--as-text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .agy-as-card-email {
+            font-size: 12px;
+            color: var(--as-text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .agy-as-card-tag {
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11.5px;
+            font-weight: 500;
+            background: var(--as-tag-bg);
+            color: var(--as-tag-text);
+            border: 1px solid var(--as-tag-border);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .agy-as-card-tag:hover {
+            opacity: 0.85;
+            transform: translateY(-1px);
+        }
+
+        .agy-as-card-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11.5px;
+            color: var(--as-text-muted);
+        }
+
+        .agy-as-badge-box {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .agy-as-badge-current {
+            background: rgba(37, 99, 235, 0.15);
+            color: #2563eb;
+            font-size: 11px;
+            font-weight: 600;
+            border-radius: 4px;
+            padding: 1.5px 6px;
+        }
+        html.dark .agy-as-badge-current {
+            background: rgba(59, 130, 246, 0.25);
+            color: #60a5fa;
+        }
+
+        .agy-as-badge-pro {
+            background: #2563eb;
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 9999px;
+            padding: 1.5px 8px;
+        }
+
+        /* Real Quota Progress Bars */
+        .agy-as-quotas-box {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .agy-as-bar-track {
+            height: 26px;
+            border-radius: 6px;
+            background: var(--as-bar-track);
+            border: 1px solid var(--as-card-border);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .agy-as-bar-fill {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            border-radius: 5px;
+            transition: width 0.3s ease;
+        }
+
+        .agy-as-bar-fill.gemini {
+            background: var(--as-bar-fill-gemini);
+        }
+        .agy-as-bar-fill.claude {
+            background: var(--as-bar-fill-claude);
+        }
+        .agy-as-bar-fill.low {
+            background: var(--as-bar-fill-low) !important;
+        }
+
+        .agy-as-bar-content {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 10px;
+            font-size: 11.5px;
+            line-height: 1;
+        }
+
+        .agy-as-bar-content.gemini {
+            color: var(--as-bar-text-gemini);
+        }
+        .agy-as-bar-content.claude {
+            color: var(--as-bar-text-claude);
+        }
+        .agy-as-bar-content.low {
+            color: var(--as-bar-text-low) !important;
+        }
+
+        .agy-as-bar-content b {
+            font-weight: 700;
+        }
+
+        /* Card Action Buttons Row */
+        .agy-as-card-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding-top: 8px;
+            border-top: 1px solid var(--as-card-border);
+        }
+
+        .agy-as-card-actions-left {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .agy-as-card-actions-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: auto;
+        }
+
+        .agy-as-card-btn {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid var(--as-btn-border);
+            background: var(--as-btn-bg);
+            color: var(--as-btn-text);
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .agy-as-card-btn:hover {
+            background: var(--as-btn-hover);
+            border-color: #3b82f6;
+        }
+
+        .agy-as-card-btn.primary {
+            background: #10b981;
+            border-color: #10b981;
+            color: #ffffff;
+            font-weight: 600;
+        }
+        .agy-as-card-btn.primary:hover {
+            background: #059669;
+            border-color: #059669;
+        }
+
+        .agy-as-card-active-label {
+            padding: 4px 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #2563eb;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        html.dark .agy-as-card-active-label {
+            color: #60a5fa;
+        }
+
+        .agy-as-card-icon-btn {
+            padding: 5px;
+            border-radius: 6px;
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--as-text-muted);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+        }
+
+        .agy-as-card-icon-btn:hover {
+            background: var(--as-btn-hover);
+            border-color: var(--as-btn-border);
+            color: var(--as-text-main);
+        }
+
+        .agy-as-card-icon-btn.danger:hover {
+            background: rgba(239, 68, 68, 0.12);
+            color: #ef4444;
+            border-color: rgba(239, 68, 68, 0.25);
+        }
+
+        .agy-as-footer {
+            padding: 12px 24px;
+            border-top: 1px solid var(--as-modal-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--as-text-muted);
+            background: var(--as-modal-bg);
+            flex-shrink: 0;
+        }
+
+        /* Device Fingerprint Modal (Matching User Screenshot 3) */
+        .agy-fp-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--as-overlay-bg);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 1000005;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: agyAsFadeIn 0.15s ease-out forwards;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        .agy-fp-card {
+            background: var(--as-modal-bg);
+            border: 1px solid var(--as-modal-border);
+            border-radius: 14px;
+            width: 780px;
+            max-width: 92vw;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.4);
+        }
+
+        .agy-fp-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--as-modal-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .agy-fp-header h4 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--as-text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .agy-fp-header .email-badge {
+            background: rgba(37, 99, 235, 0.12);
+            color: #2563eb;
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+        html.dark .agy-fp-header .email-badge {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+        }
+
+        .agy-fp-body {
+            padding: 20px 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .agy-fp-actions-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .agy-fp-section-card {
+            background: var(--as-card-bg);
+            border: 1px solid var(--as-card-border);
+            border-radius: 10px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .agy-fp-section-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--as-text-main);
+        }
+
+        .agy-fp-section-desc {
+            font-size: 11.5px;
+            color: var(--as-text-muted);
+        }
+
+        .agy-fp-code-box {
+            background: var(--as-code-bg);
+            border: 1px solid var(--as-card-border);
+            border-radius: 6px;
+            padding: 10px;
+            font-family: Consolas, monospace;
+            font-size: 11px;
+            color: var(--as-text-muted);
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 140px;
+            overflow-y: auto;
+        }
+
+        /* Universal Custom Modal Dialog */
+        .agy-as-confirm-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--as-overlay-bg);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 1000010;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: agyAsFadeIn 0.15s ease-out forwards;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        .agy-as-confirm-card {
+            background: var(--as-modal-bg);
+            border: 1px solid var(--as-modal-border);
+            border-radius: 14px;
+            width: 480px;
+            max-width: 90vw;
+            padding: 24px;
+            box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.45);
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            user-select: none;
+        }
+
+        #agy-as-scan-btn.agy-spinning svg {
+            animation: agySpin 0.8s linear infinite;
+        }
+        @keyframes agySpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    `;
+
+    // 2. State & Caches
+    let switcherOverlay = null;
+    let cachedProfiles = [];
+    let currentActiveEmail = '';
+    let searchQuery = '';
+    let selectedTierFilter = 'all';
+
+    // 3. Helper: Custom Universal Modal (Confirm / Alert / Prompt)
+    function showAgyModal(options) {
+        return new Promise((resolve) => {
+            const overlay = document.createElement('div');
+            overlay.className = 'agy-as-confirm-overlay';
+            overlay.innerHTML = `
+                <div class="agy-as-confirm-card" onclick="event.stopPropagation()">
+                    <div style="display: flex; gap: 14px; align-items: flex-start;">
+                        <div style="width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: rgba(37,99,235,0.12); color: #2563eb;">
+                            ${options.iconSvg || '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>'}
+                        </div>
+                        <div style="flex: 1; min-width: 0;">
+                            <h4 style="margin: 0 0 6px 0; font-size: 15px; font-weight: 600; color: var(--as-text-main);">${options.title || '系统提示'}</h4>
+                            <div style="font-size: 13px; line-height: 1.5; color: var(--as-text-muted); white-space: pre-wrap;">${options.message || ''}</div>
+                            ${options.hasInput ? `<input type="text" id="agy-modal-input" class="agy-as-modal-input" style="margin-top: 12px; width: 100%; box-sizing: border-box; text-align: left; padding: 0 12px;" value="${options.inputValue || ''}" placeholder="${options.inputPlaceholder || ''}" />` : ''}
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-top: 4px;">
+                        ${!options.isAlert ? `<button type="button" class="agy-as-btn" id="agy-modal-cancel">${options.cancelText || '取消'}</button>` : ''}
+                        <button type="button" class="agy-as-btn agy-as-btn-primary" id="agy-modal-ok" style="${options.confirmColor ? 'background:'+options.confirmColor+'!important;border-color:'+options.confirmColor+'!important;' : ''}">${options.confirmText || '确定'}</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+
+            const okBtn = overlay.querySelector('#agy-modal-ok');
+            const cancelBtn = overlay.querySelector('#agy-modal-cancel');
+            const inputEl = overlay.querySelector('#agy-modal-input');
+
+            if (inputEl) {
+                setTimeout(() => { inputEl.focus(); inputEl.select(); }, 50);
+                inputEl.onkeydown = (e) => {
+                    if (e.key === 'Enter') okBtn.click();
+                    if (e.key === 'Escape') cancelBtn ? cancelBtn.click() : overlay.remove();
+                };
+            }
+
+            const close = (result) => {
+                overlay.remove();
+                resolve(result);
+            };
+
+            okBtn.onclick = () => close(options.hasInput ? inputEl.value : true);
+            if (cancelBtn) cancelBtn.onclick = () => close(false);
+            overlay.onclick = () => close(false);
+        });
+    }
+
+    // 3.5 Initialize cached profiles synchronously from Bootstrap or localStorage
+    function initCachedProfiles() {
+        if (cachedProfiles && cachedProfiles.length > 0) return;
+        try {
+            const b = window.__AGY_BOOTSTRAP_PROFILES__;
+            if (b && Array.isArray(b.profiles) && b.profiles.length > 0) {
+                cachedProfiles = JSON.parse(JSON.stringify(b.profiles));
+                if (b.active) currentActiveEmail = b.active;
+            }
+        } catch(e) {}
+        if (!cachedProfiles || cachedProfiles.length === 0) {
+            try {
+                const c = localStorage.getItem('__AGY_ACCOUNT_PROFILES__');
+                if (c) {
+                    const parsed = JSON.parse(c);
+                    if (Array.isArray(parsed) && parsed.length > 0) cachedProfiles = parsed;
+                }
+                const act = localStorage.getItem('__AGY_ACTIVE_EMAIL__');
+                if (act) currentActiveEmail = act;
+            } catch(e) {}
+        }
+    }
+
+    // 4. Create Main Switcher Modal UI
+    function createSwitcherOverlay() {
+        initCachedProfiles();
+        const existing = document.getElementById('agy-as-modal-overlay');
+        if (existing) {
+            switcherOverlay = existing;
+            renderCardsGrid();
+            return switcherOverlay;
+        }
+        switcherOverlay = document.createElement('div');
+        switcherOverlay.id = 'agy-as-modal-overlay';
+        switcherOverlay.innerHTML = `
+            <div class="agy-as-card" onclick="event.stopPropagation()">
+                <div class="agy-as-header">
+                    <div class="agy-as-title-box">
+                        <h3>
+                            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/>
+                            </svg>
+                            多账号额度管理与快捷切换
+                        </h3>
+                        <p>本地安全保存多套凭证，直接切换秒级生效，免去频繁网页登录授权</p>
+                    </div>
+                    <div class="agy-as-actions">
+                        <button class="agy-as-btn" id="agy-as-scan-btn" title="检测并刷新本地账号存档">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                            刷新检测本地账号
+                        </button>
+                        <button class="agy-as-btn agy-as-btn-primary" id="agy-as-add-btn" title="登录并添加新的 Google/Gemini 账号">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            登录新账号
+                        </button>
+                        <button class="agy-as-btn" id="agy-as-close-btn" style="padding: 6px 9px;">✕</button>
+                    </div>
+                </div>
+                <div class="agy-as-toolbar">
+                    <div class="agy-as-search-box">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input type="text" class="agy-as-search-input" id="agy-as-search-input" placeholder="搜索邮箱、用户名或备注..." />
+                    </div>
+                    <div class="agy-as-filter-tabs" id="agy-as-filter-tabs">
+                        <button class="agy-as-filter-pill active" data-filter="all">全部 <span class="count" id="count-all">0</span></button>
+                        <button class="agy-as-filter-pill" data-filter="pro">PRO <span class="count" id="count-pro">0</span></button>
+                        <button class="agy-as-filter-pill" data-filter="ultra">ULTRA <span class="count" id="count-ultra">0</span></button>
+                        <button class="agy-as-filter-pill" data-filter="free">FREE <span class="count" id="count-free">0</span></button>
+                    </div>
+                </div>
+                <div class="agy-as-body" id="agy-as-body">
+                    <!-- Cards Grid dynamically rendered here -->
+                </div>
+                <div class="agy-as-footer">
+                    <span>🔒 账号凭证仅安全加密保存在您本地电脑的 ~/.gemini/ 目录及系统凭据管理器中。</span>
+                    <button class="agy-as-btn" id="agy-as-footer-close">关闭</button>
+                </div>
+            </div>
+        `;
+
+        switcherOverlay.onclick = closeSwitcher;
+        switcherOverlay.querySelector('#agy-as-close-btn').onclick = closeSwitcher;
+        switcherOverlay.querySelector('#agy-as-footer-close').onclick = closeSwitcher;
+
+        // Scan & Refresh Local Accounts
+        switcherOverlay.querySelector('#agy-as-scan-btn').onclick = async () => {
+            const btn = switcherOverlay.querySelector('#agy-as-scan-btn');
+            if (btn) btn.classList.add('agy-spinning');
+            try {
+                if (typeof window.__AGY_REFRESH_QUOTA__ === 'function') {
+                    await window.__AGY_REFRESH_QUOTA__();
+                }
+                await syncCurrentAccount();
+                await loadProfilesAndRender();
+                if (window.__AGY_SHOW_TOAST__) {
+                    window.__AGY_SHOW_TOAST__('🔍 已完成本地账号存档检测与状态同步');
+                }
+            } finally {
+                if (btn) btn.classList.remove('agy-spinning');
+            }
+        };
+
+        // Add Account (Independent Web OAuth)
+        switcherOverlay.querySelector('#agy-as-add-btn').onclick = handleStartOAuthLogin;
+
+        // Search Input Event
+        const searchInput = switcherOverlay.querySelector('#agy-as-search-input');
+        searchInput.oninput = (e) => {
+            searchQuery = (e.target.value || '').trim().toLowerCase();
+            renderCardsGrid();
+        };
+
+        // Filter Pills Event
+        switcherOverlay.querySelectorAll('.agy-as-filter-pill').forEach(pill => {
+            pill.onclick = () => {
+                switcherOverlay.querySelectorAll('.agy-as-filter-pill').forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
+                selectedTierFilter = pill.getAttribute('data-filter') || 'all';
+                renderCardsGrid();
+            };
+        });
+
+        document.body.appendChild(switcherOverlay);
+        renderCardsGrid();
+        return switcherOverlay;
+    }
+
+    // 5. Helper: Render 4 Quota Progress Bars with Real Percentage Width
+    function renderQuotaBarsHtml(quota) {
+        const g5h = quota?.gemini?.fiveHour;
+        const gWk = quota?.gemini?.weekly;
+        const c5h = quota?.claude?.fiveHour;
+        const cWk = quota?.claude?.weekly;
+
+        const g5hPct = (typeof g5h?.percent === 'number') ? g5h.percent : 100;
+        let g5hReset = g5h?.resetText ? g5h.resetText.replace(' 重置', '').trim() : '4h 59m';
+        if (!g5hReset || g5hReset.includes('d')) {
+            g5hReset = '4h 59m';
+        }
+
+        const gWkPct = (typeof gWk?.percent === 'number') ? gWk.percent : 100;
+        let gWkReset = gWk?.resetText ? gWk.resetText.replace(' 重置', '').trim() : '6d 23h';
+        if (!gWkReset || (gWkReset.includes('h') && !gWkReset.includes('d'))) {
+            gWkReset = '6d 23h';
+        }
+
+        const c5hPct = (typeof c5h?.percent === 'number') ? c5h.percent : 100;
+        let c5hReset = c5h?.resetText ? c5h.resetText.replace(' 重置', '').trim() : '4h 59m';
+        if (!c5hReset || c5hReset.includes('d')) {
+            c5hReset = '4h 59m';
+        }
+
+        const cWkPct = (typeof cWk?.percent === 'number') ? cWk.percent : 100;
+        let cWkReset = cWk?.resetText ? cWk.resetText.replace(' 重置', '').trim() : '6d 23h';
+        if (!cWkReset || (cWkReset.includes('h') && !cWkReset.includes('d'))) {
+            cWkReset = '6d 23h';
+        }
+
+        const getStatusClass = (pct) => {
+            if (pct <= 20) return 'low';
+            return '';
+        };
+
+        return `
+            <div class="agy-as-quotas-box">
+                <div class="agy-as-bar-track" title="Gemini 3.1 Pro / Flash (5小时周期)">
+                    <div class="agy-as-bar-fill gemini ${getStatusClass(g5hPct)}" style="width: ${Math.max(0, Math.min(100, g5hPct))}%;"></div>
+                    <div class="agy-as-bar-content gemini ${getStatusClass(g5hPct)}">
+                        <span>✦ Gemini 3.1 Pro (5h) ⏱ ${g5hReset}</span>
+                        <b>${g5hPct}%</b>
+                    </div>
+                </div>
+                <div class="agy-as-bar-track" title="Gemini 3.1 系列 (周周期)">
+                    <div class="agy-as-bar-fill gemini ${getStatusClass(gWkPct)}" style="width: ${Math.max(0, Math.min(100, gWkPct))}%;"></div>
+                    <div class="agy-as-bar-content gemini ${getStatusClass(gWkPct)}">
+                        <span>✦ Gemini (周配额) ⏱ ${gWkReset}</span>
+                        <b>${gWkPct}%</b>
+                    </div>
+                </div>
+                <div class="agy-as-bar-track" title="Claude 3.7 / GPT 系列 (5小时周期)">
+                    <div class="agy-as-bar-fill claude ${getStatusClass(c5hPct)}" style="width: ${Math.max(0, Math.min(100, c5hPct))}%;"></div>
+                    <div class="agy-as-bar-content claude ${getStatusClass(c5hPct)}">
+                        <span>✳ Claude Sonnet (5h) ⏱ ${c5hReset}</span>
+                        <b>${c5hPct}%</b>
+                    </div>
+                </div>
+                <div class="agy-as-bar-track" title="Claude 3.7 / GPT 系列 (周周期)">
+                    <div class="agy-as-bar-fill claude ${getStatusClass(cWkPct)}" style="width: ${Math.max(0, Math.min(100, cWkPct))}%;"></div>
+                    <div class="agy-as-bar-content claude ${getStatusClass(cWkPct)}">
+                        <span>✳ Claude (周配额) ⏱ ${cWkReset}</span>
+                        <b>${cWkPct}%</b>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // Helper: Dynamic Live Quota for Active Account
+    function getLiveQuotaForActiveAccount() {
+        if (typeof window.__AGY_GET_QUOTA_DATA__ === 'function') {
+            const q = window.__AGY_GET_QUOTA_DATA__();
+            if (q && (q.gemini || q.claude)) {
+                return q;
+            }
+        }
+        return null;
+    }
+
+    // 6. Render Cards Grid
+    function renderCardsGrid() {
+        const overlay = switcherOverlay || document.getElementById('agy-as-modal-overlay');
+        if (!overlay) return;
+        const body = overlay.querySelector('#agy-as-body');
+        if (!body) return;
+
+        const profiles = Array.isArray(cachedProfiles) ? cachedProfiles : [];
+
+        // Filter profiles based on search and tier tabs
+        const filtered = profiles.filter(p => {
+            if (!p || typeof p !== 'object') return false;
+            const matchesTier = selectedTierFilter === 'all' || (p.tier || 'PRO').toLowerCase() === selectedTierFilter.toLowerCase();
+            if (!matchesTier) return false;
+
+            if (!searchQuery) return true;
+            const searchHaystack = `${p.email || ''} ${p.name || ''} ${p.tag || ''}`.toLowerCase();
+            return searchHaystack.includes(searchQuery);
+        });
+
+        // Update counts
+        const allCount = profiles.length;
+        const proCount = profiles.filter(p => (p?.tier || 'PRO').toUpperCase() === 'PRO').length;
+        const ultraCount = profiles.filter(p => (p?.tier || '').toUpperCase() === 'ULTRA').length;
+        const freeCount = profiles.filter(p => (p?.tier || '').toUpperCase() === 'FREE').length;
+
+        const countAllEl = overlay.querySelector('#count-all');
+        if (countAllEl) countAllEl.textContent = allCount;
+        const countProEl = overlay.querySelector('#count-pro');
+        if (countProEl) countProEl.textContent = proCount;
+        const countUltraEl = overlay.querySelector('#count-ultra');
+        if (countUltraEl) countUltraEl.textContent = ultraCount;
+        const countFreeEl = overlay.querySelector('#count-free');
+        if (countFreeEl) countFreeEl.textContent = freeCount;
+
+        if (filtered.length === 0) {
+            body.innerHTML = `
+                <div style="padding: 60px 20px; text-align: center; color: var(--as-text-muted);">
+                    <p style="font-size: 14px; margin-bottom: 14px;">${profiles.length === 0 ? '尚未发现本地账号存档' : '未找到匹配的账号记录'}</p>
+                    <button class="agy-as-btn agy-as-btn-primary" id="agy-as-empty-add-btn" style="display: inline-flex; align-items: center; gap: 6px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        登录添加账号
+                    </button>
+                </div>
+            `;
+            const emptyBtn = body.querySelector('#agy-as-empty-add-btn');
+            if (emptyBtn) emptyBtn.onclick = handleStartOAuthLogin;
+            return;
+        }
+
+        let html = '<div class="agy-as-grid">';
+        filtered.forEach(p => {
+            const isActive = currentActiveEmail && p.email && typeof p.email === 'string' && typeof currentActiveEmail === 'string' && p.email.toLowerCase() === currentActiveEmail.toLowerCase();
+            let effectiveQuota = p.quota;
+            if (isActive) {
+                const liveQ = getLiveQuotaForActiveAccount();
+                if (liveQ) effectiveQuota = liveQ;
+            }
+
+            const initial = (p.name || p.email || 'A').charAt(0).toUpperCase();
+
+            html += `
+                <div class="agy-as-account-card ${isActive ? 'active' : ''}">
+                    <!-- Card Top: Avatar, Name, Email, Tag -->
+                    <div class="agy-as-card-top">
+                        <div class="agy-as-card-user">
+                            <div class="agy-as-card-avatar">
+                                ${p.avatar ? `<img src="${p.avatar}" alt="${p.name}" />` : initial}
+                            </div>
+                            <div class="agy-as-card-user-info">
+                                <span class="agy-as-card-name" title="${p.name || p.email}">${p.name || p.email.split('@')[0]}</span>
+                                <span class="agy-as-card-email" title="${p.email}">${p.email}</span>
+                            </div>
+                        </div>
+                        <div class="agy-as-card-tag" data-email="${p.email}" title="点击修改备注标签">
+                            🏷️ ${p.tag || '备注'}
+                        </div>
+                    </div>
+
+                    <!-- Card Meta: Badges & Time -->
+                    <div class="agy-as-card-meta">
+                        <div class="agy-as-badge-box">
+                            ${isActive ? '<span class="agy-as-badge-current">当前</span>' : ''}
+                            <span class="agy-as-badge-pro">◆ ${p.tier || 'PRO'}</span>
+                        </div>
+                        <span class="agy-as-card-time">${p.lastUsed || '刚刚'}</span>
+                    </div>
+
+                    <!-- Quota Progress Bars -->
+                    ${renderQuotaBarsHtml(effectiveQuota)}
+
+                    <!-- Card Actions -->
+                    <div class="agy-as-card-actions">
+                        <div class="agy-as-card-actions-left">
+                            ${isActive ? `
+                                <span class="agy-as-card-active-label">✓ 生效中</span>
+                            ` : `
+                                <button class="agy-as-card-btn primary agy-as-btn-switch" data-email="${p.email}">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+                                    切换
+                                </button>
+                            `}
+                            <button class="agy-as-card-btn agy-as-btn-refresh-single" data-email="${p.email}" title="刷新额度">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                                刷新
+                            </button>
+                            <button class="agy-as-card-btn agy-as-btn-fingerprint" data-email="${p.email}" title="设备指纹配置">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 0 0-10 10c0 5.52 4.48 10 10 10s10-4.48 10-10c0-1.85-.5-3.58-1.38-5.07"/><path d="M12 6a6 6 0 0 0-6 6c0 3.31 2.69 6 6 6s6-2.69 6-6c0-1.24-.38-2.39-1.02-3.34"/><circle cx="12" cy="12" r="2"/></svg>
+                                指纹
+                            </button>
+                        </div>
+                        <div class="agy-as-card-actions-right">
+                            <button class="agy-as-card-icon-btn agy-as-btn-export" data-email="${p.email}" title="导出账号凭据">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            </button>
+                            ${!isActive ? `
+                                <button class="agy-as-card-icon-btn danger agy-as-btn-delete" data-email="${p.email}" title="删除此本地存档">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                </button>
+                            ` : `
+                                <button class="agy-as-card-btn danger agy-as-btn-logout" data-email="${p.email}" title="退出当前账号登录" style="color: #ef4444 !important; border-color: rgba(239, 68, 68, 0.3) !important; background: rgba(239, 68, 68, 0.08) !important; display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; font-size: 11.5px; border-radius: 6px; font-weight: 500; cursor: pointer; transition: all 0.15s ease;">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                        <polyline points="16 17 21 12 16 7"></polyline>
+                                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                                    </svg>
+                                    退出登录
+                                </button>
+                            `}
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        html += '</div>';
+        body.innerHTML = html;
+
+        // Bind events
+        // 1. Switch
+        body.querySelectorAll('.agy-as-btn-switch').forEach(btn => {
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                const em = btn.getAttribute('data-email');
+                if (em) handleSwitchAccount(em, btn);
+            };
+        });
+
+        // 2. Refresh single
+        body.querySelectorAll('.agy-as-btn-refresh-single').forEach(btn => {
+            btn.onclick = async (e) => {
+                e.stopPropagation();
+                const em = btn.getAttribute('data-email');
+                btn.classList.add('agy-spinning');
+                try {
+                    if (em.toLowerCase() === currentActiveEmail.toLowerCase() && typeof window.__AGY_REFRESH_QUOTA__ === 'function') {
+                        await window.__AGY_REFRESH_QUOTA__();
+                        await syncCurrentAccount();
+                    }
+                    await loadProfilesAndRender();
+                    if (window.__AGY_SHOW_TOAST__) window.__AGY_SHOW_TOAST__(`⚡ 账号 ${em} 配额已更新`);
+                } finally {
+                    btn.classList.remove('agy-spinning');
+                }
+            };
+        });
+
+        // 3. Fingerprint
+        body.querySelectorAll('.agy-as-btn-fingerprint').forEach(btn => {
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                const em = btn.getAttribute('data-email');
+                if (em) openFingerprintModal(em);
+            };
+        });
+
+        // 4. Export
+        body.querySelectorAll('.agy-as-btn-export').forEach(btn => {
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                const em = btn.getAttribute('data-email');
+                if (em) handleExportAccount(em);
+            };
+        });
+
+        // 5. Delete
+        body.querySelectorAll('.agy-as-btn-delete').forEach(btn => {
+            btn.onclick = async (e) => {
+                e.stopPropagation();
+                const em = btn.getAttribute('data-email');
+                if (!em) return;
+                const confirmed = await showAgyModal({
+                    title: '删除本地凭证存档',
+                    message: `确定要从本地账号池中删除 ${em} 吗？\n\n此操作仅清除本机的免密登录存档，不会影响您的 Google 账号本身。`,
+                    type: 'danger',
+                    confirmText: '确认删除',
+                    cancelText: '取消',
+                    confirmColor: '#ef4444'
+                });
+                if (confirmed) {
+                    if (window.electronNative && typeof window.electronNative.deleteAccountProfile === 'function') {
+                        await window.electronNative.deleteAccountProfile(em);
+                        await loadProfilesAndRender();
+                    }
+                }
+            };
+        });
+
+        // 5.1 Logout current active account (Secondary confirmation)
+        body.querySelectorAll('.agy-as-btn-logout').forEach(btn => {
+            btn.onclick = async (e) => {
+                e.stopPropagation();
+                const em = btn.getAttribute('data-email');
+                if (!em) return;
+
+                const confirmed = await showAgyModal({
+                    title: '确认退出登录',
+                    message: `确定要退出当前账号 ${em} 的登录状态吗？\n\n退出后将清除当前客户端的活跃会话凭据。\n本地账号池中仍将安全保留该账号的凭据记录，您随时可在多账号管理中秒切恢复。`,
+                    type: 'danger',
+                    confirmText: '退出登录',
+                    cancelText: '取消',
+                    confirmColor: '#ef4444',
+                    iconSvg: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>'
+                });
+                if (!confirmed) return;
+
+                btn.disabled = true;
+                btn.innerHTML = '正在退出...';
+
+                try {
+                    localStorage.removeItem('__AGY_ACTIVE_EMAIL__');
+                    localStorage.removeItem('__AGY_USER_PROFILE__');
+                    currentActiveEmail = '';
+
+                    if (window.__AGY_SHOW_TOAST__) {
+                        window.__AGY_SHOW_TOAST__(`🚪 正在退出账号 ${em}，客户端即将重载...`);
+                    }
+
+                    if (window.electronNative && typeof window.electronNative.logoutCurrentAccount === 'function') {
+                        await window.electronNative.logoutCurrentAccount();
+                    } else if (window.electronNative && typeof window.electronNative.relaunchApp === 'function') {
+                        window.electronNative.relaunchApp();
+                    } else {
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 800);
+                    }
+                } catch(err) {
+                    btn.disabled = false;
+                    btn.innerHTML = '退出登录';
+                    await showAgyModal({
+                        title: '退出异常',
+                        message: err.message,
+                        isAlert: true,
+                        confirmText: '我知道了'
+                    });
+                }
+            };
+        });
+
+        // 6. Tag edit
+        body.querySelectorAll('.agy-as-card-tag').forEach(tagEl => {
+            tagEl.onclick = async (e) => {
+                e.stopPropagation();
+                const em = tagEl.getAttribute('data-email');
+                if (!em) return;
+                const p = cachedProfiles.find(item => item.email && item.email.toLowerCase() === em.toLowerCase());
+                const newTag = await showAgyModal({
+                    title: '修改账号备注标签',
+                    message: `为账号 ${em} 设置个性化备注（如：主力号、测试号、备用）：`,
+                    hasInput: true,
+                    inputValue: p?.tag || '',
+                    inputPlaceholder: '例如：主力号、工作、备用',
+                    confirmText: '保存备注',
+                    cancelText: '取消'
+                });
+                if (newTag !== false) {
+                    if (window.electronNative && typeof window.electronNative.updateAccountTag === 'function') {
+                        await window.electronNative.updateAccountTag(em, newTag);
+                        await loadProfilesAndRender();
+                    }
+                }
+            };
+        });
+    }
+
+    // 7. Load Profiles Data from Backend
+    async function loadProfilesAndRender() {
+        try {
+            let profiles = [];
+            let activeEmail = '';
+
+            // 1. Try Electron IPC with timeout race (2.5s maximum wait)
+            if (window.electronNative && typeof window.electronNative.getAccountProfiles === 'function') {
+                try {
+                    const ipcPromise = window.electronNative.getAccountProfiles();
+                    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('IPC timeout')), 2500));
+                    const res = await Promise.race([ipcPromise, timeoutPromise]);
+                    if (res && res.success && Array.isArray(res.profiles)) {
+                        profiles = res.profiles;
+                        activeEmail = res.activeEmail || '';
+                    }
+                } catch(e) {
+                    console.warn('[Account Switcher] IPC getAccountProfiles warning:', e);
+                }
+            }
+
+            // 2. Fallback to Bootstrap data injected directly by main process
+            if (profiles.length === 0 && window.__AGY_BOOTSTRAP_PROFILES__) {
+                try {
+                    const b = window.__AGY_BOOTSTRAP_PROFILES__;
+                    if (Array.isArray(b.profiles) && b.profiles.length > 0) {
+                        profiles = JSON.parse(JSON.stringify(b.profiles));
+                    }
+                    if (!activeEmail && b.active) {
+                        activeEmail = b.active;
+                    }
+                } catch(e) {}
+            }
+
+            // 3. Fallback to localStorage cached profiles
+            if (profiles.length === 0) {
+                try {
+                    const c = localStorage.getItem('__AGY_ACCOUNT_PROFILES__');
+                    if (c) {
+                        const parsed = JSON.parse(c);
+                        if (Array.isArray(parsed) && parsed.length > 0) profiles = parsed;
+                    }
+                } catch(e) {}
+            }
+
+            // Fallback to in-memory cachedProfiles if available
+            if (profiles.length === 0 && Array.isArray(cachedProfiles) && cachedProfiles.length > 0) {
+                profiles = JSON.parse(JSON.stringify(cachedProfiles));
+            }
+
+            // 4. Resolve currently active user from React & storage
+            const getActiveUser = () => {
+                try {
+                    if (typeof window.__AGY_GET_USER_PROFILE__ === 'function') {
+                        return window.__AGY_GET_USER_PROFILE__();
+                    }
+                    const p = localStorage.getItem('__AGY_USER_PROFILE__');
+                    if (p) return JSON.parse(p);
+                } catch(e) {}
+                return null;
+            };
+
+            const activeUser = getActiveUser();
+
+            if (!activeEmail) {
+                if (window.__AGY_BOOTSTRAP_PROFILES__ && window.__AGY_BOOTSTRAP_PROFILES__.active) {
+                    activeEmail = window.__AGY_BOOTSTRAP_PROFILES__.active;
+                } else if (localStorage.getItem('__AGY_ACTIVE_EMAIL__')) {
+                    activeEmail = localStorage.getItem('__AGY_ACTIVE_EMAIL__');
+                } else if (activeUser && activeUser.email) {
+                    activeEmail = activeUser.email;
+                } else if (profiles.length > 0 && profiles[0] && profiles[0].email) {
+                    activeEmail = profiles[0].email;
+                } else {
+                    activeEmail = '';
+                }
+            }
+            if (typeof activeEmail !== 'string') activeEmail = String(activeEmail || '');
+
+            // 5. Ensure the active account is present in profiles list and has latest name/avatar/quota
+            const nowStr = (() => {
+                const d = new Date();
+                return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+            })();
+
+            if (activeEmail) {
+                let activeCard = profiles.find(p => p && p.email && typeof p.email === 'string' && p.email.toLowerCase() === activeEmail.toLowerCase());
+                if (activeCard) {
+                    if (activeUser && activeUser.name && activeUser.name !== '乐禾泽') {
+                        activeCard.name = activeUser.name;
+                    }
+                    if (activeUser && activeUser.avatar) {
+                        activeCard.avatar = activeUser.avatar;
+                    }
+                    if (activeUser && activeUser.tier) {
+                        activeCard.tier = activeUser.tier;
+                    }
+                    const liveQ = getLiveQuotaForActiveAccount();
+                    if (liveQ) activeCard.quota = liveQ;
+                } else {
+                    profiles.unshift({
+                        email: activeEmail,
+                        name: (activeUser && activeUser.name) || activeEmail.split('@')[0],
+                        avatar: (activeUser && activeUser.avatar) || '',
+                        tier: (activeUser && activeUser.tier) || 'PRO',
+                        tag: '当前账号',
+                        lastUsed: nowStr,
+                        quota: getLiveQuotaForActiveAccount()
+                    });
+                }
+            }
+
+            // 5.5 Sanitize quotas to prevent weekly vs 5-hour mixup
+            profiles.forEach(p => {
+                if (p && p.quota && typeof p.quota === 'object') {
+                    try {
+                        ['gemini', 'claude'].forEach(m => {
+                            const mod = p.quota[m];
+                            if (mod && typeof mod === 'object') {
+                                if (mod.fiveHour && typeof mod.fiveHour.resetText === 'string' && mod.fiveHour.resetText.includes('d')) {
+                                    mod.fiveHour.resetText = '4h 59m';
+                                }
+                                if (mod.weekly && typeof mod.weekly.resetText === 'string') {
+                                    const r = mod.weekly.resetText;
+                                    if (r.includes('h') && !r.includes('d')) {
+                                        mod.weekly.resetText = '6d 23h 重置';
+                                    }
+                                }
+                            }
+                        });
+                    } catch(e) {}
+                }
+            });
+
+            // 6. Save to cache
+            cachedProfiles = profiles;
+            currentActiveEmail = activeEmail;
+            try {
+                localStorage.setItem('__AGY_ACCOUNT_PROFILES__', JSON.stringify(profiles));
+                if (activeEmail) localStorage.setItem('__AGY_ACTIVE_EMAIL__', activeEmail);
+            } catch(e) {}
+
+            renderCardsGrid();
+        } catch(err) {
+            console.error('[Account Switcher] Fatal in loadProfilesAndRender:', err);
+            try { renderCardsGrid(); } catch(e2) {}
+        }
+    }
+
+    // 8. Handle Switch Account
+    async function handleSwitchAccount(targetEmail, triggerBtn) {
+        if (!targetEmail) return;
+
+        const confirmed = await showAgyModal({
+            title: '确认切换账号',
+            message: `即将切换至账号：\n${targetEmail}\n\n系统将自动写入本地凭据、释放后台语言服务并重启客户端生效，无需跳转浏览器重新登录。\n\n是否立即切换？`,
+            confirmText: '立即切换',
+            cancelText: '取消',
+            confirmColor: '#10b981',
+            iconSvg: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>'
+        });
+        if (!confirmed) return;
+
+        window.__AGY_IS_SWITCHING__ = true;
+
+        if (triggerBtn) {
+            triggerBtn.disabled = true;
+            triggerBtn.innerHTML = '切换中...';
+        }
+
+        // 1. Immediately update local storage & active email and remove stale cached profile
+        currentActiveEmail = targetEmail;
+        try {
+            localStorage.setItem('__AGY_ACTIVE_EMAIL__', targetEmail);
+            localStorage.removeItem('__AGY_USER_PROFILE__');
+        } catch(e) {}
+
+        if (window.__AGY_SHOW_TOAST__) {
+            window.__AGY_SHOW_TOAST__(`🔄 正在无感秒切至 ${targetEmail}，即将生效...`);
+        }
+
+        if (window.electronNative && typeof window.electronNative.switchAccountProfile === 'function') {
+            try {
+                const res = await window.electronNative.switchAccountProfile(targetEmail);
+                if (res && res.success) {
+                    if (triggerBtn) triggerBtn.innerHTML = '切换成功';
+                    if (window.__AGY_SHOW_TOAST__) {
+                        window.__AGY_SHOW_TOAST__(`✅ 已成功切换至 ${targetEmail}，客户端正在重启...`);
+                    }
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1200);
+                    return;
+                } else if (res && res.error) {
+                    window.__AGY_IS_SWITCHING__ = false;
+                    await showAgyModal({
+                        title: '切换提示',
+                        message: res.error,
+                        isAlert: true,
+                        confirmText: '我知道了'
+                    });
+                }
+            } catch(err) {
+                window.__AGY_IS_SWITCHING__ = false;
+                await showAgyModal({
+                    title: '切换异常',
+                    message: err.message,
+                    isAlert: true,
+                    confirmText: '我知道了'
+                });
+            }
+        }
+
+        window.__AGY_IS_SWITCHING__ = false;
+        if (triggerBtn) {
+            triggerBtn.disabled = false;
+            triggerBtn.innerHTML = '切换';
+        }
+    }
+
+    // 9. Independent Web OAuth 2.0 Flow (Never Logs Out Active Session!)
+    async function handleStartOAuthLogin() {
+        if (!window.electronNative || typeof window.electronNative.startOAuthFlow !== 'function') {
+            await showAgyModal({
+                title: '环境未就绪',
+                message: '当前客户端主进程未就绪独立授权接口，请稍后再试。',
+                isAlert: true
+            });
+            return;
+        }
+
+        let authRes = null;
+        try {
+            authRes = await window.electronNative.startOAuthFlow();
+        } catch(e) {
+            await showAgyModal({
+                title: '启动授权失败',
+                message: '无法启动本地授权服务: ' + e.message,
+                isAlert: true
+            });
+            return;
+        }
+
+        if (!authRes || !authRes.success || !authRes.authUrl) {
+            await showAgyModal({
+                title: '获取授权链接失败',
+                message: authRes?.error || '无法生成 Google 授权链接',
+                isAlert: true
+            });
+            return;
+        }
+
+        const authUrl = authRes.authUrl;
+
+        // Display Dedicated Web OAuth Modal
+        const oauthModal = document.createElement('div');
+        oauthModal.className = 'agy-as-confirm-overlay';
+        oauthModal.innerHTML = `
+            <div class="agy-as-confirm-card" style="width: 520px;" onclick="event.stopPropagation()">
+                <div style="display: flex; gap: 14px; align-items: flex-start;">
+                    <div style="width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: rgba(37,99,235,0.12); color: #2563eb;">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                    </div>
+                    <div style="flex: 1; min-width: 0;">
+                        <h4 style="margin: 0 0 6px 0; font-size: 15.5px; font-weight: 600; color: var(--as-text-main);">添加新 Google 账号 (免登出当前账号)</h4>
+                        <p style="font-size: 12.5px; line-height: 1.5; color: var(--as-text-muted); margin: 0 0 12px 0;">
+                            系统已在本地启动官方授权监听服务（端口 51121）。请在浏览器中登录您的新账号，完成后该账号将独立存入本地多账号池，<b>当前客户端正在使用的账号完全不受影响</b>。
+                        </p>
+                        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                            <input type="text" class="agy-as-search-input" readonly value="${authUrl}" id="agy-oauth-link-input" style="flex: 1; font-size: 11px; color: var(--as-text-muted);" />
+                            <button class="agy-as-btn" id="agy-oauth-copy-btn">📋 复制链接</button>
+                        </div>
+                        <div id="agy-oauth-status-box" style="padding: 10px 12px; border-radius: 8px; background: var(--as-bar-track); font-size: 12px; color: #2563eb; display: flex; align-items: center; gap: 8px;">
+                            <span class="agy-spinning"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg></span>
+                            <span>正在等待浏览器完成 Google 登录授权...</span>
+                        </div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-top: 6px;">
+                    <button class="agy-as-btn" id="agy-oauth-cancel-btn">取消</button>
+                    <button class="agy-as-btn agy-as-btn-primary" id="agy-oauth-open-btn">🌐 打开浏览器登录</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(oauthModal);
+
+        let isOpeningBrowser = false;
+        const openInBrowser = (url) => {
+            if (!url || isOpeningBrowser) return;
+            isOpeningBrowser = true;
+            setTimeout(() => { isOpeningBrowser = false; }, 2000);
+
+            if (window.electronNative && typeof window.electronNative.openExternal === 'function') {
+                window.electronNative.openExternal(url).catch(() => {});
+                return;
+            }
+            if (window.electronNative && typeof window.electronNative.openPath === 'function') {
+                window.electronNative.openPath(url).catch(() => {});
+                return;
+            }
+            try {
+                window.open(url, '_blank');
+            } catch(e) {}
+        };
+
+        // Open in default browser automatically
+        openInBrowser(authUrl);
+
+        const copyBtn = oauthModal.querySelector('#agy-oauth-copy-btn');
+        copyBtn.onclick = () => {
+            navigator.clipboard.writeText(authUrl);
+            copyBtn.textContent = '✓ 已复制';
+            setTimeout(() => { copyBtn.textContent = '📋 复制链接'; }, 1500);
+        };
+
+        const openBtn = oauthModal.querySelector('#agy-oauth-open-btn');
+        openBtn.onclick = () => {
+            openBtn.textContent = '🌐 正在打开浏览器...';
+            openInBrowser(authUrl);
+            setTimeout(() => {
+                openBtn.textContent = '🌐 打开浏览器登录';
+            }, 1500);
+        };
+
+        let pollTimer = null;
+        const cleanup = () => {
+            if (pollTimer) clearInterval(pollTimer);
+            if (window.electronNative.cancelOAuthFlow) window.electronNative.cancelOAuthFlow();
+            oauthModal.remove();
+        };
+
+        oauthModal.querySelector('#agy-oauth-cancel-btn').onclick = cleanup;
+        oauthModal.onclick = cleanup;
+
+        // Poll for completion
+        pollTimer = setInterval(async () => {
+            try {
+                if (window.electronNative && typeof window.electronNative.checkOAuthStatus === 'function') {
+                    const status = await window.electronNative.checkOAuthStatus();
+                    if (status && status.status === 'completed') {
+                        clearInterval(pollTimer);
+                        const statusBox = oauthModal.querySelector('#agy-oauth-status-box');
+                        if (statusBox) {
+                            statusBox.style.color = '#10b981';
+                            statusBox.innerHTML = `🎉 <b>${status.result?.email || '新账号'}</b> 授权成功并已存档！`;
+                        }
+                        setTimeout(() => {
+                            cleanup();
+                            loadProfilesAndRender();
+                            if (window.__AGY_SHOW_TOAST__) {
+                                window.__AGY_SHOW_TOAST__(`🎉 新账号 ${status.result?.email} 已成功添加至账号池！`);
+                            }
+                        }, 1200);
+                    } else if (status && status.status === 'error') {
+                        const statusBox = oauthModal.querySelector('#agy-oauth-status-box');
+                        if (statusBox) {
+                            statusBox.style.color = '#ef4444';
+                            statusBox.innerHTML = `❌ 授权失败: ${status.error || '未知错误'}`;
+                        }
+                    }
+                }
+            } catch(e) {}
+        }, 1200);
+    }
+
+    // 10. Device Fingerprint Modal (Matching User Screenshot 3)
+    async function openFingerprintModal(email) {
+        if (!window.electronNative || typeof window.electronNative.getDeviceFingerprint !== 'function') return;
+
+        const res = await window.electronNative.getDeviceFingerprint(email);
+        const modal = document.createElement('div');
+        modal.className = 'agy-fp-overlay';
+        modal.innerHTML = `
+            <div class="agy-fp-card" onclick="event.stopPropagation()">
+                <div class="agy-fp-header">
+                    <h4>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 0 0-10 10c0 5.52 4.48 10 10 10s10-4.48 10-10c0-1.85-.5-3.58-1.38-5.07"/><path d="M12 6a6 6 0 0 0-6 6c0 3.31 2.69 6 6 6s6-2.69 6-6c0-1.24-.38-2.39-1.02-3.34"/><circle cx="12" cy="12" r="2"/></svg>
+                        设备指纹
+                        <span class="email-badge">${email}</span>
+                    </h4>
+                    <button class="agy-as-btn" id="agy-fp-close" style="padding: 4px 8px;">✕</button>
+                </div>
+                <div class="agy-fp-body">
+                    <div class="agy-fp-actions-bar">
+                        <span style="font-size: 13px; font-weight: 600; color: var(--as-text-main);">设备指纹操作</span>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="agy-as-btn" id="agy-fp-gen-btn" title="为该账号生成全新硬件指纹">🪄 生成并绑定</button>
+                            <button class="agy-as-btn" id="agy-fp-restore-btn" title="恢复为默认硬件指纹">↺ 恢复原始</button>
+                            <button class="agy-as-btn" id="agy-fp-dir-btn" title="在系统资源管理器中打开账号存储目录">📁 打开存储目录</button>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                        <div class="agy-fp-section-card">
+                            <div class="agy-fp-section-title">
+                                <span>当前存储</span>
+                                <span style="font-size: 11px; color: #10b981; font-weight: 600;">已生效</span>
+                            </div>
+                            <span class="agy-fp-section-desc">读取自 storage.json (切换账号时应用绑定后更新)</span>
+                            <div class="agy-fp-code-box" id="agy-fp-storage-code">${res.currentStorage ? JSON.stringify(res.currentStorage, null, 2) : 'Empty (未检测到或尚未初始化)'}</div>
+                        </div>
+
+                        <div class="agy-fp-section-card">
+                            <div class="agy-fp-section-title">
+                                <span>账号绑定</span>
+                                <span style="font-size: 11px; color: #f59e0b; font-weight: 600;">${res.boundFingerprint ? '已绑定' : '待应用'}</span>
+                            </div>
+                            <span class="agy-fp-section-desc">生成/恢复后保存为绑定，切换账号时写入 storage.json</span>
+                            <div class="agy-fp-code-box" id="agy-fp-bound-code">${res.boundFingerprint ? JSON.stringify(res.boundFingerprint, null, 2) : 'Empty (暂未绑定独立指纹)'}</div>
+                        </div>
+                    </div>
+
+                    <div class="agy-fp-section-card">
+                        <div class="agy-fp-section-title">
+                            <span>历史指纹 (可选恢复/删除)</span>
+                        </div>
+                        <div id="agy-fp-history-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 180px; overflow-y: auto;">
+                            ${(res.history && res.history.length > 0) ? res.history.map((h, i) => `
+                                <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border-radius: 6px; background: var(--as-code-bg); border: 1px solid var(--as-card-border); font-size: 12px;">
+                                    <div style="display: flex; flex-direction: column;">
+                                        <span style="font-weight: 600; color: var(--as-text-main);">auto_generated ${i === 0 ? '<span style="color:#2563eb;font-size:11px;">当前</span>' : ''}</span>
+                                        <span style="font-size: 11px; color: var(--as-text-muted); font-family: monospace;">${h.fingerprint?.['telemetry.machineId'] ? h.fingerprint['telemetry.machineId'].substring(0, 24) + '...' : ''}</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <span style="font-size: 11px; color: var(--as-text-muted);">${h.timestamp || ''}</span>
+                                        <button class="agy-as-btn agy-fp-apply-hist-btn" data-idx="${i}" style="padding: 2px 8px; font-size: 11px;">恢复</button>
+                                    </div>
+                                </div>
+                            `).join('') : '<div style="padding: 16px; text-align: center; color: var(--as-text-muted); font-size: 12px;">暂无历史指纹记录</div>'}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        modal.onclick = () => modal.remove();
+        modal.querySelector('#agy-fp-close').onclick = () => modal.remove();
+
+        // 1. Open Directory
+        modal.querySelector('#agy-fp-dir-btn').onclick = () => {
+            if (window.electronNative.openAccountFolder) {
+                window.electronNative.openAccountFolder(email);
+            }
+        };
+
+        // 2. Generate Random Fingerprint
+        modal.querySelector('#agy-fp-gen-btn').onclick = async () => {
+            const crypto = window.crypto || {};
+            const genHex = (len) => {
+                const arr = new Uint8Array(len);
+                if (crypto.getRandomValues) crypto.getRandomValues(arr);
+                return Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join('');
+            };
+            const genUuid = () => 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+                const r = Math.random() * 16 | 0;
+                return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+            });
+
+            const newFp = {
+                "telemetry.machineId": genHex(32),
+                "telemetry.macMachineId": genHex(32),
+                "telemetry.devDeviceId": genUuid(),
+                "telemetry.sqmId": "{" + genUuid().toUpperCase() + "}"
+            };
+
+            const isCurrent = email.toLowerCase() === currentActiveEmail.toLowerCase();
+            await window.electronNative.bindDeviceFingerprint(email, newFp, isCurrent);
+            modal.remove();
+            openFingerprintModal(email);
+            if (window.__AGY_SHOW_TOAST__) window.__AGY_SHOW_TOAST__('✨ 已为该账号生成并绑定全新设备指纹！');
+        };
+
+        // 3. Restore Default
+        modal.querySelector('#agy-fp-restore-btn').onclick = async () => {
+            await window.electronNative.bindDeviceFingerprint(email, {}, true);
+            modal.remove();
+            openFingerprintModal(email);
+            if (window.__AGY_SHOW_TOAST__) window.__AGY_SHOW_TOAST__('↺ 已重置设备指纹');
+        };
+
+        // 4. History apply
+        modal.querySelectorAll('.agy-fp-apply-hist-btn').forEach(btn => {
+            btn.onclick = async () => {
+                const idx = parseInt(btn.getAttribute('data-idx') || '0', 10);
+                const targetH = res.history?.[idx];
+                if (targetH && targetH.fingerprint) {
+                    const isCurrent = email.toLowerCase() === currentActiveEmail.toLowerCase();
+                    await window.electronNative.bindDeviceFingerprint(email, targetH.fingerprint, isCurrent);
+                    modal.remove();
+                    openFingerprintModal(email);
+                    if (window.__AGY_SHOW_TOAST__) window.__AGY_SHOW_TOAST__('✓ 已恢复历史指纹');
+                }
+            };
+        });
+    }
+
+    // 11. Handle Export Account
+    async function handleExportAccount(email) {
+        if (!window.electronNative || typeof window.electronNative.exportAccountProfile !== 'function') return;
+        const res = await window.electronNative.exportAccountProfile(email);
+        if (!res || !res.success || !res.data) {
+            await showAgyModal({ title: '导出失败', message: '无法导出凭据数据', isAlert: true });
+            return;
+        }
+
+        const jsonStr = JSON.stringify(res.data, null, 2);
+        const modal = document.createElement('div');
+        modal.className = 'agy-as-confirm-overlay';
+        modal.innerHTML = `
+            <div class="agy-as-confirm-card" style="width: 580px;" onclick="event.stopPropagation()">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <h4 style="margin: 0; font-size: 15px; font-weight: 600; color: var(--as-text-main);">导出账号凭证 (${email})</h4>
+                    <button class="agy-as-btn" id="agy-export-close" style="padding: 4px 8px;">✕</button>
+                </div>
+                <div class="agy-fp-code-box" style="max-height: 240px;">${jsonStr}</div>
+                <div style="display: flex; align-items: center; justify-content: flex-end; gap: 10px;">
+                    <button class="agy-as-btn" id="agy-export-download">💾 保存为文件</button>
+                    <button class="agy-as-btn agy-as-btn-primary" id="agy-export-copy">📋 复制到剪贴板</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        modal.onclick = () => modal.remove();
+        modal.querySelector('#agy-export-close').onclick = () => modal.remove();
+
+        modal.querySelector('#agy-export-copy').onclick = () => {
+            navigator.clipboard.writeText(jsonStr);
+            if (window.__AGY_SHOW_TOAST__) window.__AGY_SHOW_TOAST__('✓ 凭证已复制到系统剪贴板！');
+            modal.remove();
+        };
+
+        modal.querySelector('#agy-export-download').onclick = () => {
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `antigravity_profile_${email.replace(/[@.]/g, '_')}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            modal.remove();
+        };
+    }
+
+    // 12. Auto Sync Current Active Account
+    async function syncCurrentAccount() {
+        if (window.__AGY_IS_SWITCHING__) return;
+        try {
+            const getUser = () => {
+                if (typeof window.__AGY_GET_USER_PROFILE__ === 'function') {
+                    return window.__AGY_GET_USER_PROFILE__();
+                }
+                try {
+                    const p = localStorage.getItem('__AGY_USER_PROFILE__');
+                    if (p) return JSON.parse(p);
+                } catch(e) {}
+                return null;
+            };
+            const user = getUser();
+            let activeEmail = (user && user.email) ? user.email.trim() : '';
+            if (!activeEmail) return;
+
+            let qData = null;
+            if (typeof window.__AGY_GET_QUOTA_DATA__ === 'function') {
+                qData = window.__AGY_GET_QUOTA_DATA__();
+            }
+
+            if (window.electronNative && typeof window.electronNative.saveCurrentProfile === 'function') {
+                await window.electronNative.saveCurrentProfile({
+                    email: activeEmail,
+                    name: (user && user.name) || activeEmail.split('@')[0],
+                    avatar: (user && user.avatar) || '',
+                    tier: (user && user.tier) || 'PRO',
+                    quota: qData
+                });
+            }
+        } catch(e) {}
+    }
+
+    // 13. Open & Close Switcher Modal
+    async function openSwitcher() {
+        const overlay = createSwitcherOverlay();
+        initCachedProfiles();
+        renderCardsGrid();
+        overlay.style.display = 'flex';
+        try {
+            await loadProfilesAndRender();
+        } catch(e) {
+            console.error('[Account Switcher] loadProfiles error:', e);
+        }
+        try {
+            if (typeof window.__AGY_REFRESH_QUOTA__ === 'function') {
+                await window.__AGY_REFRESH_QUOTA__();
+            }
+            await syncCurrentAccount();
+            await loadProfilesAndRender();
+        } catch(e) {}
+    }
+
+    function closeSwitcher() {
+        const overlay = switcherOverlay || document.getElementById('agy-as-modal-overlay');
+        if (overlay) {
+            overlay.style.display = 'none';
+        }
+    }
+
+    // 14. Mount Switch Account Button in Sidebar Bottom Row (Left of Settings)
+    function mountSwitchAccountBtn() {
+        const settingsBtn = Array.from(document.querySelectorAll('button')).find(b => {
+            return b.innerText && b.innerText.trim() === '设置' && !b.closest('#agy-plugin-center-overlay') && !b.closest('#agy-sidebar-quota-card');
+        });
+        if (!settingsBtn) return;
+
+        const bottomRow = document.getElementById('agy-sidebar-bottom-row');
+        if (!bottomRow) return;
+
+        let actionsWrap = document.getElementById('agy-sidebar-actions-wrap');
+        if (!actionsWrap) {
+            actionsWrap = document.createElement('div');
+            actionsWrap.id = 'agy-sidebar-actions-wrap';
+            bottomRow.appendChild(actionsWrap);
+        }
+        actionsWrap.style.cssText = 'display: inline-flex !important; flex-direction: row !important; flex-wrap: nowrap !important; align-items: center !important; white-space: nowrap !important; gap: 3px !important; flex-shrink: 0 !important; margin-left: auto !important;';
+
+        if (settingsBtn.parentElement !== actionsWrap) {
+            actionsWrap.appendChild(settingsBtn);
+            settingsBtn.classList.remove('w-full', 'flex-1', 'justify-start');
+            settingsBtn.classList.add('w-fit');
+            settingsBtn.style.cssText = 'margin: 0 !important; width: fit-content !important; min-width: 0 !important; max-width: fit-content !important; flex: 0 0 auto !important; flex-grow: 0 !important; flex-shrink: 0 !important; justify-content: center !important; padding: 4px 6px !important; border-radius: 6px !important; gap: 3px !important; display: inline-flex !important; flex-direction: row !important; flex-wrap: nowrap !important; align-items: center !important; font-size: 12.5px !important; font-weight: 500 !important; white-space: nowrap !important;';
+        }
+
+        let switchBtn = document.getElementById('agy-sidebar-switch-account-btn');
+        if (switchBtn) {
+            switchBtn.remove();
+        }
+    }
+
+    // Expose globals
+    window.__AGY_OPEN_ACCOUNT_SWITCHER__ = openSwitcher;
+    window.__AGY_CLOSE_ACCOUNT_SWITCHER__ = closeSwitcher;
+    window.__AGY_MOUNT_SWITCH_ACCOUNT_BTN__ = mountSwitchAccountBtn;
+    window.__AGY_SYNC_CURRENT_ACCOUNT__ = syncCurrentAccount;
+
+    // Initial sync & cache preload
+    initCachedProfiles();
+    setTimeout(syncCurrentAccount, 2000);
+
+    console.log('[Antigravity Account Switcher] Multi-Account Profile & Quota Switcher Loaded.');
+})();
+
+
+// ==========================================
 // ANTIGRAVITY MASTER UI COORDINATOR & GUARDIAN
 // Single debounced MutationObserver with Anti-Reentrancy Lock
 // Completely prevents UI freezing, recursion, and layout thrashing
@@ -5377,6 +7613,9 @@
             }
             if (typeof window.__AGY_MOUNT_SCREENSHOT_MENU_ITEM__ === 'function') {
                 window.__AGY_MOUNT_SCREENSHOT_MENU_ITEM__();
+            }
+            if (typeof window.__AGY_MOUNT_SWITCH_ACCOUNT_BTN__ === 'function') {
+                window.__AGY_MOUNT_SWITCH_ACCOUNT_BTN__();
             }
         } catch (e) {
             console.error('[Antigravity Master Sync] Error:', e);

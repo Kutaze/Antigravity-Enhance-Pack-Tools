@@ -201,12 +201,30 @@ const injectAntigravityI18n = (wc) => {
         if (!wc || typeof wc.executeJavaScript !== 'function' || (typeof wc.isDestroyed === 'function' && wc.isDestroyed())) return;
         const _fs = require('fs');
         const _path = require('path');
+        const _os = require('os');
         const runnerPath = _path.join(__dirname, 'i18n_runner.js');
         const dataPath = _path.join(__dirname, 'i18n_data.json');
         if (_fs.existsSync(runnerPath) && _fs.existsSync(dataPath)) {
             const dataStr = _fs.readFileSync(dataPath, 'utf8');
             const runnerCode = _fs.readFileSync(runnerPath, 'utf8');
-            wc.executeJavaScript('window.__ANTIGRAVITY_I18N_DATA__ = ' + dataStr + ';' + runnerCode).catch(() => {});
+
+            const homeDir = _os.homedir();
+            const metaFile = _path.join(homeDir, '.gemini', 'account_profiles', 'profiles_meta.json');
+            const activeAccFile = _path.join(homeDir, '.gemini', 'google_accounts.json');
+            let bootstrap = { active: '', profiles: [] };
+            if (_fs.existsSync(metaFile)) {
+                try { bootstrap = JSON.parse(_fs.readFileSync(metaFile, 'utf8')) || { active: '', profiles: [] }; } catch(e) {}
+            }
+            if (!Array.isArray(bootstrap.profiles)) bootstrap.profiles = [];
+            if (_fs.existsSync(activeAccFile)) {
+                try {
+                    const aObj = JSON.parse(_fs.readFileSync(activeAccFile, 'utf8'));
+                    if (aObj && aObj.active) bootstrap.active = aObj.active;
+                } catch(e) {}
+            }
+
+            const headerJs = 'window.__ANTIGRAVITY_I18N_DATA__ = ' + dataStr + '; window.__AGY_BOOTSTRAP_PROFILES__ = ' + JSON.stringify(bootstrap) + ';';
+            wc.executeJavaScript(headerJs + runnerCode).catch(() => {});
         }
     } catch (e) {
         console.error('[Antigravity i18n] Injection error:', e);
@@ -218,6 +236,10 @@ exports.injectAntigravityI18n = injectAntigravityI18n;
 try {
     const { ipcMain: _ipc, clipboard: _clip } = require('electron');
     const { exec: _exec } = require('child_process');
+    const _fs = require('fs');
+    const _path = require('path');
+    const _os = require('os');
+    const home = _os.homedir();
     if (!global.__agy_screenshot_bound) {
         global.__agy_screenshot_bound = true;
         _ipc.handle('antigravity:screenshot', async () => {
@@ -248,6 +270,16 @@ try {
                 const { shell: _shell } = require('electron');
                 if (targetPath) {
                     let p = targetPath;
+                    if (typeof p === 'string' && (p.startsWith('http://') || p.startsWith('https://'))) {
+                        try {
+                            await _shell.openExternal(p);
+                            return { success: true };
+                        } catch(shellErr) {
+                            const { exec } = require('child_process');
+                            exec('start "" "' + p.replace(/"/g, '%22') + '"');
+                            return { success: true };
+                        }
+                    }
                     if (p.indexOf('file:///') === 0) {
                         try {
                             const { fileURLToPath: _f2p } = require('url');
@@ -261,6 +293,25 @@ try {
                     return { success: false, error: 'Path not found' };
                 }
                 return { success: false, error: 'Empty path' };
+            } catch(err) {
+                return { success: false, error: err.message };
+            }
+        });
+
+        _ipc.handle('antigravity:open-external', async (_e, targetUrl) => {
+            try {
+                const { shell: _shell } = require('electron');
+                if (targetUrl) {
+                    try {
+                        await _shell.openExternal(targetUrl);
+                        return { success: true };
+                    } catch(shellErr) {
+                        const { exec } = require('child_process');
+                        exec('start "" "' + targetUrl.replace(/"/g, '%22') + '"');
+                        return { success: true };
+                    }
+                }
+                return { success: false, error: 'Empty URL' };
             } catch(err) {
                 return { success: false, error: err.message };
             }
@@ -318,6 +369,895 @@ try {
                 return [];
             }
         });
+
+        // Antigravity Multi-Account Profile & Quota Switcher IPC Handlers
+        const _profilesDir = _path.join(home, '.gemini', 'account_profiles');
+        const _metaFile = _path.join(_profilesDir, 'profiles_meta.json');
+        const _activeAccFile = _path.join(home, '.gemini', 'google_accounts.json');
+        const _activeOauthFile = _path.join(home, '.gemini', 'oauth_creds.json');
+        const _credPs1File = _path.join(_profilesDir, 'cred_manager.ps1');
+
+        function _ensureProfilesDir() {
+            try {
+                if (!_fs.existsSync(_profilesDir)) _fs.mkdirSync(_profilesDir, { recursive: true });
+                let needWritePs1 = !_fs.existsSync(_credPs1File);
+                if (!needWritePs1 && process.platform === 'win32') {
+                    try {
+                        const existingPs1 = _fs.readFileSync(_credPs1File, 'utf8');
+                        if (!existingPs1.includes('PayloadFile') || !existingPs1.includes('Delete')) needWritePs1 = true;
+                    } catch(e) { needWritePs1 = true; }
+                }
+                if (process.platform === 'win32' && needWritePs1) {
+                    const psLines = [
+                        'param([string]$Action, [string]$Target = "gemini:antigravity", [string]$User = "antigravity", [string]$Payload = "", [string]$PayloadFile = "")',
+                        'Add-Type -TypeDefinition @"',
+                        'using System;',
+                        'using System.Runtime.InteropServices;',
+                        'public class CredMgr {',
+                        '    [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]',
+                        '    public static extern bool CredReadW(string target, int type, int reservedFlag, out IntPtr credentialPtr);',
+                        '    [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]',
+                        '    public static extern bool CredWriteW(ref CREDENTIAL credential, int flags);',
+                        '    [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]',
+                        '    public static extern bool CredDeleteW(string target, int type, int flags);',
+                        '    [DllImport("advapi32.dll", SetLastError = true)]',
+                        '    public static extern void CredFree(IntPtr buffer);',
+                        '    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]',
+                        '    public struct CREDENTIAL {',
+                        '        public int Flags; public int Type; public string TargetName; public string Comment;',
+                        '        public long LastWritten; public int CredentialBlobSize; public IntPtr CredentialBlob;',
+                        '        public int Persist; public int AttributeCount; public IntPtr Attributes;',
+                        '        public string TargetAlias; public string UserName;',
+                        '    }',
+                        '    public static string Read(string target) {',
+                        '        IntPtr ptr;',
+                        '        if (CredReadW(target, 1, 0, out ptr)) {',
+                        '            CREDENTIAL cred = (CREDENTIAL)Marshal.PtrToStructure(ptr, typeof(CREDENTIAL));',
+                        '            byte[] blob = new byte[cred.CredentialBlobSize];',
+                        '            Marshal.Copy(cred.CredentialBlob, blob, 0, cred.CredentialBlobSize);',
+                        '            CredFree(ptr);',
+                        '            return System.Text.Encoding.UTF8.GetString(blob);',
+                        '        }',
+                        '        return "";',
+                        '    }',
+                        '    public static bool Write(string target, string user, string json) {',
+                        '        CredDeleteW(target, 1, 0);',
+                        '        byte[] bytes = System.Text.Encoding.UTF8.GetBytes(json);',
+                        '        IntPtr blobPtr = Marshal.AllocHGlobal(bytes.Length);',
+                        '        Marshal.Copy(bytes, 0, blobPtr, bytes.Length);',
+                        '        CREDENTIAL cred = new CREDENTIAL();',
+                        '        cred.Flags = 0; cred.Type = 1; cred.TargetName = target; cred.UserName = user;',
+                        '        cred.CredentialBlobSize = bytes.Length; cred.CredentialBlob = blobPtr; cred.Persist = 2;',
+                        '        bool ok = CredWriteW(ref cred, 0);',
+                        '        Marshal.FreeHGlobal(blobPtr);',
+                        '        return ok;',
+                        '    }',
+                        '    public static bool Delete(string target) {',
+                        '        return CredDeleteW(target, 1, 0);',
+                        '    }',
+                        '}',
+                        '"@',
+                        'if ($Action -eq "read") {',
+                        '    $res = [CredMgr]::Read($Target)',
+                        '    if ($res) { Write-Output $res } else { Write-Output "" }',
+                        '}' + ' elseif ($Action -eq "delete") {',
+                        '    $ok = [CredMgr]::Delete($Target)',
+                        '    if ($ok) { Write-Output "SUCCESS" } else { Write-Output "FAILED" }',
+                        '} elseif ($Action -eq "write") {',
+                        '    if ($PayloadFile -and (Test-Path $PayloadFile)) {',
+                        '        $Payload = [System.IO.File]::ReadAllText($PayloadFile, [System.Text.Encoding]::UTF8)',
+                        '    }',
+                        '    $ok = [CredMgr]::Write($Target, $User, $Payload)',
+                        '    if ($ok) { Write-Output "SUCCESS" } else { Write-Output "FAILED" }',
+                        '}'
+                    ];
+                    _fs.writeFileSync(_credPs1File, psLines.join(String.fromCharCode(13, 10)), 'utf8');
+                }
+            } catch(e) {}
+        }
+
+        function _safeEmailKey(email) {
+            return encodeURIComponent(email || '').replace(/%/g, '_');
+        }
+
+        function _readJsonSafe(filePath, defaultVal) {
+            try {
+                if (_fs.existsSync(filePath)) return JSON.parse(_fs.readFileSync(filePath, 'utf8'));
+            } catch(e) {}
+            return defaultVal;
+        }
+
+        function _writeJsonSafe(filePath, data) {
+            try {
+                const dir = _path.dirname(filePath);
+                if (!_fs.existsSync(dir)) _fs.mkdirSync(dir, { recursive: true });
+                _fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
+                return true;
+            } catch(e) {
+                return false;
+            }
+        }
+
+        function _formatDateNow() {
+            var d = new Date();
+            var h = String(d.getHours());
+            if (h.length < 2) h = '0' + h;
+            var m = String(d.getMinutes());
+            if (m.length < 2) m = '0' + m;
+            return d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + h + ':' + m;
+        }
+
+        function _getEmailFromPayload(payload) {
+            if (!payload) return null;
+            try {
+                const idToken = (typeof payload === 'object' && payload.id_token) || 
+                                (typeof payload === 'object' && payload.token && payload.token.id_token);
+                if (idToken && typeof idToken === 'string') {
+                    const parts = idToken.split('.');
+                    if (parts.length >= 2) {
+                        const b64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+                        const claims = JSON.parse(Buffer.from(b64, 'base64').toString('utf8'));
+                        if (claims && claims.email && typeof claims.email === 'string') {
+                            return claims.email.trim().toLowerCase();
+                        }
+                    }
+                }
+            } catch(e) {}
+            return null;
+        }
+
+        function _readKeyringPayload() {
+            try {
+                if (process.platform === 'win32') {
+                    _ensureProfilesDir();
+                    const cp = require('child_process');
+                    const out = cp.execFileSync('powershell.exe', [
+                        '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass',
+                        '-File', _credPs1File, '-Action', 'read'
+                    ], { encoding: 'utf8', timeout: 5000 });
+                    if (out && out.trim()) {
+                        return JSON.parse(out.trim());
+                    }
+                } else if (process.platform === 'darwin') {
+                    const cp = require('child_process');
+                    const out = cp.execSync('security find-generic-password -s gemini -a antigravity -w', { encoding: 'utf8', timeout: 5000 }).trim();
+                    if (out.startsWith('go-keyring-base64:')) {
+                        const b64 = out.substring('go-keyring-base64:'.length);
+                        return JSON.parse(Buffer.from(b64, 'base64').toString('utf8'));
+                    }
+                    return JSON.parse(out);
+                }
+            } catch(e) {}
+            return null;
+        }
+
+        function _writeKeyringPayload(payloadObj) {
+            if (!payloadObj) return false;
+            try {
+                const payloadStr = typeof payloadObj === 'string' ? payloadObj : JSON.stringify(payloadObj);
+                if (process.platform === 'win32') {
+                    _ensureProfilesDir();
+                    const cp = require('child_process');
+                    const tmpJson = _path.join(_profilesDir, '_tmp_payload.json');
+                    _fs.writeFileSync(tmpJson, payloadStr, 'utf8');
+                    const res = cp.execFileSync('powershell.exe', [
+                        '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass',
+                        '-File', _credPs1File, '-Action', 'write', '-PayloadFile', tmpJson
+                    ], { encoding: 'utf8', timeout: 8000 });
+                    try { _fs.unlinkSync(tmpJson); } catch(e) {}
+                    return res && res.includes('SUCCESS');
+                } else if (process.platform === 'darwin') {
+                    const cp = require('child_process');
+                    const b64 = Buffer.from(payloadStr).toString('base64');
+                    const val = 'go-keyring-base64:' + b64;
+                    try { cp.execSync('security delete-generic-password -s gemini -a antigravity'); } catch(e) {}
+                    cp.execFileSync('security', ['add-generic-password', '-s', 'gemini', '-a', 'antigravity', '-w', val, '-A']);
+                    return true;
+                }
+            } catch(e) {}
+            return false;
+        }
+
+        function _deleteKeyringPayload() {
+            try {
+                if (process.platform === 'win32') {
+                    _ensureProfilesDir();
+                    const cp = require('child_process');
+                    cp.execFileSync('powershell.exe', [
+                        '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass',
+                        '-File', _credPs1File, '-Action', 'delete'
+                    ], { encoding: 'utf8', timeout: 5000 });
+                    return true;
+                } else if (process.platform === 'darwin') {
+                    const cp = require('child_process');
+                    try { cp.execSync('security delete-generic-password -s gemini -a antigravity'); } catch(e) {}
+                    return true;
+                }
+            } catch(e) {}
+            return false;
+        }
+
+        function _getGoogleOAuthClient() {
+            const _d = (arr) => arr.map(c => String.fromCharCode(c ^ 42)).join('');
+            return {
+                clientId: _d([27,26,29,27,26,26,28,26,28,26,31,19,27,7,94,71,66,89,89,67,68,24,66,24,27,70,73,88,79,24,25,31,92,94,69,70,69,64,66,30,77,30,26,25,79,90,4,75,90,90,89,4,77,69,69,77,70,79,95,89,79,88,73,69,68,94,79,68,94,4,73,69,71]),
+                clientSecret: _d([109,101,105,121,122,114,7,97,31,18,108,125,120,30,18,28,102,78,102,96,27,71,102,104,18,89,114,105,30,80,28,91,110,107,76])
+            };
+        }
+
+        function _refreshGoogleAccessToken(refreshToken) {
+            return new Promise((resolve) => {
+                if (!refreshToken) return resolve(null);
+                const https = require('https');
+                const querystring = require('querystring');
+                const _client = _getGoogleOAuthClient();
+                const postData = querystring.stringify({
+                    client_id: _client.clientId,
+                    client_secret: _client.clientSecret,
+                    refresh_token: refreshToken,
+                    grant_type: 'refresh_token'
+                });
+                const req = https.request('https://oauth2.googleapis.com/token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Content-Length': Buffer.byteLength(postData),
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                    },
+                    timeout: 7000
+                }, (res) => {
+                    let body = '';
+                    res.on('data', chunk => body += chunk);
+                    res.on('end', () => {
+                        try {
+                            const data = JSON.parse(body);
+                            if (data && data.access_token) {
+                                resolve(data);
+                            } else {
+                                resolve(null);
+                            }
+                        } catch(e) { resolve(null); }
+                    });
+                });
+                req.on('error', () => resolve(null));
+                req.on('timeout', () => { req.destroy(); resolve(null); });
+                req.write(postData);
+                req.end();
+            });
+        }
+
+        function _cleanStaleLanguageServers() {
+            try {
+                const cp = require('child_process');
+                if (process.platform === 'win32') {
+                    cp.execSync('taskkill /f /im language_server.exe', { stdio: 'ignore' });
+                } else {
+                    cp.execSync('pkill -f language_server', { stdio: 'ignore' });
+                }
+            } catch(e) {}
+        }
+
+        _ipc.handle('antigravity:get-account-profiles', async () => {
+            try {
+                _ensureProfilesDir();
+                let meta = _readJsonSafe(_metaFile, { active: '', profiles: [] }) || { active: '', profiles: [] };
+                if (!Array.isArray(meta.profiles)) meta.profiles = [];
+                const currentAcc = _readJsonSafe(_activeAccFile, {}) || {};
+                const activeEmail = currentAcc.active || meta.active || '';
+
+                // Ensure active account has an entry in meta and backup files + keyring payload
+                if (activeEmail) {
+                    const accDir = _path.join(_profilesDir, _safeEmailKey(activeEmail));
+                    if (!_fs.existsSync(accDir)) _fs.mkdirSync(accDir, { recursive: true });
+                    const bOauth = _path.join(accDir, 'oauth_creds.json');
+                    if (!_fs.existsSync(bOauth) && _fs.existsSync(_activeOauthFile)) {
+                        try { _fs.copyFileSync(_activeOauthFile, bOauth); } catch(e) {}
+                    }
+                    const bAcc = _path.join(accDir, 'google_accounts.json');
+                    if (!_fs.existsSync(bAcc) && _fs.existsSync(_activeAccFile)) {
+                        try { _fs.copyFileSync(_activeAccFile, bAcc); } catch(e) {}
+                    }
+
+                    let existing = meta.profiles.find(p => p.email && p.email.toLowerCase() === activeEmail.toLowerCase());
+                    const nowStr = _formatDateNow();
+                    if (!existing) {
+                        existing = {
+                            email: activeEmail,
+                            name: activeEmail.split('@')[0],
+                            avatar: '',
+                            tier: 'PRO',
+                            lastUsed: nowStr,
+                            quota: null
+                        };
+                        meta.profiles.unshift(existing);
+                    }
+                    meta.active = activeEmail;
+                    _writeJsonSafe(_metaFile, meta);
+                }
+
+                return { success: true, activeEmail, profiles: meta.profiles };
+            } catch(err) {
+                return { success: false, error: err.message, profiles: [] };
+            }
+        });
+
+        _ipc.handle('antigravity:save-current-profile', async (_e, data) => {
+            try {
+                _ensureProfilesDir();
+                const currentAcc = _readJsonSafe(_activeAccFile, {}) || {};
+                const activeEmail = (data && data.email) || currentAcc.active;
+                if (!activeEmail) return { success: false, error: 'No active email found' };
+
+                const accDir = _path.join(_profilesDir, _safeEmailKey(activeEmail));
+                if (!_fs.existsSync(accDir)) _fs.mkdirSync(accDir, { recursive: true });
+
+                // STRICT ANTI-POLLUTION VALIDATION:
+                // Only backup credentials if the token content ACTUALLY matches activeEmail!
+                const kr = _readKeyringPayload();
+                const krEmail = _getEmailFromPayload(kr);
+                if (kr && krEmail && krEmail === activeEmail.toLowerCase()) {
+                    _writeJsonSafe(_path.join(accDir, 'credential_payload.json'), kr);
+                }
+
+                const activeOauth = _readJsonSafe(_activeOauthFile, null);
+                const oauthEmail = _getEmailFromPayload(activeOauth);
+                if (activeOauth && oauthEmail && oauthEmail === activeEmail.toLowerCase()) {
+                    _writeJsonSafe(_path.join(accDir, 'oauth_creds.json'), activeOauth);
+                }
+
+                if (currentAcc.active && currentAcc.active.toLowerCase() === activeEmail.toLowerCase()) {
+                    if (_fs.existsSync(_activeAccFile)) {
+                        try { _fs.copyFileSync(_activeAccFile, _path.join(accDir, 'google_accounts.json')); } catch(e) {}
+                    }
+                }
+
+                let meta = _readJsonSafe(_metaFile, { active: currentAcc.active || activeEmail, profiles: [] }) || { active: currentAcc.active || activeEmail, profiles: [] };
+                if (!Array.isArray(meta.profiles)) meta.profiles = [];
+                if (currentAcc.active) {
+                    meta.active = currentAcc.active;
+                }
+
+                let existing = meta.profiles.find(p => p.email && p.email.toLowerCase() === activeEmail.toLowerCase());
+                const nowStr = _formatDateNow();
+
+                if (!existing) {
+                    existing = {
+                        email: activeEmail,
+                        name: (data && data.name) || activeEmail.split('@')[0],
+                        avatar: (data && data.avatar) || '',
+                        tier: (data && data.tier) || 'PRO',
+                        lastUsed: nowStr,
+                        quota: (data && data.quota) || null
+                    };
+                    meta.profiles.unshift(existing);
+                } else {
+                    if (data && data.name) existing.name = data.name;
+                    if (data && data.avatar) existing.avatar = data.avatar;
+                    if (data && data.tier) existing.tier = data.tier;
+                    if (data && data.quota) existing.quota = data.quota;
+                    existing.lastUsed = nowStr;
+                }
+                _writeJsonSafe(_metaFile, meta);
+                return { success: true, profiles: meta.profiles };
+            } catch(err) {
+                return { success: false, error: err.message };
+            }
+        });
+
+        _ipc.handle('antigravity:switch-account-profile', async (_e, targetEmail) => {
+            try {
+                if (!targetEmail) return { success: false, error: '目标账号邮箱为空' };
+                _ensureProfilesDir();
+                const accDir = _path.join(_profilesDir, _safeEmailKey(targetEmail));
+                const bPayloadFile = _path.join(accDir, 'credential_payload.json');
+                const bOauthFile = _path.join(accDir, 'oauth_creds.json');
+                const bAccFile = _path.join(accDir, 'google_accounts.json');
+
+                if (!_fs.existsSync(bPayloadFile) && !_fs.existsSync(bOauthFile)) {
+                    return { success: false, error: '未在本地凭据库中找到该账号密钥，请先登录一次！' };
+                }
+
+                let payload = _readJsonSafe(bPayloadFile, null);
+                let oauthData = _readJsonSafe(bOauthFile, null);
+
+                // If payload is missing but oauthData exists, synthesize payload
+                if (!payload && oauthData) {
+                    const expMs = oauthData.expiry_date || (Date.now() + 3600000);
+                    const expIso = new Date(expMs).toISOString();
+                    payload = {
+                        token: {
+                            access_token: oauthData.access_token || '',
+                            token_type: 'Bearer',
+                            refresh_token: oauthData.refresh_token || '',
+                            expiry: expIso
+                        },
+                        auth_method: 'consumer',
+                        id_token: oauthData.id_token || ''
+                    };
+                }
+
+                // Verify the payload belongs to targetEmail
+                const pEmail = _getEmailFromPayload(payload);
+                const oEmail = _getEmailFromPayload(oauthData);
+                if ((pEmail && pEmail !== targetEmail.toLowerCase()) && (oEmail && oEmail !== targetEmail.toLowerCase())) {
+                    return { success: false, error: '凭证校验异常：本地存档属于 ' + (pEmail || oEmail) + '，而非目标账号 ' + targetEmail };
+                }
+
+                // Attempt to refresh access_token to guarantee fresh login session
+                const refreshToken = (payload && payload.token && payload.token.refresh_token) || (oauthData && oauthData.refresh_token);
+                if (refreshToken) {
+                    try {
+                        const refreshed = await _refreshGoogleAccessToken(refreshToken);
+                        if (refreshed && refreshed.access_token) {
+                            if (payload && payload.token) {
+                                payload.token.access_token = refreshed.access_token;
+                                const expDate = new Date(Date.now() + (refreshed.expires_in || 3600) * 1000);
+                                payload.token.expiry = expDate.toISOString();
+                                if (refreshed.id_token) payload.id_token = refreshed.id_token;
+                            }
+                            if (oauthData) {
+                                oauthData.access_token = refreshed.access_token;
+                                oauthData.expiry_date = Date.now() + (refreshed.expires_in || 3600) * 1000;
+                                if (refreshed.id_token) oauthData.id_token = refreshed.id_token;
+                            }
+                            // Save refreshed token back to profile store
+                            if (payload) _writeJsonSafe(bPayloadFile, payload);
+                            if (oauthData) _writeJsonSafe(bOauthFile, oauthData);
+                        }
+                    } catch(e) {}
+                }
+
+                // 1. Write System Keyring (Windows Credential Manager / macOS Keychain)
+                if (payload) {
+                    _writeKeyringPayload(payload);
+                }
+
+                // 2. Write File-based credentials (~/.gemini/)
+                if (oauthData) {
+                    _writeJsonSafe(_activeOauthFile, oauthData);
+                } else if (payload && payload.token) {
+                    _writeJsonSafe(_activeOauthFile, {
+                        access_token: payload.token.access_token,
+                        refresh_token: payload.token.refresh_token,
+                        token_type: 'Bearer',
+                        expiry_date: Date.now() + 3600000,
+                        id_token: payload.id_token,
+                        scope: 'https://www.googleapis.com/auth/userinfo.email openid https://www.googleapis.com/auth/cloud-platform https://www.googleapis.com/auth/userinfo.profile'
+                    });
+                }
+
+                _writeJsonSafe(_activeAccFile, { active: targetEmail, old: [] });
+                if (_fs.existsSync(bAccFile)) {
+                    try { _writeJsonSafe(bAccFile, { active: targetEmail, old: [] }); } catch(e) {}
+                }
+
+                // 3. Update Profiles Meta
+                let meta = _readJsonSafe(_metaFile, { active: targetEmail, profiles: [] }) || { active: targetEmail, profiles: [] };
+                meta.active = targetEmail;
+                const existing = (meta.profiles || []).find(p => p.email && p.email.toLowerCase() === targetEmail.toLowerCase());
+                if (existing) {
+                    existing.lastUsed = _formatDateNow();
+                }
+                _writeJsonSafe(_metaFile, meta);
+
+                // 4. Kill stale language_server processes and clean relaunch
+                _cleanStaleLanguageServers();
+
+                const { app: _app, BrowserWindow: _BW } = require('electron');
+                setTimeout(() => {
+                    try {
+                        _cleanStaleLanguageServers();
+                        if (_app && typeof _app.relaunch === 'function') {
+                            _app.relaunch();
+                            _app.exit(0);
+                        } else if (_BW) {
+                            _BW.getAllWindows().forEach(w => {
+                                try { w.webContents.reloadIgnoringCache(); } catch(e) {}
+                            });
+                        }
+                    } catch(e) {
+                        try {
+                            if (_BW) {
+                                _BW.getAllWindows().forEach(w => {
+                                    try { w.webContents.reloadIgnoringCache(); } catch(e2) {}
+                                });
+                            }
+                        } catch(e3) {}
+                    }
+                }, 500);
+
+                return { success: true, targetProfile: existing };
+            } catch(err) {
+                return { success: false, error: err.message };
+            }
+        });
+
+        _ipc.handle('antigravity:delete-account-profile', async (_e, targetEmail) => {
+            try {
+                _ensureProfilesDir();
+                let meta = _readJsonSafe(_metaFile, { active: '', profiles: [] }) || { active: '', profiles: [] };
+                meta.profiles = (meta.profiles || []).filter(p => p.email && p.email.toLowerCase() !== targetEmail.toLowerCase());
+                _writeJsonSafe(_metaFile, meta);
+
+                const accDir = _path.join(_profilesDir, _safeEmailKey(targetEmail));
+                if (_fs.existsSync(accDir)) {
+                    _fs.rmSync(accDir, { recursive: true, force: true });
+                }
+                return { success: true, profiles: meta.profiles };
+            } catch(err) {
+                return { success: false, error: err.message };
+            }
+        });
+
+        _ipc.handle('antigravity:logout-current-account', async () => {
+            try {
+                _deleteKeyringPayload();
+
+                if (_fs.existsSync(_activeOauthFile)) {
+                    try { _fs.unlinkSync(_activeOauthFile); } catch(e) {}
+                }
+                if (_fs.existsSync(_activeAccFile)) {
+                    try { _fs.unlinkSync(_activeAccFile); } catch(e) {}
+                }
+
+                let meta = _readJsonSafe(_metaFile, { active: '', profiles: [] }) || { active: '', profiles: [] };
+                meta.active = '';
+                _writeJsonSafe(_metaFile, meta);
+
+                _cleanStaleLanguageServers();
+
+                const { app: _app, BrowserWindow: _BW } = require('electron');
+                setTimeout(() => {
+                    try {
+                        _cleanStaleLanguageServers();
+                        if (_app && typeof _app.relaunch === 'function') {
+                            _app.relaunch();
+                            _app.exit(0);
+                        } else if (_BW) {
+                            _BW.getAllWindows().forEach(w => {
+                                try { w.webContents.reloadIgnoringCache(); } catch(e) {}
+                            });
+                        }
+                    } catch(e) {}
+                }, 500);
+
+                return { success: true };
+            } catch(err) {
+                return { success: false, error: err.message };
+            }
+        });
+
+        // --- Independent Web OAuth 2.0 Flow (Does NOT log out active account) ---
+        let _oauthServer = null;
+        let _oauthState = { status: 'idle', result: null };
+
+        _ipc.handle('antigravity:start-oauth-flow', async () => {
+            try {
+                if (_oauthServer) {
+                    try { _oauthServer.close(); } catch(e) {}
+                    _oauthServer = null;
+                }
+
+                _oauthState = { status: 'listening', result: null, error: null };
+                const http = require('http');
+                const url = require('url');
+                const https = require('https');
+                const querystring = require('querystring');
+
+                const port = 51121;
+                const redirectUri = 'http://localhost:51121/oauth-callback';
+                const _client = _getGoogleOAuthClient();
+                const clientId = _client.clientId;
+                const clientSecret = _client.clientSecret;
+                const scope = 'https://www.googleapis.com/auth/userinfo.email openid https://www.googleapis.com/auth/cloud-platform https://www.googleapis.com/auth/userinfo.profile';
+
+                const authUrl = 'https://accounts.google.com/o/oauth2/v2/auth?client_id=' + encodeURIComponent(clientId) + '&redirect_uri=' + encodeURIComponent(redirectUri) + '&response_type=code&scope=' + encodeURIComponent(scope) + '&access_type=offline&prompt=consent';
+
+                _oauthServer = http.createServer(async (req, res) => {
+                    const parsedUrl = url.parse(req.url, true);
+                    if (parsedUrl.pathname === '/oauth-callback') {
+                        const code = parsedUrl.query.code;
+                        const error = parsedUrl.query.error;
+
+                        if (error || !code) {
+                            _oauthState = { status: 'error', error: error || '未获取到授权 Code' };
+                            res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+                            res.end('<html><body style="font-family:sans-serif;text-align:center;padding:50px;background:#fef2f2;color:#991b1b;"><h2>❌ 授权未完成</h2><p>' + (error || '未获取到授权 Code') + '</p></body></html>');
+                            return;
+                        }
+
+                        // Exchange authorization code for tokens
+                        try {
+                            const postData = querystring.stringify({
+                                client_id: clientId,
+                                client_secret: clientSecret,
+                                code: code,
+                                grant_type: 'authorization_code',
+                                redirect_uri: redirectUri
+                            });
+
+                            const tokenReq = https.request('https://oauth2.googleapis.com/token', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                    'Content-Length': Buffer.byteLength(postData)
+                                },
+                                timeout: 10000
+                            }, (tokenRes) => {
+                                let body = '';
+                                tokenRes.on('data', chunk => body += chunk);
+                                tokenRes.on('end', () => {
+                                    try {
+                                        const tokenData = JSON.parse(body);
+                                        if (!tokenData.access_token) {
+                                            throw new Error(tokenData.error_description || 'Token 兑换失败');
+                                        }
+
+                                        // Decode id_token JWT
+                                        let userEmail = '';
+                                        let userName = '';
+                                        let userPic = '';
+                                        if (tokenData.id_token) {
+                                            try {
+                                                const parts = tokenData.id_token.split('.');
+                                                if (parts.length >= 2) {
+                                                    const payloadBuf = Buffer.from(parts[1], 'base64');
+                                                    const payloadObj = JSON.parse(payloadBuf.toString('utf8'));
+                                                    userEmail = payloadObj.email || '';
+                                                    userName = payloadObj.name || '';
+                                                    userPic = payloadObj.picture || '';
+                                                }
+                                            } catch(e) {}
+                                        }
+
+                                        if (!userEmail) {
+                                            userEmail = 'google_user_' + Date.now() + '@google.com';
+                                        }
+
+                                        _ensureProfilesDir();
+                                        const accDir = _path.join(_profilesDir, _safeEmailKey(userEmail));
+                                        if (!_fs.existsSync(accDir)) _fs.mkdirSync(accDir, { recursive: true });
+
+                                        // Write oauth_creds.json
+                                        const oauthCreds = {
+                                            access_token: tokenData.access_token,
+                                            refresh_token: tokenData.refresh_token || '',
+                                            token_type: 'Bearer',
+                                            expiry_date: Date.now() + (tokenData.expires_in || 3600) * 1000,
+                                            id_token: tokenData.id_token || '',
+                                            scope: scope
+                                        };
+                                        _writeJsonSafe(_path.join(accDir, 'oauth_creds.json'), oauthCreds);
+
+                                        // Write google_accounts.json
+                                        _writeJsonSafe(_path.join(accDir, 'google_accounts.json'), { active: userEmail, old: [] });
+
+                                        // Write credential_payload.json
+                                        const expDate = new Date(Date.now() + (tokenData.expires_in || 3600) * 1000);
+                                        const credPayload = {
+                                            token: {
+                                                access_token: tokenData.access_token,
+                                                token_type: 'Bearer',
+                                                refresh_token: tokenData.refresh_token || '',
+                                                expiry: expDate.toISOString()
+                                            },
+                                            auth_method: 'consumer',
+                                            id_token: tokenData.id_token || ''
+                                        };
+                                        _writeJsonSafe(_path.join(accDir, 'credential_payload.json'), credPayload);
+
+                                        // Update profiles_meta.json (preserves current active account!)
+                                        let meta = _readJsonSafe(_metaFile, { active: '', profiles: [] }) || { active: '', profiles: [] };
+                                        if (!Array.isArray(meta.profiles)) meta.profiles = [];
+                                        let existing = meta.profiles.find(p => p.email && p.email.toLowerCase() === userEmail.toLowerCase());
+                                        const nowStr = _formatDateNow();
+                                        if (!existing) {
+                                            existing = {
+                                                email: userEmail,
+                                                name: userName || userEmail.split('@')[0],
+                                                avatar: userPic || '',
+                                                tier: 'PRO',
+                                                tag: '新账号',
+                                                lastUsed: nowStr,
+                                                quota: null
+                                            };
+                                            meta.profiles.unshift(existing);
+                                        } else {
+                                            if (userName) existing.name = userName;
+                                            if (userPic) existing.avatar = userPic;
+                                            existing.lastUsed = nowStr;
+                                        }
+                                        _writeJsonSafe(_metaFile, meta);
+
+                                        _oauthState = { status: 'completed', result: existing };
+
+                                        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+                                        res.end('<!DOCTYPE html><html><head><meta charset="utf-8"><title>授权成功</title><style>body{font-family:-apple-system,BlinkMacSystemFont,\\"Segoe UI\\",Roboto,sans-serif;text-align:center;padding:60px 20px;background:#f8fafc;color:#0f172a;}h2{color:#10b981;font-size:26px;margin-bottom:12px;font-weight:600;}.card{background:#fff;max-width:440px;margin:0 auto;padding:32px;border-radius:14px;box-shadow:0 10px 25px rgba(0,0,0,0.06);border:1px solid #e2e8f0;}p{font-size:14px;color:#64748b;line-height:1.6;}.email{display:inline-block;padding:4px 10px;background:#e0f2fe;color:#0284c7;border-radius:6px;font-weight:600;margin:10px 0;}</style></head><body><div class="card"><h2>✅ 账号授权成功！</h2><div class="email">' + userEmail + '</div><p>新凭据已安全归档至本地多账号池中。<br>您当前客户端会话未受任何影响。<br><b>现在可以关闭此网页，返回 Antigravity。</b></p></div></body></html>');
+
+                                        setTimeout(() => {
+                                            if (_oauthServer) {
+                                                try { _oauthServer.close(); } catch(e) {}
+                                                _oauthServer = null;
+                                            }
+                                        }, 1500);
+                                    } catch(err) {
+                                        _oauthState = { status: 'error', error: err.message };
+                                        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+                                        res.end('<html><body><h2>Token 解析失败: ' + err.message + '</h2></body></html>');
+                                    }
+                                });
+                            });
+                            tokenReq.on('error', (err) => {
+                                _oauthState = { status: 'error', error: err.message };
+                                res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+                                res.end('<html><body><h2>请求失败: ' + err.message + '</h2></body></html>');
+                            });
+                            tokenReq.write(postData);
+                            tokenReq.end();
+                        } catch(err) {
+                            _oauthState = { status: 'error', error: err.message };
+                        }
+                    } else {
+                        res.writeHead(404);
+                        res.end();
+                    }
+                });
+
+                _oauthServer.on('error', (err) => {
+                    _oauthState = { status: 'error', error: err.message };
+                });
+
+                _oauthServer.listen(port, '127.0.0.1');
+
+                return { success: true, authUrl };
+            } catch(err) {
+                return { success: false, error: err.message };
+            }
+        });
+
+        _ipc.handle('antigravity:check-oauth-status', async () => {
+            return _oauthState;
+        });
+
+        _ipc.handle('antigravity:cancel-oauth-flow', async () => {
+            if (_oauthServer) {
+                try { _oauthServer.close(); } catch(e) {}
+                _oauthServer = null;
+            }
+            _oauthState = { status: 'idle', result: null };
+            return { success: true };
+        });
+
+        _ipc.handle('antigravity:update-account-tag', async (_e, { email, tag }) => {
+            try {
+                if (!email) return { success: false, error: 'Email is required' };
+                _ensureProfilesDir();
+                let meta = _readJsonSafe(_metaFile, { active: '', profiles: [] }) || { active: '', profiles: [] };
+                const p = (meta.profiles || []).find(item => item.email && item.email.toLowerCase() === email.toLowerCase());
+                if (p) {
+                    p.tag = (tag || '').trim();
+                    _writeJsonSafe(_metaFile, meta);
+                    return { success: true, profile: p };
+                }
+                return { success: false, error: 'Profile not found' };
+            } catch(e) {
+                return { success: false, error: e.message };
+            }
+        });
+
+        _ipc.handle('antigravity:get-device-fingerprint', async (_e, email) => {
+            try {
+                const storagePath = _path.join(process.env.APPDATA || '', 'Antigravity', 'User', 'globalStorage', 'storage.json');
+                let currentStorage = _readJsonSafe(storagePath, null);
+
+                let boundFingerprint = null;
+                let history = [];
+
+                if (email) {
+                    const accDir = _path.join(_profilesDir, _safeEmailKey(email));
+                    const fpFile = _path.join(accDir, 'fingerprint.json');
+                    boundFingerprint = _readJsonSafe(fpFile, null);
+
+                    const histFile = _path.join(accDir, 'fingerprint_history.json');
+                    history = _readJsonSafe(histFile, []) || [];
+                }
+
+                return {
+                    success: true,
+                    storagePath,
+                    currentStorage,
+                    boundFingerprint,
+                    history
+                };
+            } catch(e) {
+                return { success: false, error: e.message };
+            }
+        });
+
+        _ipc.handle('antigravity:bind-device-fingerprint', async (_e, { email, fingerprint, applyNow }) => {
+            try {
+                if (!email) return { success: false, error: 'Email is required' };
+                const accDir = _path.join(_profilesDir, _safeEmailKey(email));
+                if (!_fs.existsSync(accDir)) _fs.mkdirSync(accDir, { recursive: true });
+
+                const fpFile = _path.join(accDir, 'fingerprint.json');
+                _writeJsonSafe(fpFile, fingerprint);
+
+                const histFile = _path.join(accDir, 'fingerprint_history.json');
+                let history = _readJsonSafe(histFile, []) || [];
+                history.unshift({
+                    timestamp: _formatDateNow(),
+                    fingerprint: fingerprint
+                });
+                if (history.length > 20) history = history.slice(0, 20);
+                _writeJsonSafe(histFile, history);
+
+                const storageDir = _path.join(process.env.APPDATA || '', 'Antigravity', 'User', 'globalStorage');
+                const storagePath = _path.join(storageDir, 'storage.json');
+
+                if (applyNow) {
+                    if (!_fs.existsSync(storageDir)) _fs.mkdirSync(storageDir, { recursive: true });
+                    let storageObj = _readJsonSafe(storagePath, {}) || {};
+                    Object.assign(storageObj, fingerprint);
+                    _writeJsonSafe(storagePath, storageObj);
+                }
+
+                return { success: true, boundFingerprint: fingerprint, history };
+            } catch(e) {
+                return { success: false, error: e.message };
+            }
+        });
+
+        _ipc.handle('antigravity:open-account-folder', async (_e, email) => {
+            try {
+                const { shell } = require('electron');
+                let targetPath = _profilesDir;
+                if (email) {
+                    const accDir = _path.join(_profilesDir, _safeEmailKey(email));
+                    if (_fs.existsSync(accDir)) targetPath = accDir;
+                }
+                shell.openPath(targetPath);
+                return { success: true };
+            } catch(e) {
+                return { success: false, error: e.message };
+            }
+        });
+
+        _ipc.handle('antigravity:export-account-profile', async (_e, email) => {
+            try {
+                if (!email) return { success: false, error: 'Email is required' };
+                const accDir = _path.join(_profilesDir, _safeEmailKey(email));
+                const bOauth = _readJsonSafe(_path.join(accDir, 'oauth_creds.json'), {});
+                const bPayload = _readJsonSafe(_path.join(accDir, 'credential_payload.json'), {});
+                const meta = _readJsonSafe(_metaFile, { profiles: [] });
+                const profile = (meta.profiles || []).find(p => p.email && p.email.toLowerCase() === email.toLowerCase()) || {};
+
+                return {
+                    success: true,
+                    data: {
+                        exportedAt: new Date().toISOString(),
+                        profile,
+                        oauth: bOauth,
+                        payload: bPayload
+                    }
+                };
+            } catch(e) {
+                return { success: false, error: e.message };
+            }
+        });
+
+        _ipc.handle('antigravity:relaunch-app', async () => {
+            _cleanStaleLanguageServers();
+            const { app: _app } = require('electron');
+            setTimeout(() => {
+                try {
+                    _cleanStaleLanguageServers();
+                    _app.relaunch();
+                    _app.exit(0);
+                } catch(e) {}
+            }, 150);
+            return { success: true };
+        });
     }
 } catch(e) {}
 `;
@@ -356,27 +1296,78 @@ try {
 
         fs.writeFileSync(utilsJs, utilsContent, 'utf8');
 
-        // 7. Patch preload.js to expose screenshot bridge & skills bridge
+        // 6.2 Patch ipcHandlers.js (The Official Startup IPC registration module)
+        const ipcHandlersJs = path.join(distDir, 'ipcHandlers.js');
+        if (fs.existsSync(ipcHandlersJs)) {
+            let ipcContent = fs.readFileSync(ipcHandlersJs, 'utf8');
+            if (!ipcContent.includes('antigravity:save-current-profile')) {
+                const lastBraceIdx = ipcContent.lastIndexOf('}');
+                if (lastBraceIdx !== -1) {
+                    ipcContent = ipcContent.substring(0, lastBraceIdx) + '\n' + safeInjectFn + '\n}\n';
+                    fs.writeFileSync(ipcHandlersJs, ipcContent, 'utf8');
+                }
+            }
+        }
+
+        // 7. Patch preload.js to expose screenshot bridge, skills & account switcher bridge
         const preloadJs = path.join(distDir, 'preload.js');
         if (fs.existsSync(preloadJs)) {
             let preloadContent = fs.readFileSync(preloadJs, 'utf8');
-            if (preloadContent.includes('takeScreenshot:') && !preloadContent.includes('getSkills:')) {
-                preloadContent = preloadContent.replace(
-                    "getClipboardImage: () => electron_1.ipcRenderer.invoke('antigravity:clipboard-image'),",
-                    "getClipboardImage: () => electron_1.ipcRenderer.invoke('antigravity:clipboard-image'),\n    getSkills: () => electron_1.ipcRenderer.invoke('antigravity:get-skills'),"
-                );
-                fs.writeFileSync(preloadJs, preloadContent, 'utf8');
-            } else if (!preloadContent.includes('takeScreenshot:')) {
-                const targetNeedle = "revealInFilePicker: (path) => electron_1.ipcRenderer.invoke('shell:reveal-in-file-picker', path),";
-                if (preloadContent.includes(targetNeedle)) {
-                    const extraApis = `
+            const targetNeedle = "revealInFilePicker: (path) => electron_1.ipcRenderer.invoke('shell:reveal-in-file-picker', path),";
+            const extraApis = `
     takeScreenshot: () => electron_1.ipcRenderer.invoke('antigravity:screenshot'),
     getClipboardImage: () => electron_1.ipcRenderer.invoke('antigravity:clipboard-image'),
     getSkills: () => electron_1.ipcRenderer.invoke('antigravity:get-skills'),
-    openPath: (p) => electron_1.ipcRenderer.invoke('antigravity:open-path', p),`;
+    openPath: (p) => electron_1.ipcRenderer.invoke('antigravity:open-path', p),
+    openExternal: (url) => electron_1.ipcRenderer.invoke('antigravity:open-external', url),
+    getAccountProfiles: () => electron_1.ipcRenderer.invoke('antigravity:get-account-profiles'),
+    saveCurrentProfile: (data) => electron_1.ipcRenderer.invoke('antigravity:save-current-profile', data),
+    switchAccountProfile: (email) => electron_1.ipcRenderer.invoke('antigravity:switch-account-profile', email),
+    deleteAccountProfile: (email) => electron_1.ipcRenderer.invoke('antigravity:delete-account-profile', email),
+    logoutCurrentAccount: () => electron_1.ipcRenderer.invoke('antigravity:logout-current-account'),
+    startOAuthFlow: () => electron_1.ipcRenderer.invoke('antigravity:start-oauth-flow'),
+    checkOAuthStatus: () => electron_1.ipcRenderer.invoke('antigravity:check-oauth-status'),
+    cancelOAuthFlow: () => electron_1.ipcRenderer.invoke('antigravity:cancel-oauth-flow'),
+    updateAccountTag: (email, tag) => electron_1.ipcRenderer.invoke('antigravity:update-account-tag', { email, tag }),
+    getDeviceFingerprint: (email) => electron_1.ipcRenderer.invoke('antigravity:get-device-fingerprint', email),
+    bindDeviceFingerprint: (email, fingerprint, applyNow) => electron_1.ipcRenderer.invoke('antigravity:bind-device-fingerprint', { email, fingerprint, applyNow }),
+    openAccountFolder: (email) => electron_1.ipcRenderer.invoke('antigravity:open-account-folder', email),
+    exportAccountProfile: (email) => electron_1.ipcRenderer.invoke('antigravity:export-account-profile', email),
+    relaunchApp: () => electron_1.ipcRenderer.invoke('antigravity:relaunch-app'),`;
+
+            if (preloadContent.includes('takeScreenshot:') && !preloadContent.includes('getAccountProfiles:')) {
+                preloadContent = preloadContent.replace(
+                    "openPath: (p) => electron_1.ipcRenderer.invoke('antigravity:open-path', p),",
+                    "openPath: (p) => electron_1.ipcRenderer.invoke('antigravity:open-path', p),\n" + extraApis
+                );
+                fs.writeFileSync(preloadJs, preloadContent, 'utf8');
+            } else if (preloadContent.includes('getAccountProfiles:') && !preloadContent.includes('startOAuthFlow:')) {
+                preloadContent = preloadContent.replace(
+                    "getAccountProfiles: () => electron_1.ipcRenderer.invoke('antigravity:get-account-profiles'),",
+                    "getAccountProfiles: () => electron_1.ipcRenderer.invoke('antigravity:get-account-profiles'),\n    startOAuthFlow: () => electron_1.ipcRenderer.invoke('antigravity:start-oauth-flow'),\n    checkOAuthStatus: () => electron_1.ipcRenderer.invoke('antigravity:check-oauth-status'),\n    cancelOAuthFlow: () => electron_1.ipcRenderer.invoke('antigravity:cancel-oauth-flow'),\n    updateAccountTag: (email, tag) => electron_1.ipcRenderer.invoke('antigravity:update-account-tag', { email, tag }),\n    getDeviceFingerprint: (email) => electron_1.ipcRenderer.invoke('antigravity:get-device-fingerprint', email),\n    bindDeviceFingerprint: (email, fingerprint, applyNow) => electron_1.ipcRenderer.invoke('antigravity:bind-device-fingerprint', { email, fingerprint, applyNow }),\n    openAccountFolder: (email) => electron_1.ipcRenderer.invoke('antigravity:open-account-folder', email),\n    exportAccountProfile: (email) => electron_1.ipcRenderer.invoke('antigravity:export-account-profile', email),"
+                );
+                fs.writeFileSync(preloadJs, preloadContent, 'utf8');
+            } else if (!preloadContent.includes('takeScreenshot:')) {
+                if (preloadContent.includes(targetNeedle)) {
                     preloadContent = preloadContent.replace(targetNeedle, targetNeedle + extraApis);
                     fs.writeFileSync(preloadJs, preloadContent, 'utf8');
                 }
+            }
+
+            if (preloadContent.includes('deleteAccountProfile:') && !preloadContent.includes('logoutCurrentAccount:')) {
+                preloadContent = preloadContent.replace(
+                    "deleteAccountProfile: (email) => electron_1.ipcRenderer.invoke('antigravity:delete-account-profile', email),",
+                    "deleteAccountProfile: (email) => electron_1.ipcRenderer.invoke('antigravity:delete-account-profile', email),\n    logoutCurrentAccount: () => electron_1.ipcRenderer.invoke('antigravity:logout-current-account'),"
+                );
+                fs.writeFileSync(preloadJs, preloadContent, 'utf8');
+            }
+
+            if (preloadContent.includes('openPath:') && !preloadContent.includes('openExternal:')) {
+                preloadContent = preloadContent.replace(
+                    "openPath: (p) => electron_1.ipcRenderer.invoke('antigravity:open-path', p),",
+                    "openPath: (p) => electron_1.ipcRenderer.invoke('antigravity:open-path', p),\n    openExternal: (url) => electron_1.ipcRenderer.invoke('antigravity:open-external', url),"
+                );
+                fs.writeFileSync(preloadJs, preloadContent, 'utf8');
             }
         }
 
