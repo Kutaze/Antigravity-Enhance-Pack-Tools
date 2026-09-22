@@ -26,7 +26,8 @@
   <a href="#-インストール">インストール</a> • 
   <a href="#-ワークフロー">ワークフロー</a> • 
   <a href="#-api-リファレンス">API リファレンス</a> • 
-  <a href="#-更新履歴">更新履歴</a>
+  <a href="#-更新履歴">更新履歴</a> • 
+  <a href="#-star-history">Star History</a>
 </p>
 
 </div>
@@ -193,6 +194,22 @@ curl -fsSL https://raw.githubusercontent.com/Kutaze/Antigravity-Enhance-Pack-Too
 - 多言語ドキュメント（簡体字中国語・英語・日本語）の追加とナビゲーションの最適化。
 
 </details>
+
+---
+
+## 📈 Star History
+
+<div align="center">
+
+<a href="https://star-history.com/#Kutaze/Antigravity-Enhance-Pack-Tools&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Kutaze/Antigravity-Enhance-Pack-Tools&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Kutaze/Antigravity-Enhance-Pack-Tools&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=Kutaze/Antigravity-Enhance-Pack-Tools&type=Date" />
+ </picture>
+</a>
+
+</div>
 
 ---
 

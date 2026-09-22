@@ -26,7 +26,8 @@
   <a href="#-部署指南">部署指南</a> • 
   <a href="#-工作流程">工作流程</a> • 
   <a href="#-api-参考">API 参考</a> • 
-  <a href="#-变更日志">变更日志</a>
+  <a href="#-变更日志">变更日志</a> • 
+  <a href="#-star-history">Star History</a>
 </p>
 
 </div>
@@ -436,6 +437,22 @@ window.__AGY_APPLY_THINKING_LEVEL__('high');
   - 支持原生 asar 解包、语法树分析、注入与无损还原。
 
 </details>
+
+---
+
+## 📈 Star History
+
+<div align="center">
+
+<a href="https://star-history.com/#Kutaze/Antigravity-Enhance-Pack-Tools&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Kutaze/Antigravity-Enhance-Pack-Tools&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Kutaze/Antigravity-Enhance-Pack-Tools&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=Kutaze/Antigravity-Enhance-Pack-Tools&type=Date" />
+ </picture>
+</a>
+
+</div>
 
 ---
 

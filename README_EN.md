@@ -26,7 +26,8 @@
   <a href="#-installation">Installation</a> • 
   <a href="#-workflow">Workflow</a> • 
   <a href="#-api-reference">API Reference</a> • 
-  <a href="#-changelog">Changelog</a>
+  <a href="#-changelog">Changelog</a> • 
+  <a href="#-star-history">Star History</a>
 </p>
 
 </div>
@@ -194,6 +195,22 @@ curl -fsSL https://raw.githubusercontent.com/Kutaze/Antigravity-Enhance-Pack-Too
 - Standardized single-emoji title styling and multilingual documentation.
 
 </details>
+
+---
+
+## 📈 Star History
+
+<div align="center">
+
+<a href="https://star-history.com/#Kutaze/Antigravity-Enhance-Pack-Tools&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Kutaze/Antigravity-Enhance-Pack-Tools&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Kutaze/Antigravity-Enhance-Pack-Tools&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=Kutaze/Antigravity-Enhance-Pack-Tools&type=Date" />
+ </picture>
+</a>
+
+</div>
 
 ---
 
