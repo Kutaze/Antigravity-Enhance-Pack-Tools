@@ -8,17 +8,12 @@
 **专为 Google Antigravity 官方桌面客户端打造的汉化与原生 UI 交互增强套件。**
 
 <p align="center">
-  <a href="https://discord.gg/QRsPcNrSB"><img src="https://img.shields.io/badge/Discord-用户交流社区-5865F2?style=flat-square&logo=discord&logoColor=white" alt="Discord Community" /></a>
-  <a href="https://discord.gg/QRsPcNrSB"><b>👉 加入官方 Discord 交流平台 (https://discord.gg/QRsPcNrSB)</b></a>
-</p>
-
-<p align="center">
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases"><img src="https://img.shields.io/badge/Release-v0.1.5-6366f1?style=flat-square" alt="Release" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-10b981?style=flat-square" alt="License" /></a>
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools"><img src="https://img.shields.io/badge/Platform-Windows_%7C_macOS_%7C_Linux-0284c7?style=flat-square" alt="Platform" /></a>
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools"><img src="https://img.shields.io/badge/UI-Dual_Theme_GUI-8b5cf6?style=flat-square" alt="UI" /></a>
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools"><img src="https://img.shields.io/badge/Runtime-Zero_Dependency-f59e0b?style=flat-square" alt="Runtime" /></a>
-  <a href="https://discord.gg/QRsPcNrSB"><img src="https://img.shields.io/badge/Discord-Join%20Chat-5865F2?style=flat-square&logo=discord&logoColor=white" alt="Discord" /></a>
+  <a href="https://discord.gg/QRsPcNrSB"><img src="https://img.shields.io/badge/Discord-用户交流社区-5865F2?style=flat-square&logo=discord&logoColor=white" alt="Discord Community" /></a>
 </p>
 
 <p align="center">
