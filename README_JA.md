@@ -49,6 +49,13 @@ DOM監視のループ振動を防止し、会話インタラクションにミ�
 | :---: | :---: |
 | <img src="assets/verified_anti_freeze_live.png" width="450" /> | <img src="assets/verified_model_slider_live.png" width="450" /> |
 
+### 3. マルチアカウント管理 & ステータスバー統合
+アカウントプールのシームレス切替、リアルタイム枠（Quota）テレメトリ、統合プロファイルカプセルを搭載：
+
+| マルチアカウント管理 & ワンクリック切替モーダル | ステータスバー統合プロファイル & ツールチップ |
+| :---: | :---: |
+| <img src="assets/verified_account_switcher_live.png" width="450" /> | <img src="assets/verified_bottom_profile_tooltip_live.png" width="450" /> |
+
 ---
 
 ## 🧠 設計思想

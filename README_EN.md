@@ -49,6 +49,13 @@ Eliminates DOM oscillation loops, delivering sub-millisecond response to convers
 | :---: | :---: |
 | <img src="assets/verified_anti_freeze_live.png" width="450" /> | <img src="assets/verified_model_slider_live.png" width="450" /> |
 
+### 3. Native Multi-Account Switcher & Bottom Bar Integration
+Seamless account switching, dynamic profile pool, quota telemetry, and integrated status bar profile pill:
+
+| Multi-Account Quota & Switcher Modal | Integrated Profile Capsule & Dynamic Tooltip |
+| :---: | :---: |
+| <img src="assets/verified_account_switcher_live.png" width="450" /> | <img src="assets/verified_bottom_profile_tooltip_live.png" width="450" /> |
+
 ---
 
 ## 🧠 Core Philosophy
