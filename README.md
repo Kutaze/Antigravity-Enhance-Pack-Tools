@@ -76,12 +76,12 @@
 
 ### 开发思路与设计灵感 (Design Philosophy & Inspiration)
 
-在软件架构构思与交互体系设计的全过程中，**Antigravity Enhance Tools** 深入借鉴了业内标杆工具与开源社区的实践经验：
+在软件架构构思与交互体系设计的全过程中，**Antigravity Enhance Tools** 坚持追求极致轻量、原生融合与母语级交互体验：
 
-1. **汲取 [lbjlaq/Antigravity-Manager](https://github.com/lbjlaq/Antigravity-Manager) 思路并实现内嵌轻量化**：深度参考了开源项目 [lbjlaq/Antigravity-Manager](https://github.com/lbjlaq/Antigravity-Manager)（Antigravity 账号管理与切换工具）在多账号管理、配额监控与一键切换方面的产品思路与优秀实践；但考虑到独立外部桌面软件需要单独打开且常驻切换较为繁琐臃肿，本项目选择将其核心能力以零额外进程、极轻量化的方式直接**原生深度集成进 Antigravity 客户端内部**，打造浑然一体的原生内嵌式无缝秒切体验。
-2. **学习 Codex 的深度交互逻辑**：引入上下文预算透明化理念（五段式用量遥测面板）与即时思考深度调控（4 挡思考滑块），消除长程对话焦虑。
-3. **学习 Workbuddy 的界面交互美学**：吸收圆角卡片、柔和微光渐变与现代排版，并设计独创「DOM 缓存守卫（Cache Guard）」，兼具现代视觉与零震荡高流畅度。
-4. **致敬开源项目 renkeshui/antigravity-chinese-locale 的汉化实践**：充分参考其本地化词条全景映射与术语校准沉淀，并升级运行时防卡死机制，带来母语级编程体验。
+1. **原生内嵌化融合设计**：摒弃外部独立软件常驻与跨应用切换的臃肿繁琐，将多账号管理与配额遥测直接以零额外进程、极轻量化的方式原生深度集成进 Antigravity 客户端底栏，实现浑然一体的顺滑操作。
+2. **上下文透明化与思考调控**：引入上下文预算透明化理念（五段式用量遥测面板）与即时思考深度调控（4 挡思考滑块），消除长程开发与多轮对话过程中的 Token 消耗焦虑。
+3. **现代排版与无抖动流畅度**：吸收现代圆角卡片与柔和微光渐变排版，辅以独创「DOM 缓存守卫（Cache Guard）」，兼具现代视觉质感与零震荡高流畅度。
+4. **母语级全景深度润色**：全量界面词典人工校对与专业级润色，深度贴合开发者日常编程与 Agent 结对工作流。
 
 > [!IMPORTANT]
 > **🛡️ 账号安全与本地隐私承诺 (Security & Privacy First)**
@@ -118,9 +118,7 @@
 ## ✨ 功能特色
 
 ### 全界面原生深度汉化与真实上下文动态遥测
-- **词条 100% 深度覆盖**：全面汉化客户端菜单栏、工作区视窗、侧边栏导航、对话输入框、配置面板及各组件提示语。
-- **汲取开源社区实践**：汉化体系深度借鉴并学习了开源先驱项目 [renkeshui/antigravity-chinese-locale](https://github.com/renkeshui/antigravity-chinese-locale)，结合专业 AI 编程与 Agent 交互语境完成全量词典校对与母语级精细润色。
-- **专业级术语润色**：针对大语言模型、上下文预算、Agent 智能体、结对编程场景进行精细校准，彻底告别机器翻译的生硬感。
+- **专业级精细人工润色**：全套汉化词典经过严谨人工校对与专业术语润色，结合日常 AI 编程与 Agent 交互语境，彻底告别机器翻译的生硬感。
 - **底栏常驻高灵敏胶囊**：实时显示当前对话消耗的 Token 精确数值与使用百分比（如 `6.4K / 250K (2.6%)`）。
 - **五段式分层占比卡片**：点击悬浮展开「已缓存上下文」、「输入载荷」、「思维推理」、「回复生成」与「剩余可用量」，内置 `/compact` 压缩快捷键。
 
@@ -441,19 +439,24 @@ window.__AGY_APPLY_THINKING_LEVEL__('high');
 
 ---
 
-## 📜 许可证与安全声明
+## 📜 许可证与鸣谢声明
 
-### 开源许可证
-本项目遵循 [MIT License](LICENSE) 许可协议开放源代码。您可以自由地使用、修改和分发本项目，但需保留原作者版权声明与许可申明。
+感谢所有为本项目付出汗水与智慧的开发者。
 
-### 安全与隐私承诺
-- **100% 本地运行**：本工具的所有汉化、界面补丁和逻辑注入均在您的本机环境执行，不会上传任何用户的代码、聊天记录、API 密钥或账户信息至第三方服务器。
-- **纯粹的前端增强**：本扩展仅针对客户端界面呈现与前端交互进行优化，未修改任何后端加密通讯逻辑与协议签名。
-- **安全可溯源**：所有代码与打包脚本均公开可见，无任何暗桩、后门或混淆代码。
+<details>
+<summary><b>🤝 鸣谢项目 (Special Thanks) - 点击展开</b></summary>
 
-### 致谢与开源参考
-- 特别鸣谢开源项目 [renkeshui/antigravity-chinese-locale](https://github.com/renkeshui/antigravity-chinese-locale) 在 Antigravity 客户端汉化探索上的宝贵先驱实践，本项目汉化模块的设计与词条体系深受其启发。
-- 特别鸣谢开源项目 [lbjlaq/Antigravity-Manager](https://github.com/lbjlaq/Antigravity-Manager)（专业的 Antigravity 账号管理与切换工具）在多账号管理与一键切换思路上的先驱探索与产品启发，本项目吸收其精髓并进一步实现了客户端原生内嵌集成。
+本项目在开发过程中参考或借鉴了以下优秀开源项目的思路或代码，排名不分先后：
+
+- [lbjlaq/Antigravity-Manager](https://github.com/lbjlaq/Antigravity-Manager)：专业的 Antigravity 账号管理与切换工具（Antigravity Tools），为本项目多账号配额监控与一键切换提供了优秀的思路借鉴与产品启发。考虑到外部独立软件单独打开较为繁琐臃肿，本项目选择将其核心能力以极轻量化的方式原生深度集成进 Antigravity 客户端内部，实现零额外进程常驻。
+- [renkeshui/antigravity-chinese-locale](https://github.com/renkeshui/antigravity-chinese-locale)：Antigravity 客户端汉化探索的先驱项目，其本地化词典映射与术语体系为本项目提供了宝贵的沉淀与参考。
+
+---
+
+- **版权许可**：基于 [MIT License](LICENSE) 许可，保留原作者版权声明与许可申明，严禁任何形式的商业转售行为。
+- **安全声明**：本应用所有账号数据严格加密存储于本地操作系统凭据库（Windows Credential Manager / macOS Keychain）与本机私有目录，无任何第三方云端中转服务器，数据绝不离开您的设备。
+
+</details>
 
 ### 免责声明
 - Google Antigravity 是 Google LLC 的商标。本项目为独立开源社区作品，与 Google LLC 及其关联实体不存在任何隶属、认可、赞助或官方合作关系。

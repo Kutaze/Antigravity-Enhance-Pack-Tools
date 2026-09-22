@@ -69,12 +69,12 @@ Direct access button on the chat input bar opening a modern, theme-adaptive skil
 
 ### Design Philosophy & Inspiration
 
-Throughout the architectural conception and UX design of **Antigravity Enhance Tools**, the project has deeply integrated best practices from leading tools and open source projects:
+Throughout the architectural conception and UX design of **Antigravity Enhance Tools**, the project emphasizes lightweight zero-overhead runtime, native deep integration, and fluid developer workflows:
 
-1. **[lbjlaq/Antigravity-Manager](https://github.com/lbjlaq/Antigravity-Manager) Concept Integration**: Inspired by the excellent open-source project [lbjlaq/Antigravity-Manager](https://github.com/lbjlaq/Antigravity-Manager) (Antigravity Account Manager & Switcher) for account management and quota tracking; but instead of running a separate bloated standalone desktop application, this project natively embeds all core multi-account management directly into Antigravity with zero extra background processes.
-2. **Codex-Inspired Interaction**: Transparent token consumption telemetry pill (5-tier breakdown card) and seamless thinking depth slider (4-tier control) eliminating context anxiety.
-3. **Workbuddy-Inspired UI/UX**: Minimalist aesthetic with rounded cards and subtle glow, paired with a proprietary DOM Cache Guard ensuring zero-jank fluid interaction.
-4. **Open Source Localization Reference**: Deeply inspired by [renkeshui/antigravity-chinese-locale](https://github.com/renkeshui/antigravity-chinese-locale) for its comprehensive terminology mapping and localization structure.
+1. **Native Embedded Integration**: Replaces external bloated standalone tools with native status-bar integration, ensuring zero extra background processes and seamless hot-swapping.
+2. **Context Transparency & Reasoning Control**: Introduces real-time token telemetry (5-tier breakdown pill) and dynamic thinking depth regulation (4-level slider) to eliminate context exhaustion anxiety.
+3. **Modern Aesthetics & Zero-Jank Fluidity**: Combines rounded minimalist cards, subtle gradients, and an innovative DOM Cache Guard to guarantee silky smooth interaction without oscillation loops.
+4. **Developer-Tuned Localization**: 100% full-interface localization meticulously calibrated for pair programming and agentic workflows.
 
 > [!IMPORTANT]
 > **🛡️ Security & Local Privacy Guarantee**
@@ -199,7 +199,23 @@ curl -fsSL https://raw.githubusercontent.com/Kutaze/Antigravity-Enhance-Pack-Too
 
 ## 📜 License & Acknowledgments
 
-- Licensed under the [MIT License](LICENSE).
-- Special thanks to [renkeshui/antigravity-chinese-locale](https://github.com/renkeshui/antigravity-chinese-locale) for pioneering localization work on Antigravity.
-- Special thanks to [lbjlaq/Antigravity-Manager](https://github.com/lbjlaq/Antigravity-Manager) (Professional Antigravity Account Manager & Switcher) for pioneering multi-account management and inspiring our native embedded design.
-- Google Antigravity is a trademark of Google LLC. This project is an independent community project.
+Thanks to all developers who contributed their dedication and wisdom to the open-source community.
+
+<details>
+<summary><b>🤝 Special Thanks - Click to Expand</b></summary>
+
+This project referenced concepts and implementations from the following open-source projects during development (in no particular order):
+
+- [lbjlaq/Antigravity-Manager](https://github.com/lbjlaq/Antigravity-Manager): Professional Antigravity Account Manager & Switcher (Antigravity Tools), which provided excellent ideas for multi-account quota monitoring and switching. Instead of requiring a standalone external application, this project natively embeds these capabilities directly into Antigravity with zero background processes.
+- [renkeshui/antigravity-chinese-locale](https://github.com/renkeshui/antigravity-chinese-locale): Pioneering localization initiative for the Antigravity desktop client, providing solid reference for dictionary mapping and terminology alignment.
+
+---
+
+- **License**: Licensed under the [MIT License](LICENSE). Retain copyright and license notices; commercial resale is strictly prohibited.
+- **Security Declaration**: All account credentials and profiles are strictly encrypted and stored in your local operating system credential store (Windows Credential Manager / macOS Keychain) and local private directory; zero remote servers or telemetry.
+
+</details>
+
+### Disclaimer
+- Google Antigravity is a trademark of Google LLC. This project is an independent community project and is not affiliated with, endorsed by, or sponsored by Google LLC.
+- Please use this tool responsibly and in compliance with all relevant terms of service.

@@ -69,12 +69,12 @@ DOM監視のループ振動を防止し、会話インタラクションにミ�
 
 ### 開発方針とインスピレーション (Design Philosophy & Inspiration)
 
-本プロジェクトは、業界の先進的AIツールおよびオープンソースコミュニティの成果から深く学び構築されています：
+**Antigravity Enhance Tools** のアーキテクチャおよびUX設計は、徹底した軽量性、クライアントへのネイティブ統合、そして滑らかな開発体験を追求しています：
 
-1. **[lbjlaq/Antigravity-Manager](https://github.com/lbjlaq/Antigravity-Manager) の思想吸収とネイティブ内蔵化**: オープンソースプロジェクト [lbjlaq/Antigravity-Manager](https://github.com/lbjlaq/Antigravity-Manager)（Antigravity 账号管理与切换工具）のアカウント管理や枠監視の着想を深く参考にしつつ、独立した外部アプリを別途起動する煩わしさとメモリ消費を排除するため、全機能を Antigravity クライアント内部へネイティブ統合。
-2. **Codex に学ぶ直感的なインタラクション**: トークン使用量をステータスバーカプセル（5段階カード）でリアルタイム可視化し、思考スライダーで推論深度を即座に調整。
-3. **Workbuddy に学ぶモダンなUI/UX**: 洗練された丸角デザインと独自の DOM キャッシュガード（Cache Guard）により、画面のちらつきやフリーズを根絶。
-4. **オープンソースへのリスペクト**: 先駆的オープンソースプロジェクト [renkeshui/antigravity-chinese-locale](https://github.com/renkeshui/antigravity-chinese-locale) の知見を深く参考にさせていただきました。
+1. **ネイティブ統合アーキテクチャ**: 外部独立アプリ常駐の煩わしさとメモリ負荷を排除し、ステータスバーから直接アカウント切り替えと残量枠確認が可能に。常駐プロセスはゼロ。
+2. **コンテキストの透明化と思考深度制御**: トークン使用量をステータスバーカプセル（5段階カード）でリアルタイム可視化し、思考スライダーで推論深度を即座に調整。
+3. **モダンな美学とフリーズ防止**: 洗練された丸角デザインと独自の DOM キャッシュガード（Cache Guard）により、画面のちらつきやフリーズを根絶。
+4. **自然な専門用語調整**: AIプログラミングやAgent共同作業に即した自然な専門用語調整を全域で実現。
 
 > [!IMPORTANT]
 > **🛡️ アカウントセキュリティとローカルプライバシー保護宣言**
@@ -196,9 +196,25 @@ curl -fsSL https://raw.githubusercontent.com/Kutaze/Antigravity-Enhance-Pack-Too
 
 ---
 
-## 📜 ライセンスと免責事項
+## 📜 ライセンスと謝辞声明
+ 
+本プロジェクトのために知恵と情熱を注いでくださったすべての開発者に心より感謝申し上げます。
 
-- 本プロジェクトは [MIT License](LICENSE) のもとで公開されています。
-- [renkeshui/antigravity-chinese-locale](https://github.com/renkeshui/antigravity-chinese-locale) プロジェクトに心より感謝申し上げます。
-- オープンソースプロジェクト [lbjlaq/Antigravity-Manager](https://github.com/lbjlaq/Antigravity-Manager)（Antigravity 账号管理与切换工具）のアカウント枠管理およびツール統合の先駆的着想に深く感謝申し上げます。
-- Google Antigravity は Google LLC の商標です。本プロジェクトは独立したコミュニティによるオープンソースソフトウェアです。
+<details>
+<summary><b>🤝 謝辞プロジェクト (Special Thanks) - クリックして展開</b></summary>
+
+本プロジェクトの開発過程において、以下の優れたオープンソースプロジェクトの着想や設計を参考にさせていただきました（順不同）：
+
+- [lbjlaq/Antigravity-Manager](https://github.com/lbjlaq/Antigravity-Manager): プロフェッショナルな Antigravity アカウント管理・切替ツール（Antigravity Tools）。マルチアカウント枠監視と切替の着想に多大な示唆をいただきました。本プロジェクトでは外部アプリ常駐の負担をなくし、クライアント内部へネイティブ統合・軽量化を実現しています。
+- [renkeshui/antigravity-chinese-locale](https://github.com/renkeshui/antigravity-chinese-locale): Antigravity クライアント全画面多言語化の先駆的プロジェクト。辞書マッピングと用語体系の基盤として深く参考にさせていただきました。
+
+---
+
+- **著作権ライセンス**: [MIT License](LICENSE) に基づき公開。著作権表示を保持し、いかなる形式の商用転売も禁止します。
+- **セキュリティ声明**: 本アプリのすべてのアカウント情報は、ローカルOSの認証マネージャー（Windows Credential Manager / macOS Keychain）および専用フォルダに厳格に暗号化保管され、外部クラウド中継サーバーは一切介在しません。データが端末外へ送信されることはありません。
+
+</details>
+
+### 免責事項
+- Google Antigravity は Google LLC の商標です。本プロジェクトは独立したコミュニティによるオープンソースプロジェクトであり、Google LLC と提携・公認・後援の関係はありません。
+- 関連する利用規約およびライセンスを遵守した上で、自己責任でご利用ください。
