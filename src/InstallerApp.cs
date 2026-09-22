@@ -81,9 +81,25 @@ namespace AntigravityInstaller
         private TextBlock titleText;
         private Border verBadge;
         private TextBlock verBadgeText;
+        private Button btnAbout;
         private Button btnTheme;
         private Button btnMin;
         private Button btnClose;
+
+        // Footer About & Author Controls
+        private Border footerBorder;
+        private Border cardAuthor;
+        private TextBlock lblAuthorTitle;
+        private TextBlock lblAuthorVal;
+        private Border cardModel;
+        private TextBlock lblModelTitle;
+        private TextBlock lblModelVal;
+        private Border cardGithub;
+        private TextBlock lblGithubTitle;
+        private TextBlock lblGithubVal;
+        private List<Border> footerBadges = new List<Border>();
+        private List<TextBlock> footerBadgeTexts = new List<TextBlock>();
+        private TextBlock lblCopyright;
 
         private Border bannerBorder;
         private TextBlock bannerTitle;
@@ -118,7 +134,7 @@ namespace AntigravityInstaller
 
             Title = "Antigravity Enhance Tools (Antigravity 扩展增强工具)";
             Width = 750;
-            Height = 670;
+            Height = 745;
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
             WindowStyle = WindowStyle.None;
             AllowsTransparency = true;
@@ -156,7 +172,8 @@ namespace AntigravityInstaller
             var mainGrid = new Grid();
             mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(46) }); // Header
             mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) }); // Content
-            mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(64) }); // Bottom Actions
+            mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(56) }); // Bottom Actions
+            mainGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // Footer: Model, Author, GitHub & About
 
             // ================= 1. Custom Title Bar =================
             titleBar = new Grid
@@ -203,7 +220,7 @@ namespace AntigravityInstaller
             };
             verBadgeText = new TextBlock
             {
-                Text = "v0.1.4",
+                Text = "v0.1.5",
                 FontSize = 10.5,
                 FontWeight = FontWeights.Medium
             };
@@ -219,6 +236,19 @@ namespace AntigravityInstaller
                 VerticalAlignment = VerticalAlignment.Center,
                 Margin = new Thickness(0, 0, 14, 0)
             };
+
+            btnAbout = new Button
+            {
+                Content = "ℹ️ 关于",
+                Height = 28,
+                Padding = new Thickness(8, 0, 8, 0),
+                Margin = new Thickness(0, 0, 8, 0),
+                FontSize = 11,
+                Cursor = Cursors.Hand,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            btnAbout.Click += (s, e) => ShowAboutDialog();
+            titleRight.Children.Add(btnAbout);
 
             btnTheme = new Button
             {
@@ -476,6 +506,78 @@ namespace AntigravityInstaller
             Grid.SetRow(bottomGrid, 2);
             mainGrid.Children.Add(bottomGrid);
 
+            // ================= 4. Modern Footer (Model, Author, GitHub & About) =================
+            footerBorder = new Border
+            {
+                BorderThickness = new Thickness(0, 1, 0, 0),
+                Padding = new Thickness(18, 9, 18, 11),
+                Margin = new Thickness(0)
+            };
+
+            var footerStack = new StackPanel();
+
+            // 3-Card Row
+            var cardsGrid = new UniformGrid
+            {
+                Columns = 3,
+                Margin = new Thickness(0, 0, 0, 7)
+            };
+
+            // Card 1: Author
+            cardAuthor = CreateFooterCard("👤", "作者 (Author)", "Kutaze", Color.FromRgb(59, 130, 246), out lblAuthorTitle, out lblAuthorVal);
+            cardAuthor.Cursor = Cursors.Hand;
+            cardAuthor.ToolTip = "点击访问作者 GitHub 个人主页";
+            cardAuthor.MouseLeftButtonUp += (s, e) => OpenUrl("https://github.com/Kutaze");
+            cardsGrid.Children.Add(cardAuthor);
+
+            // Card 2: Software Model
+            cardModel = CreateFooterCard("🏷️", "软件型号 (Model)", "v0.1.5 Enhance Pro", Color.FromRgb(16, 185, 129), out lblModelTitle, out lblModelVal);
+            cardModel.Cursor = Cursors.Hand;
+            cardModel.ToolTip = "Antigravity 原生深度增强与多账号管理套件 (点击查看关于信息)";
+            cardModel.MouseLeftButtonUp += (s, e) => ShowAboutDialog();
+            cardsGrid.Children.Add(cardModel);
+
+            // Card 3: GitHub
+            cardGithub = CreateFooterCard("🐙", "开源地址 (GitHub)", "View Code ↗", Color.FromRgb(139, 92, 246), out lblGithubTitle, out lblGithubVal);
+            cardGithub.Cursor = Cursors.Hand;
+            cardGithub.ToolTip = "点击在浏览器中打开 GitHub 开源仓库主页";
+            cardGithub.MouseLeftButtonUp += (s, e) => OpenUrl("https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools");
+            cardsGrid.Children.Add(cardGithub);
+
+            footerStack.Children.Add(cardsGrid);
+
+            // Badges & Copyright Row
+            var metaStack = new Grid();
+            metaStack.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            metaStack.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+            var badgesRow = new StackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            badgesRow.Children.Add(CreateFooterBadge("C# 5.0 / WPF"));
+            badgesRow.Children.Add(CreateFooterBadge("Electron AST"));
+            badgesRow.Children.Add(CreateFooterBadge("100% 本地凭据安全"));
+            badgesRow.Children.Add(CreateFooterBadge("MIT License"));
+            Grid.SetColumn(badgesRow, 0);
+            metaStack.Children.Add(badgesRow);
+
+            lblCopyright = new TextBlock
+            {
+                Text = "Copyright © 2026 Antigravity Enhance Tools · Kutaze",
+                FontSize = 10,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            Grid.SetColumn(lblCopyright, 1);
+            metaStack.Children.Add(lblCopyright);
+
+            footerStack.Children.Add(metaStack);
+            footerBorder.Child = footerStack;
+
+            Grid.SetRow(footerBorder, 3);
+            mainGrid.Children.Add(footerBorder);
+
             rootBorder.Child = mainGrid;
             windowContainer.Children.Add(rootBorder);
             Content = windowContainer;
@@ -576,6 +678,54 @@ namespace AntigravityInstaller
                     Opacity = 0.28,
                     ShadowDepth = 1
                 };
+
+                // Footer & About Cards (Dark Theme)
+                if (footerBorder != null)
+                {
+                    footerBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(51, 65, 85));
+
+                    var cardBgDark = new SolidColorBrush(Color.FromRgb(30, 41, 59));
+                    var cardBorderDark = new SolidColorBrush(Color.FromRgb(51, 65, 85));
+                    var textMutedDark = new SolidColorBrush(Color.FromRgb(148, 163, 184));
+                    var textValDark = new SolidColorBrush(Color.FromRgb(248, 250, 252));
+
+                    cardAuthor.Background = cardBgDark;
+                    cardAuthor.BorderBrush = cardBorderDark;
+                    lblAuthorTitle.Foreground = textMutedDark;
+                    lblAuthorVal.Foreground = textValDark;
+
+                    cardModel.Background = cardBgDark;
+                    cardModel.BorderBrush = cardBorderDark;
+                    lblModelTitle.Foreground = textMutedDark;
+                    lblModelVal.Foreground = textValDark;
+
+                    cardGithub.Background = cardBgDark;
+                    cardGithub.BorderBrush = cardBorderDark;
+                    lblGithubTitle.Foreground = textMutedDark;
+                    lblGithubVal.Foreground = new SolidColorBrush(Color.FromRgb(96, 165, 250)); // Blue 400
+
+                    foreach (var b in footerBadges)
+                    {
+                        b.Background = new SolidColorBrush(Color.FromRgb(15, 23, 42));
+                        b.BorderBrush = new SolidColorBrush(Color.FromRgb(51, 65, 85));
+                    }
+                    foreach (var tb in footerBadgeTexts)
+                    {
+                        tb.Foreground = new SolidColorBrush(Color.FromRgb(148, 163, 184));
+                    }
+
+                    lblCopyright.Foreground = new SolidColorBrush(Color.FromRgb(100, 116, 139));
+                }
+
+                if (btnAbout != null)
+                {
+                    btnAbout.Content = "ℹ️ 关于";
+                    UpdateButtonStyle(btnAbout,
+                        new SolidColorBrush(Color.FromRgb(30, 41, 59)),
+                        new SolidColorBrush(Color.FromRgb(226, 232, 240)),
+                        new CornerRadius(6),
+                        new SolidColorBrush(Color.FromRgb(51, 65, 85)));
+                }
             }
             else
             {
@@ -668,6 +818,54 @@ namespace AntigravityInstaller
                     Opacity = 0.16,
                     ShadowDepth = 1
                 };
+
+                // Footer & About Cards (Light Theme)
+                if (footerBorder != null)
+                {
+                    footerBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(226, 232, 240));
+
+                    var cardBgLight = new SolidColorBrush(Color.FromRgb(248, 250, 252));
+                    var cardBorderLight = new SolidColorBrush(Color.FromRgb(226, 232, 240));
+                    var textMutedLight = new SolidColorBrush(Color.FromRgb(100, 116, 139));
+                    var textValLight = new SolidColorBrush(Color.FromRgb(15, 23, 42));
+
+                    cardAuthor.Background = cardBgLight;
+                    cardAuthor.BorderBrush = cardBorderLight;
+                    lblAuthorTitle.Foreground = textMutedLight;
+                    lblAuthorVal.Foreground = textValLight;
+
+                    cardModel.Background = cardBgLight;
+                    cardModel.BorderBrush = cardBorderLight;
+                    lblModelTitle.Foreground = textMutedLight;
+                    lblModelVal.Foreground = textValLight;
+
+                    cardGithub.Background = cardBgLight;
+                    cardGithub.BorderBrush = cardBorderLight;
+                    lblGithubTitle.Foreground = textMutedLight;
+                    lblGithubVal.Foreground = new SolidColorBrush(Color.FromRgb(37, 99, 235)); // Blue 600
+
+                    foreach (var b in footerBadges)
+                    {
+                        b.Background = new SolidColorBrush(Color.FromRgb(241, 245, 249));
+                        b.BorderBrush = new SolidColorBrush(Color.FromRgb(203, 213, 225));
+                    }
+                    foreach (var tb in footerBadgeTexts)
+                    {
+                        tb.Foreground = new SolidColorBrush(Color.FromRgb(100, 116, 139));
+                    }
+
+                    lblCopyright.Foreground = new SolidColorBrush(Color.FromRgb(148, 163, 184));
+                }
+
+                if (btnAbout != null)
+                {
+                    btnAbout.Content = "ℹ️ 关于";
+                    UpdateButtonStyle(btnAbout,
+                        new SolidColorBrush(Color.FromRgb(248, 250, 252)),
+                        new SolidColorBrush(Color.FromRgb(51, 65, 85)),
+                        new CornerRadius(6),
+                        new SolidColorBrush(Color.FromRgb(226, 232, 240)));
+                }
             }
 
             ValidatePath();
@@ -861,6 +1059,124 @@ namespace AntigravityInstaller
             });
 
             return b;
+        }
+
+        private Border CreateFooterCard(string icon, string title, string val, Color iconAccent, out TextBlock tbTitle, out TextBlock tbVal)
+        {
+            var b = new Border
+            {
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(10),
+                Padding = new Thickness(10, 7, 10, 7),
+                Margin = new Thickness(4, 0, 4, 0)
+            };
+
+            var g = new Grid();
+            g.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(32) });
+            g.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+            var iconBorder = new Border
+            {
+                Width = 28,
+                Height = 28,
+                CornerRadius = new CornerRadius(7),
+                Background = new SolidColorBrush(Color.FromArgb(32, iconAccent.R, iconAccent.G, iconAccent.B)),
+                BorderBrush = new SolidColorBrush(Color.FromArgb(64, iconAccent.R, iconAccent.G, iconAccent.B)),
+                BorderThickness = new Thickness(1),
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Left
+            };
+            var tbIcon = new TextBlock
+            {
+                Text = icon,
+                FontSize = 13.5,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                FontFamily = new FontFamily("Segoe UI Emoji, Segoe UI")
+            };
+            iconBorder.Child = tbIcon;
+            Grid.SetColumn(iconBorder, 0);
+            g.Children.Add(iconBorder);
+
+            var s = new StackPanel
+            {
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(4, 0, 0, 0)
+            };
+            tbTitle = new TextBlock
+            {
+                Text = title,
+                FontSize = 10.5,
+                Margin = new Thickness(0, 0, 0, 1)
+            };
+            tbVal = new TextBlock
+            {
+                Text = val,
+                FontSize = 12,
+                FontWeight = FontWeights.SemiBold
+            };
+            s.Children.Add(tbTitle);
+            s.Children.Add(tbVal);
+            Grid.SetColumn(s, 1);
+            g.Children.Add(s);
+
+            b.Child = g;
+
+            b.MouseEnter += (s1, e1) => { b.Opacity = 0.85; };
+            b.MouseLeave += (s1, e1) => { b.Opacity = 1.0; };
+
+            return b;
+        }
+
+        private Border CreateFooterBadge(string text)
+        {
+            var b = new Border
+            {
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(4),
+                Padding = new Thickness(5, 1.5, 5, 1.5),
+                Margin = new Thickness(0, 0, 6, 0)
+            };
+            var tb = new TextBlock
+            {
+                Text = text,
+                FontSize = 9.5,
+                FontWeight = FontWeights.Medium
+            };
+            b.Child = tb;
+            footerBadges.Add(b);
+            footerBadgeTexts.Add(tb);
+            return b;
+        }
+
+        private void OpenUrl(string url)
+        {
+            try
+            {
+                Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("无法打开链接: " + ex.Message, "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
+        private void ShowAboutDialog()
+        {
+            MessageBox.Show(
+                "Antigravity Enhance Tools (Antigravity 扩展增强工具)\n\n" +
+                "软件型号：v0.1.5 Enhance Pro (全原生 AST 响应式注入)\n" +
+                "作者：Kutaze\n" +
+                "开源项目主页：https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools\n\n" +
+                "核心能力：\n" +
+                "• 全界面母语级原生深度汉化与防卡死守卫\n" +
+                "• 多账号无缝秒切与配额监控 (100% 本地凭据库存储，绝无云端中转)\n" +
+                "• 真实上下文 Token 动态遥测与 5 段式占比面板\n" +
+                "• 4 挡思考深度滑动调节与原生截图集成\n\n" +
+                "Copyright © 2025-2026 Antigravity Enhance Tools · Kutaze",
+                "关于软件 - Antigravity Enhance Tools",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
         }
 
         private Button CreateWindowButton(string text, RoutedEventHandler onClick, bool isClose = false)
@@ -1440,7 +1756,11 @@ namespace AntigravityInstaller
                 lblPathStatus.Foreground = new SolidColorBrush(Color.FromRgb(16, 185, 129));
                 txtLog.Text = "[13:40:00] 自动检测到 Antigravity 安装目录: C:\\Users\\Lynan\\AppData\\Local\\Programs\\antigravity\r\n[13:40:01] 核心文件校验通过 (resources\\app.asar, 版本: 1.109.0)\r\n[13:40:01] 就绪状态：可点击下方按钮一键安装增强补丁或还原官方原版。";
 
-                string assetsDir = @"D:\desk\Antigravity-Enhance-Pack\assets";
+                string assetsDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "assets");
+                if (!Directory.Exists(assetsDir))
+                {
+                    assetsDir = @"D:\desk\Antigravity\Antigravity-Enhance-Pack\assets";
+                }
                 string brainDir = @"C:\Users\Lynan\.gemini\antigravity\brain\52cfb1d6-5446-4024-b205-602befeaea39";
 
                 // 1. Light theme
@@ -1472,7 +1792,7 @@ namespace AntigravityInstaller
         public static void SaveVisualAsPng(FrameworkElement visual, string outputPath)
         {
             int w = 750;
-            int h = 670;
+            int h = 745;
             visual.Measure(new Size(w, h));
             visual.Arrange(new Rect(0, 0, w, h));
             visual.UpdateLayout();

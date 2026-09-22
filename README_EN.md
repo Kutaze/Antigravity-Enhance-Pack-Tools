@@ -79,22 +79,40 @@ Throughout the architectural conception and UX design of **Antigravity Enhance T
 
 ## ✨ Features
 
-### Native Full UI Localization
+### Native Full UI Localization & Real-time Context Telemetry
 - **100% Coverage**: Complete translation of menu bars, workspace views, sidebar panels, input fields, and dialogs.
 - **Developer-Calibrated Terminology**: Carefully tuned for LLMs, agentic workflows, and pair programming.
+- **Status Bar Dynamic Capsule**: Displays exact consumed tokens and percentage (e.g. `6.4K / 250K (2.6%)`).
+- **5-Tier Breakdown Card**: Expands on hover to show Cached Context, Prompt Input, Thinking Tokens, Generated Output, and Remaining Tokens.
 
-### Dynamic Multi-Account Switcher
+| Localized UI · Real-time Context Breakdown Card · Quota Telemetry |
+| :---: |
+| <img src="assets/verified_anti_freeze_live.png" width="750" /> |
+
+### Dynamic Multi-Account Switcher (Privacy Masked)
 - **Native Embedded Experience**: Eliminates the need for bloated standalone external tools by seamlessly embedding multi-account management directly into Antigravity's status bar.
 - **Unlimited Dynamic Profiles**: Fully dynamic architecture supporting unlimited Google accounts (PRO / ULTRA / FREE) with instant search and filter tabs.
 - **Instant Hot-Swapping**: One-click profile switching with automatic Access Token refresh and OS credential manager synchronization.
 - **Unified Avatar Interaction**: Click the bottom-bar avatar or display name to summon the management modal; includes double-confirmation logout with clean credential removal.
 
-### Real-time Context Telemetry
-- **Status Bar Dynamic Capsule**: Displays exact consumed tokens and percentage (e.g. `6.4K / 250K (2.6%)`).
-- **5-Tier Breakdown Card**: Expands on hover to show Cached Context, Prompt Input, Thinking Tokens, Generated Output, and Remaining Tokens.
+| Multi-Account Quota & Switcher Modal | Integrated Profile Capsule & Dynamic Tooltip |
+| :---: | :---: |
+| <img src="assets/verified_account_switcher_live.png" width="450" /> | <img src="assets/verified_bottom_profile_tooltip_live.png" width="450" /> |
 
 ### 4-Level Thinking Slider
-- **Embedded in Model Selector**: Seamlessly slide between `Off`, `Low`, `Medium`, and `High` reasoning modes.
+- **Embedded in Model Selector**: Seamlessly slide between `Off`, `Low`, `Medium`, and `High` reasoning modes with smooth gradient glowing effects.
+
+| Model Selector 4-Level Dynamic Thinking Slider |
+| :---: |
+| <img src="assets/verified_model_slider_live.png" width="750" /> |
+
+### Modern Dual-Theme GUI Installer
+- **Single Portable Executable**: Standalone C# / WPF app without external runtimes, supporting instant Light / Dark mode switching.
+- **Integrated Brand & Open Source Footer**: Built-in interactive cards displaying author info (`Kutaze`), software model (`v0.1.5 Enhance Pro`), and one-click GitHub navigation (`View Code ↗`).
+
+| Modern Light Mode | Dark Obsidian Mode |
+| :---: | :---: |
+| <img src="assets/gui_installer_light_preview.png" width="450" /> | <img src="assets/gui_installer_dark_preview.png" width="450" /> |
 
 ### Visual Skills Hub
 - **Dedicated Toolbar Trigger**: Direct access button on the chat input bar opening a modern, theme-adaptive skills selector.
