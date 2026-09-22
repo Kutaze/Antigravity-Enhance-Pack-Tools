@@ -52,9 +52,16 @@ Eliminates DOM oscillation loops, delivering sub-millisecond response to convers
 ### 3. Native Multi-Account Switcher & Bottom Bar Integration
 Seamless account switching, dynamic profile pool, quota telemetry, and integrated status bar profile pill:
 
-| Multi-Account Quota & Switcher Modal | Integrated Profile Capsule & Dynamic Tooltip |
+| Multi-Account Quota & Switcher Modal (Privacy Masked) | Integrated Profile Capsule & Dynamic Tooltip |
 | :---: | :---: |
 | <img src="assets/verified_account_switcher_live.png" width="450" /> | <img src="assets/verified_bottom_profile_tooltip_live.png" width="450" /> |
+
+### 4. Visual Skills Hub Showcase
+Direct access button on the chat input bar opening a modern, theme-adaptive skills selector:
+
+| Visual Skills Hub (42+ Built-in & Ecosystem Development Skills) |
+| :---: |
+| <img src="assets/verified_skills_hub_live.png" width="750" /> |
 
 ---
 
@@ -116,9 +123,13 @@ Throughout the architectural conception and UX design of **Antigravity Enhance T
 
 ### Visual Skills Hub
 - **Dedicated Toolbar Trigger**: Direct access button on the chat input bar opening a modern, theme-adaptive skills selector.
-- **35+ Built-in & Ecosystem Skills**: Categorized into Architecture & Engineering, Design & UI, Review & Diagnosis, Documents, and Gemini Ecosystem, with instant fuzzy search.
+- **42+ Built-in & Ecosystem Skills**: Categorized into Architecture & Engineering, Design & UI, Review & Diagnosis, Documents, and Gemini Ecosystem, with instant fuzzy search.
 - **One-Click Invocation**: Click any skill card to insert `$skill-name` into the chat box with automatic cursor focus.
 - **Dynamic Skill Discovery**: Detects custom user skills from workspace and global directories.
+
+| Visual Skills Hub (42+ Built-in & Ecosystem Development Skills) |
+| :---: |
+| <img src="assets/verified_skills_hub_live.png" width="750" /> |
 
 ### Native Screenshot Integration
 - **"+" Context Menu Access**: Built-in screenshot item directly inside the "+" context menu (`Win+Shift+S`).
