@@ -69,7 +69,7 @@
 ### 3. 多账号原生管理与底栏一体化交互
 深度集成无限动态账号池，点击底栏头像一键秒切，支持独立配额监控与高质感悬浮提示：
 
-| 多账号额度管理与快捷切换面板 (隐私打码保护) | 底栏头像一体化无缝秒切入口与悬浮窗 |
+| 多账号额度管理与快捷切换面板 | 底栏头像一体化无缝秒切入口与悬浮窗 |
 | :---: | :---: |
 | <img src="assets/verified_account_switcher_live.png" width="450" /> | <img src="assets/verified_bottom_profile_tooltip_live.png" width="450" /> |
 
@@ -149,7 +149,7 @@
 - **一键极速秒切**：点击即切，自动同步刷新 Access Token 并写入系统凭据库，彻底避免跨账号凭证串号或会话混乱。
 - **头像一体化快捷交互**：底栏用户头像与切换按钮双向融合，点击头像或昵称即可直接呼出账号管理面板；支持退出登录二次确认与本地凭据深度注销。
 
-| 多账号额度管理与快捷切换面板 (隐私打码保护) | 底栏头像一体化无缝秒切入口与悬浮窗 |
+| 多账号额度管理与快捷切换面板 | 底栏头像一体化无缝秒切入口与悬浮窗 |
 | :---: | :---: |
 | <img src="assets/verified_account_switcher_live.png" width="450" /> | <img src="assets/verified_bottom_profile_tooltip_live.png" width="450" /> |
 

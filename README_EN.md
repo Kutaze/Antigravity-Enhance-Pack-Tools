@@ -62,7 +62,7 @@ Eliminates DOM oscillation loops, delivering sub-millisecond response to convers
 ### 3. Native Multi-Account Switcher & Bottom Bar Integration
 Seamless account switching, dynamic profile pool, quota telemetry, and integrated status bar profile pill:
 
-| Multi-Account Quota & Switcher Modal (Privacy Masked) | Integrated Profile Capsule & Dynamic Tooltip |
+| Multi-Account Quota & Switcher Modal | Integrated Profile Capsule & Dynamic Tooltip |
 | :---: | :---: |
 | <img src="assets/verified_account_switcher_live.png" width="450" /> | <img src="assets/verified_bottom_profile_tooltip_live.png" width="450" /> |
 
@@ -113,7 +113,7 @@ Throughout the architectural conception and UX design of **Antigravity Enhance T
 | :---: |
 | <img src="assets/verified_anti_freeze_live.png" width="750" /> |
 
-### Dynamic Multi-Account Switcher (Privacy Masked)
+### Dynamic Multi-Account Switcher
 - **Native Embedded Experience**: Eliminates the need for bloated standalone external tools by seamlessly embedding multi-account management directly into Antigravity's status bar.
 - **Unlimited Dynamic Profiles**: Fully dynamic architecture supporting unlimited Google accounts (PRO / ULTRA / FREE) with instant search and filter tabs.
 - **Instant Hot-Swapping**: One-click profile switching with automatic Access Token refresh and OS credential manager synchronization.
