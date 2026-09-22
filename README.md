@@ -64,7 +64,7 @@
 
 在软件架构构思与交互体系设计的全过程中，**Antigravity Enhance Tools** 深入借鉴了业内标杆工具与开源社区的实践经验：
 
-1. **汲取 Antigravity tools 思路并实现内嵌轻量化**：参考了开源社区 Antigravity tools 项目关于账号配额与多工具管理的方向；但因深感独立外部程序单独打开过于臃肿繁琐，本项目选择将其核心能力以零额外进程、极轻量化的方式直接深度集成进 Antigravity 客户端内部，实现原生内嵌式丝滑体验。
+1. **汲取 [lbjlaq/Antigravity-Manager](https://github.com/lbjlaq/Antigravity-Manager) 思路并实现内嵌轻量化**：深度参考了开源项目 [lbjlaq/Antigravity-Manager](https://github.com/lbjlaq/Antigravity-Manager)（Antigravity 账号管理与切换工具）在多账号管理、配额监控与一键切换方面的产品思路与优秀实践；但考虑到独立外部桌面软件需要单独打开且常驻切换较为繁琐臃肿，本项目选择将其核心能力以零额外进程、极轻量化的方式直接**原生深度集成进 Antigravity 客户端内部**，打造浑然一体的原生内嵌式无缝秒切体验。
 2. **学习 Codex 的深度交互逻辑**：引入上下文预算透明化理念（五段式用量遥测面板）与即时思考深度调控（4 挡思考滑块），消除长程对话焦虑。
 3. **学习 Workbuddy 的界面交互美学**：吸收圆角卡片、柔和微光渐变与现代排版，并设计独创「DOM 缓存守卫（Cache Guard）」，兼具现代视觉与零震荡高流畅度。
 4. **致敬开源项目 renkeshui/antigravity-chinese-locale 的汉化实践**：充分参考其本地化词条全景映射与术语校准沉淀，并升级运行时防卡死机制，带来母语级编程体验。
@@ -413,7 +413,7 @@ window.__AGY_APPLY_THINKING_LEVEL__('high');
 
 ### 致谢与开源参考
 - 特别鸣谢开源项目 [renkeshui/antigravity-chinese-locale](https://github.com/renkeshui/antigravity-chinese-locale) 在 Antigravity 客户端汉化探索上的宝贵先驱实践，本项目汉化模块的设计与词条体系深受其启发。
-- 特别鸣谢开源社区项目 Antigravity tools 在账号配额与工具集成思路上的探索，本项目吸收其方向并深度内嵌至客户端，避免了外部独立程序的臃肿与多开负担。
+- 特别鸣谢开源项目 [lbjlaq/Antigravity-Manager](https://github.com/lbjlaq/Antigravity-Manager)（专业的 Antigravity 账号管理与切换工具）在多账号管理与一键切换思路上的先驱探索与产品启发，本项目吸收其精髓并进一步实现了客户端原生内嵌集成。
 
 ### 免责声明
 - Google Antigravity 是 Google LLC 的商标。本项目为独立开源社区作品，与 Google LLC 及其关联实体不存在任何隶属、认可、赞助或官方合作关系。

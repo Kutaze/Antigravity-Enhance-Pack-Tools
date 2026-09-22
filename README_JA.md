@@ -57,7 +57,7 @@ DOM監視のループ振動を防止し、会話インタラクションにミ�
 
 本プロジェクトは、業界の先進的AIツールおよびオープンソースコミュニティの成果から深く学び構築されています：
 
-1. **Antigravity tools の思想吸収とネイティブ内蔵化**: アカウント使用量枠や多機能管理の方向性を参考にしつつ、独立した外部アプリを別途起動する煩わしさとメモリ消費を排除するため、全機能を Antigravity クライアント内部へネイティブ統合。
+1. **[lbjlaq/Antigravity-Manager](https://github.com/lbjlaq/Antigravity-Manager) の思想吸収とネイティブ内蔵化**: オープンソースプロジェクト [lbjlaq/Antigravity-Manager](https://github.com/lbjlaq/Antigravity-Manager)（Antigravity 账号管理与切换工具）のアカウント管理や枠監視の着想を深く参考にしつつ、独立した外部アプリを別途起動する煩わしさとメモリ消費を排除するため、全機能を Antigravity クライアント内部へネイティブ統合。
 2. **Codex に学ぶ直感的なインタラクション**: トークン使用量をステータスバーカプセル（5段階カード）でリアルタイム可視化し、思考スライダーで推論深度を即座に調整。
 3. **Workbuddy に学ぶモダンなUI/UX**: 洗練された丸角デザインと独自の DOM キャッシュガード（Cache Guard）により、画面のちらつきやフリーズを根絶。
 4. **オープンソースへのリスペクト**: 先駆的オープンソースプロジェクト [renkeshui/antigravity-chinese-locale](https://github.com/renkeshui/antigravity-chinese-locale) の知見を深く参考にさせていただきました。
@@ -157,5 +157,5 @@ curl -fsSL https://raw.githubusercontent.com/Kutaze/Antigravity-Enhance-Pack-Too
 
 - 本プロジェクトは [MIT License](LICENSE) のもとで公開されています。
 - [renkeshui/antigravity-chinese-locale](https://github.com/renkeshui/antigravity-chinese-locale) プロジェクトに心より感謝申し上げます。
-- コミュニティプロジェクト Antigravity tools のアカウント枠管理およびツール統合の着想に深く感謝申し上げます。
+- オープンソースプロジェクト [lbjlaq/Antigravity-Manager](https://github.com/lbjlaq/Antigravity-Manager)（Antigravity 账号管理与切换工具）のアカウント枠管理およびツール統合の先駆的着想に深く感謝申し上げます。
 - Google Antigravity は Google LLC の商標です。本プロジェクトは独立したコミュニティによるオープンソースソフトウェアです。

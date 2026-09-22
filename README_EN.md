@@ -57,7 +57,7 @@ Eliminates DOM oscillation loops, delivering sub-millisecond response to convers
 
 Throughout the architectural conception and UX design of **Antigravity Enhance Tools**, the project has deeply integrated best practices from leading tools and open source projects:
 
-1. **Antigravity Tools Concept Integration**: Inspired by the community's Antigravity tools project for account quota tracking and utility management; but instead of running a separate bloated standalone window, this project natively embeds all core multi-account management directly into Antigravity with zero overhead.
+1. **[lbjlaq/Antigravity-Manager](https://github.com/lbjlaq/Antigravity-Manager) Concept Integration**: Inspired by the excellent open-source project [lbjlaq/Antigravity-Manager](https://github.com/lbjlaq/Antigravity-Manager) (Antigravity Account Manager & Switcher) for account management and quota tracking; but instead of running a separate bloated standalone desktop application, this project natively embeds all core multi-account management directly into Antigravity with zero extra background processes.
 2. **Codex-Inspired Interaction**: Transparent token consumption telemetry pill (5-tier breakdown card) and seamless thinking depth slider (4-tier control) eliminating context anxiety.
 3. **Workbuddy-Inspired UI/UX**: Minimalist aesthetic with rounded cards and subtle glow, paired with a proprietary DOM Cache Guard ensuring zero-jank fluid interaction.
 4. **Open Source Localization Reference**: Deeply inspired by [renkeshui/antigravity-chinese-locale](https://github.com/renkeshui/antigravity-chinese-locale) for its comprehensive terminology mapping and localization structure.
@@ -158,5 +158,5 @@ curl -fsSL https://raw.githubusercontent.com/Kutaze/Antigravity-Enhance-Pack-Too
 
 - Licensed under the [MIT License](LICENSE).
 - Special thanks to [renkeshui/antigravity-chinese-locale](https://github.com/renkeshui/antigravity-chinese-locale) for pioneering localization work on Antigravity.
-- Special thanks to community project Antigravity tools for quota tracking and account management ideas, which inspired our native embedded design.
+- Special thanks to [lbjlaq/Antigravity-Manager](https://github.com/lbjlaq/Antigravity-Manager) (Professional Antigravity Account Manager & Switcher) for pioneering multi-account management and inspiring our native embedded design.
 - Google Antigravity is a trademark of Google LLC. This project is an independent community project.
