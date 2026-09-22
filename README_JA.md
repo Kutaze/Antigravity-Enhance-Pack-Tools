@@ -142,6 +142,11 @@ curl -fsSL https://raw.githubusercontent.com/Kutaze/Antigravity-Enhance-Pack-Too
 - **インストーラー・配布パッケージ**:
   - `Antigravity Enhance Tools.exe` を v0.1.5 へ刷新し、配布用アーカイブ（`.zip` / `.tar.gz`）を最新化。
 
+👉 **[詳細な更新履歴 CHANGELOG.md を見る →](CHANGELOG.md)**
+
+<details>
+<summary><b>📜 過去バージョンの更新履歴を展開 (v0.1.0 〜 v0.1.4)</b></summary>
+
 ### [v0.1.4] - 2026-09-21
 - **スキルハブ（Skills Hub）の刷新**：3列レスポンシブグリッドレイアウトへの全面改修、ダーク・ライト両テーマにおける高コントラストなテキスト表示、新規チャット自動遷移呼び出し、仕様フォルダ展開機能。
 - **起動時ズーム異常の安全ガード**：破損したChromiumキャッシュを自動クリアし、異常なUI拡大を防止するガードを実装。グローバルズームショートカット（`Ctrl+0` / `Ctrl+=` / `Ctrl+-`）とリアルタイムトースト通知を追加。
@@ -150,6 +155,8 @@ curl -fsSL https://raw.githubusercontent.com/Kutaze/Antigravity-Enhance-Pack-Too
 - macOS（Apple Silicon M1〜M4 および Intel）と各主要 Linux ディストリビューションに対応。
 - 独立 Node.js が未検出の場合、クライアント内蔵 Electron 実行環境を自動活用するインテリジェント機構を実装。
 - 多言語ドキュメント（簡体字中国語・英語・日本語）の追加とナビゲーションの最適化。
+
+</details>
 
 ---
 

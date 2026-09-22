@@ -143,6 +143,11 @@ curl -fsSL https://raw.githubusercontent.com/Kutaze/Antigravity-Enhance-Pack-Too
 - **Packaging & Tooling**:
   - Upgraded standalone installer `Antigravity Enhance Tools.exe` to v0.1.5 and refreshed both offline archives (`.zip` and `.tar.gz`).
 
+👉 **[View Full Changelog CHANGELOG.md →](CHANGELOG.md)**
+
+<details>
+<summary><b>📜 Expand Historical Releases (v0.1.0 ~ v0.1.4)</b></summary>
+
 ### [v0.1.4] - 2026-09-21
 - **Skills Hub Overhaul**: Upgraded to 3-column responsive grid layout, high-contrast dark typography for both themes, auto new-chat invocation, and directory reveal.
 - **Startup Zoom Safety Guard**: Cleared corrupted Chromium zoom caches and implemented strict bounds clamping against abnormal UI magnifications; added global zoom hotkeys (`Ctrl+0` / `Ctrl+=` / `Ctrl+-`) with visual toast feedback.
@@ -151,6 +156,8 @@ curl -fsSL https://raw.githubusercontent.com/Kutaze/Antigravity-Enhance-Pack-Too
 - Added full macOS (Apple Silicon M1-M4 & Intel) and Linux support with automated bash scripts.
 - Runtime auto-probe reuses client built-in Electron runtime if system Node is absent.
 - Standardized single-emoji title styling and multilingual documentation.
+
+</details>
 
 ---
 

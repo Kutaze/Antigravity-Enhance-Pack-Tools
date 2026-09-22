@@ -355,6 +355,11 @@ window.__AGY_APPLY_THINKING_LEVEL__('high');
   - `Antigravity Enhance Tools.exe` 升级至 v0.1.5，体积流线化优化，启动探测与注入速度显著提高；
   - 同步更新生成 `Antigravity-Enhance-Pack.zip` 与 `Antigravity-Enhance-Pack.tar.gz` 双端完整离线包。
 
+👉 **[查看完整更新日志 CHANGELOG.md →](CHANGELOG.md)**
+
+<details>
+<summary><b>📜 展开查看历史版本更新记录 (v0.1.0 ~ v0.1.4)</b></summary>
+
 ### [v0.1.4] - 2026-09-21
 - **技能中心 (Skills Hub) 体验全面升级**：
   - 排版重构为更整齐舒适的 3 列响应式网格布局，卡片层次分明；
@@ -398,6 +403,8 @@ window.__AGY_APPLY_THINKING_LEVEL__('high');
   - 实现了 Antigravity 官方桌面客户端的全界面原生深度汉化；
   - 实现了基于 C# WPF 的独立安装引导程序；
   - 支持原生 asar 解包、语法树分析、注入与无损还原。
+
+</details>
 
 ---
 
