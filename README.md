@@ -510,10 +510,10 @@ window.__AGY_APPLY_THINKING_LEVEL__('high');
       <sub><a href="https://afdian.com/a/Kutaze">https://afdian.com/a/Kutaze</a></sub>
       <br /><br />
       <div align="left" style="display: inline-block; font-size: 13px; line-height: 1.6; color: #64748b;">
-        ☕ <b>¥5/月</b> · 请作者喝杯咖啡 (Sponsors 鸣谢)<br />
-        ⚡ <b>¥15/月</b> · 极客能量包 (Discord 专属彩色身份组)<br />
-        🚀 <b>¥30/月</b> · 深度共创官 (需求优先评估排期)<br />
-        👑 <b>¥99/月</b> · 荣誉守护者 (首页大徽章+1V1专属支持)
+        ☕ <b>¥6.66/月</b> · 请作者喝杯咖啡 (Sponsors 鸣谢)<br />
+        ⚡ <b>¥12/月</b> · 极客能量包 (Discord 专属彩色身份组)<br />
+        🚀 <b>¥29.9/月</b> · 深度共创官 (需求优先评估排期)<br />
+        👑 <b>¥99.9/月</b> · 荣誉守护者 (首页大徽章+1V1专属支持)
       </div>
       <br /><br />
     </td>

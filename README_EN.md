@@ -267,10 +267,10 @@ Continuous reverse engineering, AST patching, performance tuning, and cross-plat
       <sub><a href="https://afdian.com/a/Kutaze">https://afdian.com/a/Kutaze</a></sub>
       <br /><br />
       <div align="left" style="display: inline-block; font-size: 13px; line-height: 1.6; color: #64748b;">
-        ☕ <b>¥5/mo</b> · Coffee Support (Sponsors Wall)<br />
-        ⚡ <b>¥15/mo</b> · Geek Energy (Discord Sponsor Role)<br />
-        🚀 <b>¥30/mo</b> · Co-Creator (Priority Feature Requests)<br />
-        👑 <b>¥99/mo</b> · Honor Guardian (Top Badge + 1v1 Support)
+        ☕ <b>¥6.66/mo</b> · Coffee Support (Sponsors Wall)<br />
+        ⚡ <b>¥12/mo</b> · Geek Energy (Discord Sponsor Role)<br />
+        🚀 <b>¥29.9/mo</b> · Co-Creator (Priority Feature Requests)<br />
+        👑 <b>¥99.9/mo</b> · Honor Guardian (Top Badge + 1v1 Support)
       </div>
       <br /><br />
     </td>
