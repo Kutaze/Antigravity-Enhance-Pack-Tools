@@ -1060,8 +1060,8 @@
       <ul class="nav-links">
         <li><a href="#why">为什么选它</a></li>
         <li><a href="#features">功能矩阵</a></li>
-        <li><a href="#multi-account">多账号管理</a></li>
-        <li><a href="#thinking-token">思考与遥测</a></li>
+        <li><a href="#multi-account">多账号切换</a></li>
+        <li><a href="#ui-interaction">UI美化与交互</a></li>
         <li><a href="#skills">技能中心</a></li>
         <li><a href="#author">关于作者</a></li>
       </ul>
@@ -1136,12 +1136,12 @@
           <div class="metric-label">全场景原生深度汉化</div>
         </div>
         <div class="metric-card">
-          <div class="metric-num">∞</div >
-          <div class="metric-label">无上限动态账号池</div>
+          <div class="metric-num">多账号</div>
+          <div class="metric-label">支持多账号功能切换<br>实时显示账户额度</div>
         </div>
         <div class="metric-card">
-          <div class="metric-num">4 挡</div>
-          <div class="metric-label">思考预算微调滑块</div>
+          <div class="metric-num">UI美化</div>
+          <div class="metric-label">界面UI美化与交互增强<br>模型切换更加便捷顺手</div>
         </div>
         <div class="metric-card">
           <div class="metric-num">0 依赖</div>
@@ -1192,22 +1192,22 @@
         <!-- Card 2 -->
         <div class="why-card">
           <div class="why-card-icon">👥</div>
-          <div class="why-pain">❌ 原版痛点：单账号限制，配额用尽需登出重登，频繁跨工具切换臃肿</div>
-          <div class="why-solution">✅ 我们的方案：底栏原生一体化无上限账号池 + 云端真实配额自动同步</div>
-          <h3 class="why-card-title">多账号原生切换与额度雷达</h3>
+          <div class="why-pain">❌ 原版痛点：单账号限制，配额用尽需手动登出，无法直观掌握余量</div>
+          <div class="why-solution">✅ 我们的方案：支持多账号功能切换，实时显示账户额度与倒计时</div>
+          <h3 class="why-card-title">多账号功能切换与实时额度显示</h3>
           <p class="why-card-text">
-            直接在底栏头像处呼出管理弹窗，支持无限添加 PRO/ULTRA 账号。打开面板即可毫秒级向 Google 官方端点并发同步剩余配额与重置倒计时，JWT 签名物理防串号。
+            直接在底栏头像呼出切换面板，支持多账号无缝快速切换，并自动向 Google 官方端点并发同步最新剩余额度与重置倒计时，换号前余量一目了然。
           </p>
         </div>
 
         <!-- Card 3 -->
         <div class="why-card">
-          <div class="why-card-icon">🧠</div>
-          <div class="why-pain">❌ 原版痛点：思考模型预算无法调节，小任务过度消耗，长任务思考不足</div>
-          <div class="why-solution">✅ 我们的方案：模型菜单内嵌「思考能力 4 挡调节滑块」</div>
-          <h3 class="why-card-title">Thinking 预算按需灵活掌控</h3>
+          <div class="why-card-icon">🎨</div>
+          <div class="why-pain">❌ 原版痛点：原生界面布局分散，模型切换步骤多，交互体验不够顺手</div>
+          <div class="why-solution">✅ 我们的方案：全界面 UI 精致美化，快捷模型切换与悬浮面板一体化</div>
+          <h3 class="why-card-title">界面 UI 美化与便捷交互体验</h3>
           <p class="why-card-text">
-            提供「关闭 / 低 / 中 / 高」四挡顺滑滑动条，根据任务难度灵活调节思考深度，极大节省关键配额，最高挡尊享动态光效。
+            做这个套件的核心初衷就是为了让日常交互更方便。重新美化客户端视觉与排版，将模型快速切换与优雅状态感知原生嵌合，让高频操作更加自然顺手。
           </p>
         </div>
 
@@ -1243,34 +1243,35 @@
         </div>
         <div class="feature-content">
           <span class="feature-badge-mini badge-purple">v0.1.5 重磅架构</span>
-          <h3>多账号原生动态管理体系</h3>
+          <h3>支持多账号功能切换与实时配额同步</h3>
           <p>
             告别外部独立工具的繁琐调用，底栏头像与切换功能彻底合二为一。微光深色毛玻璃悬浮窗让当前状态一目了然。
           </p>
           <ul class="feature-bullets">
-            <li><span class="check">✔</span> <strong>无上限账号池</strong>：支持任意数量 Google 账号，标签筛选与即时搜索；</li>
-            <li><span class="check">✔</span> <strong>云端实时配额同步</strong>：自动向 Google 端点并发同步配额与重置时间，到期自动恢复为 100%；</li>
+            <li><span class="check">✔</span> <strong>快捷多账号功能切换</strong>：点击底栏头像一键快速切换不同账号，支持即时搜索与分组标签；</li>
+            <li><span class="check">✔</span> <strong>实时显示账户额度</strong>：自动向 Google 端点并发同步最新配额与重置时间，到期自动恢复为 100%；</li>
             <li><span class="check">✔</span> <strong>本地物理防污染隔离</strong>：每组凭证在本地安全目录物理隔离，彻底杜绝串号；</li>
             <li><span class="check">✔</span> <strong>深度注销二次确认</strong>：一键擦除 Windows Credential / Keychain 凭据。</li>
           </ul>
         </div>
       </div>
 
-      <!-- Feature 2: Thinking Slider & Token Telemetry -->
-      <div class="feature-showcase-row reverse" id="thinking-token">
+      <!-- Feature 2: UI Beautification & Interaction Upgrade -->
+      <div class="feature-showcase-row reverse" id="ui-interaction">
         <div class="feature-media">
-          <img src="../assets/verified_model_slider_live.png" alt="思考滑块与用量遥测">
+          <img src="../assets/verified_model_slider_live.png" alt="界面UI美化与模型切换">
         </div>
         <div class="feature-content">
-          <span class="feature-badge-mini badge-cyan">核心交互革新</span>
-          <h3>思考深度调控 & 上下文动态遥测</h3>
+          <span class="feature-badge-mini badge-cyan">交互体验升级</span>
+          <h3>界面 UI 全面美化 & 便捷交互设计</h3>
           <p>
-            将原本隐藏的高级推理参数原生嵌入模型选择菜单，搭配底栏动态彩色胶囊，打造最清晰直观的 AI 协作掌控感。
+            做这个项目的主要初衷就是为了让日常交互更方便！深度重塑客户端视觉质感，将模型快捷切换与优雅状态感知原生嵌合，让高频操作更加自然顺畅。
           </p>
           <ul class="feature-bullets">
-            <li><span class="check">✔</span> <strong>思考滑块 4 挡调节</strong>：自由拉拽控制模型 Reasoning 深度，节省宝贵额度；</li>
-            <li><span class="check">✔</span> <strong>五段真实 Token 遥测</strong>：已缓存 / 输入 / 思考 / 生成 / 剩余额度；</li>
-            <li><span class="check">✔</span> <strong>独创 DOM 缓存守卫</strong>：指纹校验杜绝单页应用死循环假死与闪退。</li>
+            <li><span class="check">✔</span> <strong>界面 UI 视觉深度美化</strong>：微光圆角卡片、高质感毛玻璃悬浮面板与 ClearType 高清抗锯齿排版；</li>
+            <li><span class="check">✔</span> <strong>模型快捷切换一步直达</strong>：原生菜单无缝嵌入模型切换与调节交互，视觉清晰不挡视线；</li>
+            <li><span class="check">✔</span> <strong>实时状态动态感知</strong>：底栏彩色胶囊毫秒级遥测上下文，操作反馈更即时；</li>
+            <li><span class="check">✔</span> <strong>独创 DOM 缓存守卫</strong>：指纹校验彻底杜绝单页应用死循环卡死与假死。</li>
           </ul>
         </div>
       </div>
