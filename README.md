@@ -10,6 +10,7 @@
 <p align="center">
   <a href="https://antigravity-enhance-tools.github.io/"><img src="https://img.shields.io/badge/Website-Live-0284c7?style=flat-square&logo=google-chrome&logoColor=white" alt="Website" /></a>
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases"><img src="https://img.shields.io/badge/Release-v0.1.5-6366f1?style=flat-square" alt="Release" /></a>
+  <a href="https://afdian.com/a/Kutaze"><img src="https://img.shields.io/badge/Afdian-爱发电赞助-946ce6?style=flat-square&logo=kofi&logoColor=white" alt="Afdian" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-10b981?style=flat-square" alt="License" /></a>
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools"><img src="https://img.shields.io/badge/Platform-Windows_%7C_macOS_%7C_Linux-0284c7?style=flat-square" alt="Platform" /></a>
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools"><img src="https://img.shields.io/badge/UI-Dual_Theme_GUI-8b5cf6?style=flat-square" alt="UI" /></a>
@@ -23,6 +24,10 @@
   &nbsp;&nbsp;
   <a href="https://antigravity-enhance-tools.github.io/" target="_blank" rel="noopener noreferrer">
     <img src="assets/website_button.svg" alt="访问官方产品首页" height="38" />
+  </a>
+  &nbsp;&nbsp;
+  <a href="https://afdian.com/a/Kutaze" target="_blank" rel="noopener noreferrer">
+    <img src="assets/afdian_button.svg" alt="在爱发电上赞助支持" height="38" />
   </a>
 </p>
 
@@ -39,6 +44,7 @@
   <a href="#-工作流程">工作流程</a> • 
   <a href="#-api-参考">API 参考</a> • 
   <a href="#-更新日志">更新日志</a> • 
+  <a href="#-赞赏与支持-sponsorship">💖 赞赏与支持</a> • 
   <a href="#-star-history">Star History</a> • 
   <a href="https://discord.gg/QRsPcNrSB">Discord 社区</a>
 </p>
@@ -469,6 +475,54 @@ window.__AGY_APPLY_THINKING_LEVEL__('high');
   - 支持原生 asar 解包、语法树分析、注入与无损还原。
 
 </details>
+
+---
+
+## 💖 赞赏与支持 (Sponsorship)
+
+**Antigravity Enhance Tools** 承诺核心功能 **永远 100% 开源免费、零广告植入、纯净本地运行**。
+
+工具的持续逆向适配、功能突破、DOM 架构重构以及多平台打包部署均由作者在业余时间独立维护。如果您觉得这个套件切实提升了您的工作效率与协同体验，欢迎通过以下渠道为作者充电投喂！每一份发电与赞赏，都是支持本项目长期高频迭代的最大动力。
+
+<div align="center">
+
+<table>
+  <tr>
+    <td align="center" width="50%" valign="top">
+      <br />
+      <img src="docs/assets/wechat_sponsor.png" alt="微信赞赏码" width="260" style="border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);" />
+      <br /><br />
+      <b>微信赞赏码 (WeChat Pay)</b>
+      <br />
+      <sub>“一分钱也是爱 ❤️❤️ · 乐禾泽”</sub>
+      <br /><br />
+      <sub>支持自由随心投喂，扫码即付</sub>
+      <br /><br />
+    </td>
+    <td align="center" width="50%" valign="top">
+      <br />
+      <a href="https://afdian.com/a/Kutaze" target="_blank" rel="noopener noreferrer">
+        <img src="assets/afdian_button.svg" alt="爱发电赞助" width="240" />
+      </a>
+      <br /><br />
+      <b>爱发电会员赞助 (Afdian)</b>
+      <br />
+      <sub><a href="https://afdian.com/a/Kutaze">https://afdian.com/a/Kutaze</a></sub>
+      <br /><br />
+      <div align="left" style="display: inline-block; font-size: 13px; line-height: 1.6; color: #64748b;">
+        ☕ <b>¥5/月</b> · 请作者喝杯咖啡 (Sponsors 鸣谢)<br />
+        ⚡ <b>¥15/月</b> · 极客能量包 (Discord 专属彩色身份组)<br />
+        🚀 <b>¥30/月</b> · 深度共创官 (需求优先评估排期)<br />
+        👑 <b>¥99/月</b> · 荣誉守护者 (首页大徽章+1V1专属支持)
+      </div>
+      <br /><br />
+    </td>
+  </tr>
+</table>
+
+> 🎁 **赞助者回馈**：赞助后欢迎加入 [Discord 官方社区](https://discord.gg/QRsPcNrSB) 私信管理员 **Kutaze** 领取您的专属彩色 Sponsor 身份组，并可登记您的昵称与链接收录至官网与 README 的鸣谢榜单！
+
+</div>
 
 ---
 

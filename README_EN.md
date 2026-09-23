@@ -10,6 +10,7 @@
 <p align="center">
   <a href="https://antigravity-enhance-tools.github.io/"><img src="https://img.shields.io/badge/Website-Live-0284c7?style=flat-square&logo=google-chrome&logoColor=white" alt="Website" /></a>
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases"><img src="https://img.shields.io/badge/Release-v0.1.5-6366f1?style=flat-square" alt="Release" /></a>
+  <a href="https://afdian.com/a/Kutaze"><img src="https://img.shields.io/badge/Afdian-Sponsor-946ce6?style=flat-square&logo=kofi&logoColor=white" alt="Afdian" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-10b981?style=flat-square" alt="License" /></a>
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools"><img src="https://img.shields.io/badge/Platform-Windows_%7C_macOS_%7C_Linux-0284c7?style=flat-square" alt="Platform" /></a>
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools"><img src="https://img.shields.io/badge/UI-Dual_Theme_GUI-8b5cf6?style=flat-square" alt="UI" /></a>
@@ -23,6 +24,10 @@
   &nbsp;&nbsp;
   <a href="https://antigravity-enhance-tools.github.io/" target="_blank" rel="noopener noreferrer">
     <img src="assets/website_button_en.svg" alt="Visit Official Website" height="38" />
+  </a>
+  &nbsp;&nbsp;
+  <a href="https://afdian.com/a/Kutaze" target="_blank" rel="noopener noreferrer">
+    <img src="assets/afdian_button.svg" alt="Support on Afdian" height="38" />
   </a>
 </p>
 
@@ -227,6 +232,54 @@ curl -fsSL https://raw.githubusercontent.com/Kutaze/Antigravity-Enhance-Pack-Too
 - Standardized single-emoji title styling and multilingual documentation.
 
 </details>
+
+---
+
+## 💖 Sponsorship & Support
+
+**Antigravity Enhance Tools** is and will always remain **100% free, open-source, and privacy-respecting**.
+
+Continuous reverse engineering, AST patching, performance tuning, and cross-platform maintenance are carried out independently by the author in spare time. If you find this project valuable, consider fueling the development via the channels below!
+
+<div align="center">
+
+<table>
+  <tr>
+    <td align="center" width="50%" valign="top">
+      <br />
+      <img src="docs/assets/wechat_sponsor.png" alt="WeChat Pay QR Code" width="260" style="border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);" />
+      <br /><br />
+      <b>WeChat Pay (微信赞赏码)</b>
+      <br />
+      <sub>“一分钱也是爱 ❤️❤️ · 乐禾泽”</sub>
+      <br /><br />
+      <sub>Scan with WeChat app to support freely</sub>
+      <br /><br />
+    </td>
+    <td align="center" width="50%" valign="top">
+      <br />
+      <a href="https://afdian.com/a/Kutaze" target="_blank" rel="noopener noreferrer">
+        <img src="assets/afdian_button.svg" alt="Afdian Sponsor" width="240" />
+      </a>
+      <br /><br />
+      <b>Afdian Membership / Donation</b>
+      <br />
+      <sub><a href="https://afdian.com/a/Kutaze">https://afdian.com/a/Kutaze</a></sub>
+      <br /><br />
+      <div align="left" style="display: inline-block; font-size: 13px; line-height: 1.6; color: #64748b;">
+        ☕ <b>¥5/mo</b> · Coffee Support (Sponsors Wall)<br />
+        ⚡ <b>¥15/mo</b> · Geek Energy (Discord Sponsor Role)<br />
+        🚀 <b>¥30/mo</b> · Co-Creator (Priority Feature Requests)<br />
+        👑 <b>¥99/mo</b> · Honor Guardian (Top Badge + 1v1 Support)
+      </div>
+      <br /><br />
+    </td>
+  </tr>
+</table>
+
+> 🎁 **Sponsor Perks**: Join our [Discord Server](https://discord.gg/QRsPcNrSB) and DM **Kutaze** to claim your custom Sponsor role and be listed in our official hall of fame!
+
+</div>
 
 ---
 

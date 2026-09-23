@@ -1232,6 +1232,152 @@
     }
 
     /* ========================================================
+       SPONSOR & DONATION SECTION (爱发电与微信赞赏)
+       ======================================================== */
+    .sponsor-section {
+      max-width: 1100px;
+      margin: 4.5rem auto 2rem;
+      padding: 0 1rem;
+    }
+    .sponsor-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    .sponsor-header h2 {
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: var(--text-main);
+      margin-bottom: 0.8rem;
+    }
+    .sponsor-header p {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      max-width: 680px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    .sponsor-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+    .sponsor-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 22px;
+      padding: 2.2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      box-shadow: var(--shadow-card);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .sponsor-card:hover {
+      border-color: var(--border-hover);
+      box-shadow: var(--shadow-glow), var(--shadow-card);
+      transform: translateY(-3px);
+    }
+    .sponsor-card-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 14px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      margin-bottom: 1.2rem;
+    }
+    .tag-wechat {
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--accent-emerald);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .tag-afdian {
+      background: rgba(148, 108, 230, 0.12);
+      color: #946ce6;
+      border: 1px solid rgba(148, 108, 230, 0.35);
+    }
+    .sponsor-qr-box {
+      background: #ffffff;
+      padding: 12px;
+      border-radius: 18px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+      margin-bottom: 1.2rem;
+      display: inline-block;
+    }
+    .sponsor-qr-img {
+      width: 220px;
+      height: 220px;
+      object-fit: contain;
+      display: block;
+      border-radius: 12px;
+    }
+    .sponsor-card-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 0.5rem;
+    }
+    .sponsor-card-desc {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 1.2rem;
+    }
+    .afdian-official-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      height: 48px;
+      padding: 0 1.8rem;
+      border-radius: 24px;
+      background: linear-gradient(135deg, #946ce6 0%, #7232e0 100%);
+      color: #ffffff !important;
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: 700;
+      box-shadow: 0 4px 18px rgba(114, 50, 224, 0.4);
+      transition: all 0.25s ease;
+      margin-top: 1rem;
+    }
+    .afdian-official-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(114, 50, 224, 0.55);
+      filter: brightness(1.08);
+    }
+    .afdian-tiers-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      text-align: left;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 1rem 1.2rem;
+      margin-top: 0.5rem;
+    }
+    .afdian-tier-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+    .afdian-tier-row strong {
+      color: var(--text-main);
+    }
+
+    @media (max-width: 768px) {
+      .sponsor-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ========================================================
        FOOTER
        ======================================================== */
     footer {
@@ -1451,6 +1597,15 @@
             </div>
           </a>
         </li>
+        <li>
+          <a href="#sponsor" class="drawer-link" onclick="closeSidebar()">
+            <span class="drawer-link-icon">💖</span>
+            <div class="drawer-link-text">
+              <span class="drawer-link-name">赞助与支持</span>
+              <span class="drawer-link-desc">爱发电与微信赞赏 · 支持作者</span>
+            </div>
+          </a>
+        </li>
       </ul>
     </div>
 
@@ -1459,6 +1614,9 @@
         📥 客户端下载 (v0.1.5)
       </a>
       <div class="drawer-community-row">
+        <a href="https://afdian.com/a/Kutaze" target="_blank" class="drawer-mini-btn" style="color: #a855f7; border-color: rgba(168, 85, 247, 0.4);">
+          ⚡ 爱发电
+        </a>
         <a href="https://discord.gg/QRsPcNrSB" target="_blank" class="drawer-mini-btn">
           💬 Discord
         </a>
@@ -1491,6 +1649,7 @@
         <li><a href="#skills"><span class="nav-title-full">技能中心</span><span class="nav-title-short">技能</span></a></li>
         <li><a href="#installer"><span class="nav-title-full">下载安装</span><span class="nav-title-short">下载</span></a></li>
         <li><a href="#author"><span class="nav-title-full">关于作者</span><span class="nav-title-short">作者</span></a></li>
+        <li><a href="#sponsor"><span class="nav-title-full">💖 赞助支持</span><span class="nav-title-short">赞助</span></a></li>
       </ul>
 
       <!-- Right Action Cluster -->
@@ -1807,6 +1966,70 @@
       </div>
     </section>
 
+    <!-- ========================================================
+         SPONSOR & DONATION SECTION (赞助与支持)
+         ======================================================== -->
+    <section class="sponsor-section" id="sponsor">
+      <div class="sponsor-header">
+        <span class="feature-badge-mini badge-amber" style="margin-bottom: 0.6rem; display: inline-block;">💖 开源守护 · 纯净相伴</span>
+        <h2>赞助与支持 (Sponsors)</h2>
+        <p>
+          本项目承诺核心功能 <strong>永远 100% 开源免费、零广告、纯本地运行</strong>。由作者在业余时间独立逆向适配与架构维护。如果工具确实改善了您的协同效率，欢迎随心投喂，支持项目长久迭代！
+        </p>
+      </div>
+
+      <div class="sponsor-grid">
+        <!-- WeChat Pay Card -->
+        <div class="sponsor-card">
+          <span class="sponsor-card-tag tag-wechat">💚 微信扫码 · 随心赞赏</span>
+          <div class="sponsor-qr-box">
+            <img src="assets/wechat_sponsor.png" alt="微信赞赏码" class="sponsor-qr-img">
+          </div>
+          <h4 class="sponsor-card-title">微信赞赏码</h4>
+          <p class="sponsor-card-desc">“一分钱也是爱 ❤️❤️ · 乐禾泽”<br>支持任意金额随心打赏，即扫即付</p>
+          <div style="font-size: 0.85rem; color: var(--text-dim);">
+            💡 赞赏后可在 Discord 社区私信 Kutaze 登记鸣谢
+          </div>
+        </div>
+
+        <!-- Afdian Card -->
+        <div class="sponsor-card">
+          <span class="sponsor-card-tag tag-afdian">⚡ 爱发电会员 · 专属权益</span>
+          <div style="width: 80px; height: 80px; border-radius: 20px; background: rgba(148, 108, 230, 0.15); display: flex; align-items: center; justify-content: center; font-size: 42px; margin: 10px 0 16px;">
+            ⚡
+          </div>
+          <h4 class="sponsor-card-title">爱发电主页赞助</h4>
+          <p class="sponsor-card-desc">支持按月订阅或自选金额，解锁专属社区身份组与需求排期</p>
+          
+          <div class="afdian-tiers-list">
+            <div class="afdian-tier-row">
+              <span>☕ <strong>¥5/月</strong> 请作者喝杯咖啡</span>
+              <span>Sponsors 鸣谢</span>
+            </div>
+            <div class="afdian-tier-row">
+              <span>⚡ <strong>¥15/月</strong> 极客能量包 (主力)</span>
+              <span>Discord 专属彩色身份</span>
+            </div>
+            <div class="afdian-tier-row">
+              <span>🚀 <strong>¥30/月</strong> 深度共创官</span>
+              <span>需求优先评估排期</span>
+            </div>
+            <div class="afdian-tier-row">
+              <span>👑 <strong>¥99/月</strong> 荣誉守护者</span>
+              <span>首页大徽章 + 1V1支持</span>
+            </div>
+          </div>
+
+          <a href="https://afdian.com/a/Kutaze" target="_blank" rel="noopener noreferrer" class="afdian-official-btn">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+            </svg>
+            <span>前往爱发电赞助 (afdian.com/a/Kutaze)</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
     <!-- Community CTA Box (Fixed Proportion Discord Button) -->
     <div class="community-box">
       <div class="community-text">
@@ -1837,6 +2060,7 @@
         <li><a href="https://github.com/Kutaze" target="_blank">作者主页</a></li>
         <li><a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools" target="_blank">GitHub 仓库</a></li>
         <li><a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases" target="_blank">版本发布</a></li>
+        <li><a href="https://afdian.com/a/Kutaze" target="_blank" style="color: #a855f7; font-weight: 700;">爱发电赞助</a></li>
         <li><a href="https://discord.gg/QRsPcNrSB" target="_blank">Discord 频道</a></li>
         <li><a href="#">回到顶部 ↑</a></li>
       </ul>
