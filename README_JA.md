@@ -250,6 +250,7 @@ curl -fsSL https://raw.githubusercontent.com/Kutaze/Antigravity-Enhance-Pack-Too
 
 - [lbjlaq/Antigravity-Manager](https://github.com/lbjlaq/Antigravity-Manager): プロフェッショナルな Antigravity アカウント管理・切替ツール（Antigravity Tools）。マルチアカウント枠監視と切替の着想に多大な示唆をいただきました。本プロジェクトでは外部アプリ常驻の負担をなくし、クライアント内部へネイティブ統合・軽量化を実現しています。
 - [renkeshui/antigravity-chinese-locale](https://github.com/renkeshui/antigravity-chinese-locale): Antigravity クライアント全画面多言語化の先駆的プロジェクト。辞書マッピングと用語体系の基盤として深く参考にさせていただきました。
+- [lobehub/lobe-icons](https://github.com/lobehub/lobe-icons): 高品質なAIおよび開発者ブランドのベクターロゴ・アイコンライブラリ。本プロジェクトのデスクトップGUIインストーラーにおけるGitHubベクターアイコンの参照元として活用されています。
 
 ---
 

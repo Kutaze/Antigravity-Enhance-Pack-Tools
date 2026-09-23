@@ -250,6 +250,7 @@ This project referenced concepts and implementations from the following open-sou
 
 - [lbjlaq/Antigravity-Manager](https://github.com/lbjlaq/Antigravity-Manager): Professional Antigravity Account Manager & Switcher (Antigravity Tools), which provided excellent ideas for multi-account quota monitoring and switching. Instead of requiring a standalone external application, this project natively embeds these capabilities directly into Antigravity with zero background processes.
 - [renkeshui/antigravity-chinese-locale](https://github.com/renkeshui/antigravity-chinese-locale): Pioneering localization initiative for the Antigravity desktop client, providing solid reference for dictionary mapping and terminology alignment.
+- [lobehub/lobe-icons](https://github.com/lobehub/lobe-icons): Popular open-source AI and developer brand vector logos and icon library, providing official standard vector GitHub brand identity support for our GUI installer.
 
 ---
 

@@ -97,6 +97,7 @@ namespace AntigravityInstaller
         private Border cardGithub;
         private TextBlock lblGithubTitle;
         private TextBlock lblGithubVal;
+        private System.Windows.Shapes.Path pathGithubLogo;
         private List<Border> footerBadges = new List<Border>();
         private List<TextBlock> footerBadgeTexts = new List<TextBlock>();
         private TextBlock lblCopyright;
@@ -523,8 +524,24 @@ namespace AntigravityInstaller
                 Margin = new Thickness(0, 0, 0, 7)
             };
 
-            // Card 1: Author
-            cardAuthor = CreateFooterCard("👤", "作者 (Author)", "Kutaze", Color.FromRgb(59, 130, 246), out lblAuthorTitle, out lblAuthorVal);
+            // Card 1: Author (Display personal avatar)
+            UIElement authorIconEl = null;
+            var avatarBmp = LoadEmbeddedImage("author_avatar.png");
+            if (avatarBmp != null)
+            {
+                var img = new Image
+                {
+                    Source = avatarBmp,
+                    Width = 24,
+                    Height = 24,
+                    Stretch = Stretch.UniformToFill,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                img.Clip = new EllipseGeometry(new Point(12, 12), 12, 12);
+                authorIconEl = img;
+            }
+            cardAuthor = CreateFooterCard("👤", "作者 (Author)", "Kutaze", Color.FromRgb(59, 130, 246), out lblAuthorTitle, out lblAuthorVal, authorIconEl);
             cardAuthor.Cursor = Cursors.Hand;
             cardAuthor.ToolTip = "点击访问作者 GitHub 个人主页";
             cardAuthor.MouseLeftButtonUp += (s, e) => OpenUrl("https://github.com/Kutaze");
@@ -537,10 +554,20 @@ namespace AntigravityInstaller
             cardModel.MouseLeftButtonUp += (s, e) => ShowAboutDialog();
             cardsGrid.Children.Add(cardModel);
 
-            // Card 3: GitHub
-            cardGithub = CreateFooterCard("🐙", "开源地址 (GitHub)", "View Code ↗", Color.FromRgb(139, 92, 246), out lblGithubTitle, out lblGithubVal);
+            // Card 3: GitHub (Lobe Icons vector GitHub logo)
+            pathGithubLogo = new System.Windows.Shapes.Path
+            {
+                Width = 15,
+                Height = 15,
+                Stretch = Stretch.Uniform,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                Data = Geometry.Parse("M12 0c6.63 0 12 5.276 12 11.79-.001 5.067-3.29 9.567-8.175 11.187-.6.118-.825-.25-.825-.56 0-.398.015-1.665.015-3.242 0-1.105-.375-1.813-.81-2.181 2.67-.295 5.475-1.297 5.475-5.822 0-1.297-.465-2.344-1.23-3.169.12-.295.54-1.503-.12-3.125 0 0-1.005-.324-3.3 1.209a11.32 11.32 0 00-3-.398c-1.02 0-2.04.133-3 .398-2.295-1.518-3.3-1.209-3.3-1.209-.66 1.622-.24 2.83-.12 3.125-.765.825-1.23 1.887-1.23 3.169 0 4.51 2.79 5.527 5.46 5.822-.345.294-.66.81-.765 1.577-.69.31-2.415.81-3.495-.973-.225-.354-.9-1.223-1.845-1.209-1.005.015-.405.56.015.781.51.28 1.095 1.327 1.23 1.666.24.663 1.02 1.93 4.035 1.385 0 .988.015 1.916.015 2.196 0 .31-.225.664-.825.56C3.303 21.374-.003 16.867 0 11.791 0 5.276 5.37 0 12 0z"),
+                Fill = new SolidColorBrush(Color.FromRgb(168, 85, 247))
+            };
+            cardGithub = CreateFooterCard("", "开源地址 (GitHub)", "View Code ↗", Color.FromRgb(139, 92, 246), out lblGithubTitle, out lblGithubVal, pathGithubLogo);
             cardGithub.Cursor = Cursors.Hand;
-            cardGithub.ToolTip = "点击在浏览器中打开 GitHub 开源仓库主页";
+            cardGithub.ToolTip = "点击在浏览器中打开 GitHub 开源仓库主页 (Logo 来源: lobehub/lobe-icons)";
             cardGithub.MouseLeftButtonUp += (s, e) => OpenUrl("https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools");
             cardsGrid.Children.Add(cardGithub);
 
@@ -703,6 +730,10 @@ namespace AntigravityInstaller
                     cardGithub.BorderBrush = cardBorderDark;
                     lblGithubTitle.Foreground = textMutedDark;
                     lblGithubVal.Foreground = new SolidColorBrush(Color.FromRgb(96, 165, 250)); // Blue 400
+                    if (pathGithubLogo != null)
+                    {
+                        pathGithubLogo.Fill = new SolidColorBrush(Color.FromRgb(192, 132, 252));
+                    }
 
                     foreach (var b in footerBadges)
                     {
@@ -843,6 +874,10 @@ namespace AntigravityInstaller
                     cardGithub.BorderBrush = cardBorderLight;
                     lblGithubTitle.Foreground = textMutedLight;
                     lblGithubVal.Foreground = new SolidColorBrush(Color.FromRgb(37, 99, 235)); // Blue 600
+                    if (pathGithubLogo != null)
+                    {
+                        pathGithubLogo.Fill = new SolidColorBrush(Color.FromRgb(124, 58, 237));
+                    }
 
                     foreach (var b in footerBadges)
                     {
@@ -1061,7 +1096,7 @@ namespace AntigravityInstaller
             return b;
         }
 
-        private Border CreateFooterCard(string icon, string title, string val, Color iconAccent, out TextBlock tbTitle, out TextBlock tbVal)
+        private Border CreateFooterCard(string icon, string title, string val, Color iconAccent, out TextBlock tbTitle, out TextBlock tbVal, UIElement customIcon = null)
         {
             var b = new Border
             {
@@ -1079,22 +1114,29 @@ namespace AntigravityInstaller
             {
                 Width = 28,
                 Height = 28,
-                CornerRadius = new CornerRadius(7),
+                CornerRadius = (customIcon is Border) ? new CornerRadius(14) : new CornerRadius(7),
                 Background = new SolidColorBrush(Color.FromArgb(32, iconAccent.R, iconAccent.G, iconAccent.B)),
                 BorderBrush = new SolidColorBrush(Color.FromArgb(64, iconAccent.R, iconAccent.G, iconAccent.B)),
                 BorderThickness = new Thickness(1),
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Left
             };
-            var tbIcon = new TextBlock
+            if (customIcon != null)
             {
-                Text = icon,
-                FontSize = 13.5,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center,
-                FontFamily = new FontFamily("Segoe UI Emoji, Segoe UI")
-            };
-            iconBorder.Child = tbIcon;
+                iconBorder.Child = customIcon;
+            }
+            else
+            {
+                var tbIcon = new TextBlock
+                {
+                    Text = icon,
+                    FontSize = 13.5,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    FontFamily = new FontFamily("Segoe UI Emoji, Segoe UI")
+                };
+                iconBorder.Child = tbIcon;
+            }
             Grid.SetColumn(iconBorder, 0);
             g.Children.Add(iconBorder);
 
@@ -1173,6 +1215,8 @@ namespace AntigravityInstaller
                 "• 多账号快捷切换与配额监控 (100% 本地凭据库存储，绝无云端中转)\n" +
                 "• 真实上下文 Token 动态遥测与 5 段式占比面板\n" +
                 "• 4 挡思考深度滑动调节与原生截图集成\n\n" +
+                "特别鸣谢：\n" +
+                "• 界面 GitHub 矢量图标参考自开源项目 lobehub/lobe-icons\n\n" +
                 "Copyright © 2025-2026 Antigravity Enhance Tools · Kutaze",
                 "关于软件 - Antigravity Enhance Tools",
                 MessageBoxButton.OK,
@@ -1199,30 +1243,60 @@ namespace AntigravityInstaller
         {
             try
             {
-                if (!string.IsNullOrEmpty(CustomLogoPath) && File.Exists(CustomLogoPath))
+                if (resourceName == "icon.png" && !string.IsNullOrEmpty(CustomLogoPath) && File.Exists(CustomLogoPath))
                 {
-                    var customImg = new BitmapImage();
-                    customImg.BeginInit();
-                    customImg.UriSource = new Uri(Path.GetFullPath(CustomLogoPath));
-                    customImg.CacheOption = BitmapCacheOption.OnLoad;
-                    customImg.EndInit();
-                    customImg.Freeze();
-                    return customImg;
+                    using (var fs = File.OpenRead(CustomLogoPath))
+                    {
+                        var customImg = new BitmapImage();
+                        customImg.BeginInit();
+                        customImg.StreamSource = fs;
+                        customImg.CacheOption = BitmapCacheOption.OnLoad;
+                        customImg.EndInit();
+                        customImg.Freeze();
+                        return customImg;
+                    }
                 }
+
                 var asm = Assembly.GetExecutingAssembly();
                 using (var stream = asm.GetManifestResourceStream(resourceName))
                 {
-                    if (stream == null) return null;
-                    var img = new BitmapImage();
-                    img.BeginInit();
-                    img.StreamSource = stream;
-                    img.CacheOption = BitmapCacheOption.OnLoad;
-                    img.EndInit();
-                    img.Freeze();
-                    return img;
+                    if (stream != null)
+                    {
+                        var img = new BitmapImage();
+                        img.BeginInit();
+                        img.StreamSource = stream;
+                        img.CacheOption = BitmapCacheOption.OnLoad;
+                        img.EndInit();
+                        img.Freeze();
+                        return img;
+                    }
+                }
+
+                // Fallback to local assets folder
+                string localAsset = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "assets", resourceName);
+                if (!File.Exists(localAsset))
+                {
+                    localAsset = Path.Combine(@"D:\desk\Antigravity\Antigravity-Enhance-Pack\assets", resourceName);
+                }
+                if (File.Exists(localAsset))
+                {
+                    using (var fs = File.OpenRead(localAsset))
+                    {
+                        var localImg = new BitmapImage();
+                        localImg.BeginInit();
+                        localImg.StreamSource = fs;
+                        localImg.CacheOption = BitmapCacheOption.OnLoad;
+                        localImg.EndInit();
+                        localImg.Freeze();
+                        return localImg;
+                    }
                 }
             }
-            catch { return null; }
+            catch (Exception ex)
+            {
+                try { File.AppendAllText(@"C:\Users\Lynan\.gemini\antigravity\scratch\img_err.log", resourceName + ": " + ex.ToString() + "\n"); } catch { }
+            }
+            return null;
         }
 
         private void DetectPath(bool isManual = false)

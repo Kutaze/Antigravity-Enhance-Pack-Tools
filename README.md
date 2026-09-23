@@ -492,6 +492,7 @@ window.__AGY_APPLY_THINKING_LEVEL__('high');
 
 - [lbjlaq/Antigravity-Manager](https://github.com/lbjlaq/Antigravity-Manager)：专业的 Antigravity 账号管理与切换工具（Antigravity Tools），为本项目多账号配额监控与一键切换提供了优秀的思路借鉴与产品启发。考虑到外部独立软件单独打开较为繁琐臃肿，本项目选择将其核心能力以极轻量化的方式原生深度集成进 Antigravity 客户端内部，实现零额外进程常驻。
 - [renkeshui/antigravity-chinese-locale](https://github.com/renkeshui/antigravity-chinese-locale)：Antigravity 客户端汉化探索的先驱项目，其本地化词典映射与术语体系为本项目提供了宝贵的沉淀与参考。
+- [lobehub/lobe-icons](https://github.com/lobehub/lobe-icons)：优质热门的开源 AI 与开发者品牌矢量 Logo 与图标资源库，为本项目的桌面安装向导及图形界面提供了官方标准的 GitHub 矢量标识支持。
 
 ---
 

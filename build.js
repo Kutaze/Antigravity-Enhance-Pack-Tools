@@ -41,6 +41,7 @@ const csc = 'C:/Windows/Microsoft.NET/Framework64/v4.0.30319/csc.exe';
 const installerCs = path.join(repoRoot, 'src', 'InstallerApp.cs');
 const icoPath = path.join(repoRoot, 'core', 'app.ico');
 const iconPng = path.join(repoRoot, 'core', 'icon.png');
+const avatarPng = path.join(repoRoot, 'assets', 'author_avatar.png');
 
 const distDir = path.join(repoRoot, 'dist');
 if (!fs.existsSync(distDir)) fs.mkdirSync(distDir, { recursive: true });
@@ -59,7 +60,7 @@ if (fs.existsSync(tempCompiledExe)) {
     try { fs.unlinkSync(tempCompiledExe); } catch(e) {}
 }
 
-const cscCmd = `"${csc}" /target:winexe /optimize+ /platform:anycpu /r:System.Xaml.dll /r:System.IO.Compression.FileSystem.dll /r:System.IO.Compression.dll /r:"C:/Windows/Microsoft.NET/Framework64/v4.0.30319/WPF/PresentationCore.dll" /r:"C:/Windows/Microsoft.NET/Framework64/v4.0.30319/WPF/PresentationFramework.dll" /r:"C:/Windows/Microsoft.NET/Framework64/v4.0.30319/WPF/WindowsBase.dll" /win32icon:"${icoPath}" /resource:"${payloadZip}",payload.zip /resource:"${iconPng}",icon.png /out:"${tempCompiledExe}" "${installerCs}"`;
+const cscCmd = `"${csc}" /target:winexe /optimize+ /platform:anycpu /r:System.Xaml.dll /r:System.IO.Compression.FileSystem.dll /r:System.IO.Compression.dll /r:"C:/Windows/Microsoft.NET/Framework64/v4.0.30319/WPF/PresentationCore.dll" /r:"C:/Windows/Microsoft.NET/Framework64/v4.0.30319/WPF/PresentationFramework.dll" /r:"C:/Windows/Microsoft.NET/Framework64/v4.0.30319/WPF/WindowsBase.dll" /win32icon:"${icoPath}" /resource:"${payloadZip}",payload.zip /resource:"${iconPng}",icon.png /resource:"${avatarPng}",author_avatar.png /out:"${tempCompiledExe}" "${installerCs}"`;
 try {
     execSync(cscCmd);
     console.log('Compiled GUI Installer successfully to temp file, Size:', fs.statSync(tempCompiledExe).size);
