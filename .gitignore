@@ -30,9 +30,11 @@ dist/
 *.tar.gz
 
 # Local desktop utility scripts and study notes
+push.bat
 Fix_Antigravity.bat
 Restart_Antigravity.bat
 启动_AIG汉化.bat
 一键推送到GitHub.bat
 Antigravity汉化_最佳实践.py
 Antigravity汉化技能学习笔记.md
+*.lnk
