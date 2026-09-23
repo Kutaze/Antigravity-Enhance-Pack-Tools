@@ -8,6 +8,7 @@
 **专为 Google Antigravity 官方桌面客户端打造的汉化与原生 UI 交互增强套件。**
 
 <p align="center">
+  <a href="https://antigravity-enhance-tools.github.io/"><img src="https://img.shields.io/badge/Website-Live-0284c7?style=flat-square&logo=google-chrome&logoColor=white" alt="Website" /></a>
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases"><img src="https://img.shields.io/badge/Release-v0.1.5-6366f1?style=flat-square" alt="Release" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-10b981?style=flat-square" alt="License" /></a>
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools"><img src="https://img.shields.io/badge/Platform-Windows_%7C_macOS_%7C_Linux-0284c7?style=flat-square" alt="Platform" /></a>
@@ -19,6 +20,10 @@
   <a href="https://discord.gg/QRsPcNrSB" target="_blank" rel="noopener noreferrer">
     <img src="assets/discord_button.svg" alt="加入 Discord 官方交流频道" height="38" />
   </a>
+  &nbsp;&nbsp;
+  <a href="https://antigravity-enhance-tools.github.io/" target="_blank" rel="noopener noreferrer">
+    <img src="assets/website_button.svg" alt="访问官方产品首页" height="38" />
+  </a>
 </p>
 
 <p align="center">
@@ -28,6 +33,7 @@
 </p>
 
 <p align="center">
+  <a href="https://antigravity-enhance-tools.github.io/">🌐 官方网站</a> • 
   <a href="#-功能特色">功能特色</a> • 
   <a href="#-部署指南">部署指南</a> • 
   <a href="#-工作流程">工作流程</a> • 

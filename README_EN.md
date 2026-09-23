@@ -8,6 +8,7 @@
 **An all-in-one UI and interaction enhancement suite tailored for the official Google Antigravity desktop client.**
 
 <p align="center">
+  <a href="https://antigravity-enhance-tools.github.io/"><img src="https://img.shields.io/badge/Website-Live-0284c7?style=flat-square&logo=google-chrome&logoColor=white" alt="Website" /></a>
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases"><img src="https://img.shields.io/badge/Release-v0.1.5-6366f1?style=flat-square" alt="Release" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-10b981?style=flat-square" alt="License" /></a>
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools"><img src="https://img.shields.io/badge/Platform-Windows_%7C_macOS_%7C_Linux-0284c7?style=flat-square" alt="Platform" /></a>
@@ -19,6 +20,10 @@
   <a href="https://discord.gg/QRsPcNrSB" target="_blank" rel="noopener noreferrer">
     <img src="assets/discord_button_en.svg" alt="Join Discord Community" height="38" />
   </a>
+  &nbsp;&nbsp;
+  <a href="https://antigravity-enhance-tools.github.io/" target="_blank" rel="noopener noreferrer">
+    <img src="assets/website_button_en.svg" alt="Visit Official Website" height="38" />
+  </a>
 </p>
 
 <p align="center">
@@ -28,6 +33,7 @@
 </p>
 
 <p align="center">
+  <a href="https://antigravity-enhance-tools.github.io/">🌐 Official Website</a> • 
   <a href="#-features">Features</a> • 
   <a href="#-installation">Installation</a> • 
   <a href="#-workflow">Workflow</a> • 
