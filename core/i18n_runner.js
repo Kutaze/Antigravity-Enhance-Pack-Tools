@@ -7275,7 +7275,7 @@
 
                 const confirmed = await showAgyModal({
                     title: '确认退出登录',
-                    message: `确定要退出当前账号 ${em} 的登录状态吗？\n\n退出后将清除当前客户端的活跃会话凭据。\n本地账号池中仍将安全保留该账号的凭据记录，您随时可在多账号管理中秒切恢复。`,
+                    message: `确定要退出当前账号 ${em} 的登录状态吗？\n\n退出后将清除当前客户端的活跃会话凭据。\n本地账号池中仍将安全保留该账号的凭据记录，您随时可在多账号管理中恢复切换。`,
                     type: 'danger',
                     confirmText: '退出登录',
                     cancelText: '取消',
@@ -7522,7 +7522,7 @@
         } catch(e) {}
 
         if (window.__AGY_SHOW_TOAST__) {
-            window.__AGY_SHOW_TOAST__(`🔄 正在无感秒切至 ${targetEmail}，即将生效...`);
+            window.__AGY_SHOW_TOAST__(`🔄 正在切换至 ${targetEmail}，即将生效...`);
         }
 
         if (window.electronNative && typeof window.electronNative.switchAccountProfile === 'function') {

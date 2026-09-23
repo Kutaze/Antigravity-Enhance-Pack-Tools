@@ -1170,7 +1170,7 @@ namespace AntigravityInstaller
                 "开源项目主页：https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools\n\n" +
                 "核心能力：\n" +
                 "• 全界面母语级原生深度汉化与防卡死守卫\n" +
-                "• 多账号无缝秒切与配额监控 (100% 本地凭据库存储，绝无云端中转)\n" +
+                "• 多账号快捷切换与配额监控 (100% 本地凭据库存储，绝无云端中转)\n" +
                 "• 真实上下文 Token 动态遥测与 5 段式占比面板\n" +
                 "• 4 挡思考深度滑动调节与原生截图集成\n\n" +
                 "Copyright © 2025-2026 Antigravity Enhance Tools · Kutaze",
