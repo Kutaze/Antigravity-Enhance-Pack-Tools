@@ -355,6 +355,260 @@
       transform: translateY(-1px);
     }
 
+    /* Hamburger Menu Toggle Button (In Navbar) */
+    .menu-toggle-btn {
+      display: none;
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+    [data-theme="light"] .menu-toggle-btn {
+      background: rgba(0, 0, 0, 0.05);
+    }
+    .menu-toggle-btn:hover {
+      background: rgba(99, 102, 241, 0.15);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    /* Short & Long Title Switch Rules (短标题与长标题自适应) */
+    .nav-title-short,
+    .logo-text-short,
+    .hero-title-short,
+    .download-text-short {
+      display: none;
+    }
+    .nav-title-full,
+    .logo-text-full,
+    .hero-title-full,
+    .download-text-full {
+      display: inline;
+    }
+
+    /* ========================================================
+       OFF-CANVAS MOBILE SIDEBAR (非固定式侧边栏抽屉)
+       ======================================================== */
+    .sidebar-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 998;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .sidebar-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .mobile-sidebar-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: min(88vw, 360px);
+      background: var(--bg-card-solid);
+      border-left: 1px solid var(--border-color);
+      box-shadow: -12px 0 40px rgba(0, 0, 0, 0.45);
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow: hidden;
+    }
+    [data-theme="light"] .mobile-sidebar-drawer {
+      background: #ffffff;
+      box-shadow: -10px 0 35px rgba(0, 0, 0, 0.12);
+    }
+    .mobile-sidebar-drawer.active {
+      transform: translateX(0);
+    }
+
+    .drawer-header {
+      padding: 1.25rem 1.25rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .drawer-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+    .drawer-logo-img {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+    }
+    .drawer-logo-texts {
+      display: flex;
+      flex-direction: column;
+    }
+    .drawer-logo-title {
+      font-size: 0.98rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.2;
+    }
+    .drawer-version {
+      font-size: 0.72rem;
+      color: var(--primary);
+      font-weight: 700;
+    }
+    .drawer-close-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: all 0.2s ease;
+    }
+    [data-theme="light"] .drawer-close-btn {
+      background: rgba(0, 0, 0, 0.05);
+    }
+    .drawer-close-btn:hover {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #ef4444;
+    }
+
+    .drawer-body {
+      flex: 1;
+      padding: 1.25rem 1rem;
+      overflow-y: auto;
+    }
+    .drawer-section-label {
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-dim);
+      margin-bottom: 0.75rem;
+      padding-left: 0.5rem;
+    }
+    .drawer-nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .drawer-link {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      padding: 0.75rem 0.85rem;
+      border-radius: 12px;
+      text-decoration: none;
+      color: var(--text-main);
+      background: transparent;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+    }
+    .drawer-link:hover {
+      background: rgba(99, 102, 241, 0.08);
+      border-color: rgba(99, 102, 241, 0.2);
+      transform: translateX(3px);
+    }
+    [data-theme="light"] .drawer-link:hover {
+      background: rgba(99, 102, 241, 0.06);
+    }
+    .drawer-link-icon {
+      font-size: 1.25rem;
+      flex-shrink: 0;
+      width: 28px;
+      text-align: center;
+    }
+    .drawer-link-text {
+      display: flex;
+      flex-direction: column;
+    }
+    .drawer-link-name {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .drawer-link-desc {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+
+    .drawer-footer {
+      padding: 1.2rem 1.25rem;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      background: rgba(0, 0, 0, 0.02);
+    }
+    .drawer-cta-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.8rem 1rem;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #ffffff !important;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.92rem;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);
+      transition: all 0.2s ease;
+    }
+    .drawer-cta-btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.08);
+    }
+    .drawer-community-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+    }
+    .drawer-mini-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.55rem 0.5rem;
+      border-radius: 8px;
+      text-decoration: none;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted) !important;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    [data-theme="light"] .drawer-mini-btn {
+      background: rgba(0, 0, 0, 0.04);
+    }
+    .drawer-mini-btn:hover {
+      border-color: var(--primary);
+      color: var(--text-main) !important;
+    }
+
     /* ========================================================
        HERO SECTION
        ======================================================== */
@@ -1021,24 +1275,46 @@
     /* ========================================================
        RESPONSIVE ADAPTATIONS (UI 拉伸与缩放适配)
        ======================================================== */
-    @media (max-width: 1260px) {
-      .nav-links {
-        gap: 0.75rem;
-      }
-      .nav-links a {
-        font-size: 0.82rem;
-      }
-      .nav-container {
-        padding: 0.75rem 1rem;
-        gap: 0.65rem;
-      }
+    /* ========================================================
+       RESPONSIVE ADAPTATIONS (UI 拉伸与缩放适配)
+       ======================================================== */
+    /* 宽屏与紧凑屏幕：短标题与长标题自适应切换 */
+    @media (max-width: 1280px) {
+      .nav-title-full { display: none; }
+      .nav-title-short { display: inline; }
+      .nav-links { gap: 0.8rem; }
+      .nav-links a { font-size: 0.84rem; }
+      .nav-container { padding: 0.75rem 1rem; gap: 0.65rem; }
     }
 
-    @media (max-width: 1140px) {
+    @media (max-width: 1100px) {
+      .logo-text-full { display: none; }
+      .logo-text-short { display: inline; }
+      .download-text-full { display: none; }
+      .download-text-short { display: inline; }
+      .nav-links { gap: 0.65rem; }
+    }
+
+    /* 竖屏/长比例/手机查看网页：顶部标题全部收拢至非固定侧边栏 (Slide-out Drawer) */
+    @media (max-width: 960px), (max-aspect-ratio: 13/10) and (max-width: 1040px) {
       .nav-links {
-        display: none; /* Hide center nav on compact windows to avoid squashing */
+        display: none !important; /* 标题全部收拢至非固定式侧边栏 */
       }
-      .hero-title { font-size: 2.8rem; }
+      .menu-toggle-btn {
+        display: inline-flex !important; /* 移动端显示汉堡侧边栏按钮 */
+      }
+      .discord-nav-btn {
+        display: none; /* 收进侧边栏内 */
+      }
+      .github-nav-btn span {
+        display: none;
+      }
+      .github-nav-btn {
+        padding: 0 0.65rem;
+      }
+      .hero-title-full { display: none; }
+      .hero-title-short { display: inline; }
+      .hero-title { font-size: 2.6rem; }
       .metrics-bar { grid-template-columns: repeat(2, 1fr); }
       .why-grid { grid-template-columns: 1fr; }
       .feature-showcase-row, .feature-showcase-row.reverse {
@@ -1061,8 +1337,7 @@
     }
 
     @media (max-width: 768px) {
-      .nav-links { display: none; }
-      .hero-title { font-size: 2.2rem; }
+      .hero-title { font-size: 2.1rem; }
       .hero-desc { font-size: 1.05rem; }
       .metrics-bar { grid-template-columns: 1fr; }
       .installer-dual-grid { grid-template-columns: 1fr; }
@@ -1072,11 +1347,11 @@
       }
     }
 
-    @media (max-width: 640px) {
-      .discord-nav-btn span { display: none; }
-      .discord-nav-btn { padding: 0 0.65rem; }
-      .github-nav-btn span { display: none; }
-      .github-nav-btn { padding: 0 0.65rem; }
+    @media (max-width: 480px) {
+      .version-tag { display: none; }
+      .logo-area { gap: 0.45rem; }
+      .nav-container { padding: 0.65rem 0.85rem; }
+      .nav-actions { gap: 0.5rem; }
     }
   </style>
 </head>
@@ -1089,25 +1364,126 @@
     <div class="light-blob blob-3"></div>
   </div>
 
+  <!-- Non-Fixed Off-Canvas Mobile Sidebar & Backdrop (非固定式移动端侧边抽屉栏) -->
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+  <aside class="mobile-sidebar-drawer" id="mobile-sidebar" aria-label="移动端快速导航">
+    <div class="drawer-header">
+      <div class="drawer-logo">
+        <img src="../assets/logo_glyph_transparent.png" alt="Logo" class="drawer-logo-img">
+        <div class="drawer-logo-texts">
+          <span class="drawer-logo-title">Antigravity Enhance</span>
+          <span class="drawer-version">v0.1.5 · 增强套件</span>
+        </div>
+      </div>
+      <button class="drawer-close-btn" onclick="closeSidebar()" aria-label="关闭侧边栏">✕</button>
+    </div>
+
+    <div class="drawer-body">
+      <div class="drawer-section-label">页面导航目录</div>
+      <ul class="drawer-nav-list">
+        <li>
+          <a href="#why" class="drawer-link" onclick="closeSidebar()">
+            <span class="drawer-link-icon">💡</span>
+            <div class="drawer-link-text">
+              <span class="drawer-link-name">为什么选它</span>
+              <span class="drawer-link-desc">解决痛点与架构解析</span>
+            </div>
+          </a>
+        </li>
+        <li>
+          <a href="#features" class="drawer-link" onclick="closeSidebar()">
+            <span class="drawer-link-icon">⚡</span>
+            <div class="drawer-link-text">
+              <span class="drawer-link-name">全能功能矩阵</span>
+              <span class="drawer-link-desc">深度汉化与三大核心升级</span>
+            </div>
+          </a>
+        </li>
+        <li>
+          <a href="#multi-account" class="drawer-link" onclick="closeSidebar()">
+            <span class="drawer-link-icon">👥</span>
+            <div class="drawer-link-text">
+              <span class="drawer-link-name">多账号动态切换</span>
+              <span class="drawer-link-desc">实时配额显示与无缝轮换</span>
+            </div>
+          </a>
+        </li>
+        <li>
+          <a href="#ui-interaction" class="drawer-link" onclick="closeSidebar()">
+            <span class="drawer-link-icon">🎨</span>
+            <div class="drawer-link-text">
+              <span class="drawer-link-name">界面 UI 美化与交互</span>
+              <span class="drawer-link-desc">模型切换更便捷顺手</span>
+            </div>
+          </a>
+        </li>
+        <li>
+          <a href="#skills" class="drawer-link" onclick="closeSidebar()">
+            <span class="drawer-link-icon">🧩</span>
+            <div class="drawer-link-text">
+              <span class="drawer-link-name">可视化技能中心</span>
+              <span class="drawer-link-desc">35+ 技能即点即用</span>
+            </div>
+          </a>
+        </li>
+        <li>
+          <a href="#installer" class="drawer-link" onclick="closeSidebar()">
+            <span class="drawer-link-icon">🛠️</span>
+            <div class="drawer-link-text">
+              <span class="drawer-link-name">双主题 GUI 安装向导</span>
+              <span class="drawer-link-desc">单文件免安装 · 即装即用</span>
+            </div>
+          </a>
+        </li>
+        <li>
+          <a href="#author" class="drawer-link" onclick="closeSidebar()">
+            <span class="drawer-link-icon">👨‍💻</span>
+            <div class="drawer-link-text">
+              <span class="drawer-link-name">关于项目作者</span>
+              <span class="drawer-link-desc">Kutaze · 前端展示与交互体验</span>
+            </div>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="drawer-footer">
+      <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases" target="_blank" rel="noopener noreferrer" class="drawer-cta-btn">
+        📥 客户端下载 (v0.1.5)
+      </a>
+      <div class="drawer-community-row">
+        <a href="https://discord.gg/QRsPcNrSB" target="_blank" class="drawer-mini-btn">
+          💬 Discord
+        </a>
+        <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools" target="_blank" class="drawer-mini-btn">
+          ⭐ GitHub
+        </a>
+      </div>
+    </div>
+  </aside>
+
   <!-- Top Sticky Navigation Bar -->
   <header>
     <div class="nav-container">
       <!-- Logo -->
       <a href="#" class="logo-area">
         <img src="../assets/logo_glyph_transparent.png" alt="Logo" class="logo-img">
-        <span class="logo-text">Antigravity Enhance Tools</span>
+        <span class="logo-text">
+          <span class="logo-text-full">Antigravity Enhance Tools</span>
+          <span class="logo-text-short">AG Enhance</span>
+        </span>
         <span class="version-tag">v0.1.5</span>
       </a>
 
       <!-- Center Nav Links -->
       <ul class="nav-links">
-        <li><a href="#why">为什么选它</a></li>
-        <li><a href="#features">功能矩阵</a></li>
-        <li><a href="#multi-account">多账号切换</a></li>
-        <li><a href="#ui-interaction">UI美化与交互</a></li>
-        <li><a href="#skills">技能中心</a></li>
-        <li><a href="#installer">下载安装</a></li>
-        <li><a href="#author">关于作者</a></li>
+        <li><a href="#why"><span class="nav-title-full">为什么选它</span><span class="nav-title-short">优势</span></a></li>
+        <li><a href="#features"><span class="nav-title-full">功能矩阵</span><span class="nav-title-short">功能</span></a></li>
+        <li><a href="#multi-account"><span class="nav-title-full">多账号切换</span><span class="nav-title-short">多账号</span></a></li>
+        <li><a href="#ui-interaction"><span class="nav-title-full">UI美化与交互</span><span class="nav-title-short">UI交互</span></a></li>
+        <li><a href="#skills"><span class="nav-title-full">技能中心</span><span class="nav-title-short">技能</span></a></li>
+        <li><a href="#installer"><span class="nav-title-full">下载安装</span><span class="nav-title-short">下载</span></a></li>
+        <li><a href="#author"><span class="nav-title-full">关于作者</span><span class="nav-title-short">作者</span></a></li>
       </ul>
 
       <!-- Right Action Cluster -->
@@ -1122,7 +1498,8 @@
           <svg class="download-icon" viewBox="0 0 24 24">
             <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
           </svg>
-          <span>下载客户端</span>
+          <span class="download-text-full">下载客户端</span>
+          <span class="download-text-short">下载</span>
         </a>
 
         <!-- Discord Button (Fixed Proportion) -->
@@ -1137,6 +1514,15 @@
         <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools" target="_blank" rel="noopener noreferrer" class="github-nav-btn">
           <span>⭐ GitHub</span>
         </a>
+
+        <!-- Mobile Menu Toggle Button (非固定式侧边栏呼出按钮) -->
+        <button class="menu-toggle-btn" id="menu-toggle-btn" onclick="openSidebar()" aria-label="打开导航目录" title="打开导航菜单">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
       </div>
     </div>
   </header>
@@ -1158,8 +1544,8 @@
       </div>
 
       <h1 class="hero-title">
-        释放 Google Antigravity 的<br>
-        <span class="gradient-text">终极全能生产力体验</span>
+        <span class="hero-title-full">释放 Google Antigravity 的<br><span class="gradient-text">终极全能生产力体验</span></span>
+        <span class="hero-title-short">释放 Antigravity 的<br><span class="gradient-text">极致全能生产力</span></span>
       </h1>
       <p class="hero-desc">
         专为官方桌面客户端打造的深度母语汉化与原生 UI 交互增强套件。<br>
@@ -1476,6 +1862,32 @@
       document.documentElement.setAttribute('data-theme', savedTheme);
       updateThemeButton(savedTheme);
     })();
+
+    // Mobile Off-Canvas Drawer Sidebar Controls (非固定式侧边栏抽屉交互)
+    function openSidebar() {
+      const drawer = document.getElementById('mobile-sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      if (drawer && overlay) {
+        drawer.classList.add('active');
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function closeSidebar() {
+      const drawer = document.getElementById('mobile-sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      if (drawer && overlay) {
+        drawer.classList.remove('active');
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    }
+
+    // Dismiss drawer on Escape key
+    window.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeSidebar();
+    });
   </script>
 </body>
 </html>
