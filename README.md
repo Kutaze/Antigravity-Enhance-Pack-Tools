@@ -486,41 +486,53 @@ window.__AGY_APPLY_THINKING_LEVEL__('high');
 
 <div align="center">
 
-<table>
+<table style="border: none; border-collapse: collapse;">
   <tr>
-    <td align="center" width="50%" valign="top">
+    <td align="center" width="50%" valign="middle" style="padding: 24px 30px; border-right: 1px solid rgba(226, 232, 240, 0.2);">
       <br />
-      <img src="docs/assets/wechat_sponsor.png" alt="微信赞赏码" width="260" style="border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);" />
+      <img src="docs/assets/wechat_sponsor.png" alt="微信赞赏码" width="240" style="border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);" />
       <br /><br />
-      <b>微信赞赏码 (WeChat Pay)</b>
-      <br />
+      <h3 style="margin: 8px 0 4px;">💚 微信赞赏 (WeChat Pay)</h3>
       <sub>“一分钱也是爱 ❤️❤️ · 乐禾泽”</sub>
-      <br /><br />
-      <sub>支持自由随心投喂，扫码即付</sub>
+      <br />
+      <sub>支持任意金额随心投喂，微信扫码即付</sub>
       <br /><br />
     </td>
-    <td align="center" width="50%" valign="top">
+    <td align="center" width="50%" valign="middle" style="padding: 24px 30px;">
       <br />
       <a href="https://afdian.com/a/Kutaze" target="_blank" rel="noopener noreferrer">
         <img src="assets/afdian_button.svg" alt="爱发电赞助" width="240" />
       </a>
       <br /><br />
-      <b>爱发电会员赞助 (Afdian)</b>
-      <br />
-      <sub><a href="https://afdian.com/a/Kutaze">https://afdian.com/a/Kutaze</a></sub>
+      <h3 style="margin: 8px 0 4px;">⚡ 爱发电会员赞助 (Afdian)</h3>
+      <a href="https://afdian.com/a/Kutaze"><code>https://afdian.com/a/Kutaze</code></a>
       <br /><br />
-      <div align="left" style="display: inline-block; font-size: 13px; line-height: 1.6; color: #64748b;">
-        ☕ <b>¥6.66/月</b> · 请作者喝杯咖啡 (Sponsors 鸣谢)<br />
-        ⚡ <b>¥12/月</b> · 极客能量包 (Discord 专属彩色身份组)<br />
-        🚀 <b>¥29.9/月</b> · 深度共创官 (需求优先评估排期)<br />
-        👑 <b>¥99.9/月</b> · 荣誉守护者 (首页大徽章+1V1专属支持)
-      </div>
+      <table align="center" style="border: none; border-collapse: collapse; text-align: left; font-size: 13.5px; line-height: 1.8;">
+        <tr>
+          <td style="border: none; padding: 4px 8px; white-space: nowrap;">☕ <b>¥6.66 / 月</b></td>
+          <td style="border: none; padding: 4px 8px; color: #64748b;">请作者喝杯咖啡 · 鸣谢名单</td>
+        </tr>
+        <tr>
+          <td style="border: none; padding: 4px 8px; white-space: nowrap;">⚡ <b>¥12.00 / 月</b></td>
+          <td style="border: none; padding: 4px 8px; color: #64748b;">极客能量包 · <b>Discord 专属彩色身份</b></td>
+        </tr>
+        <tr>
+          <td style="border: none; padding: 4px 8px; white-space: nowrap;">🚀 <b>¥29.90 / 月</b></td>
+          <td style="border: none; padding: 4px 8px; color: #64748b;">深度共创官 · 需求优先评估排期</td>
+        </tr>
+        <tr>
+          <td style="border: none; padding: 4px 8px; white-space: nowrap;">👑 <b>¥99.90 / 月</b></td>
+          <td style="border: none; padding: 4px 8px; color: #64748b;">荣誉守护者 · 首页大徽章 + 1V1支持</td>
+        </tr>
+      </table>
+      <br />
+      <sub><a href="https://antigravity-enhance-tools.github.io/sponsor.html" target="_blank">🌐 前往官网专属赞赏页查看更多详情与权益 →</a></sub>
       <br /><br />
     </td>
   </tr>
 </table>
 
-> 🎁 **赞助者回馈**：赞助后欢迎加入 [Discord 官方社区](https://discord.gg/QRsPcNrSB) 私信管理员 **Kutaze** 领取您的专属彩色 Sponsor 身份组，并可登记您的昵称与链接收录至官网与 README 的鸣谢榜单！
+> 🎁 **赞助者回馈**：赞助后欢迎加入 [Discord 官方社区](https://discord.gg/QRsPcNrSB) 私信管理员 **Kutaze** 凭订单截图领取您的专属彩色 Sponsor 身份组，并可登记您的个人昵称与链接收录至官网与 README 的鸣谢榜单！
 
 </div>
 

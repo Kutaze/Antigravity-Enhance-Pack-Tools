@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>赞助与支持 (Sponsors) - Antigravity Enhance Tools</title>
+  <meta name="description" content="赞助与支持 Antigravity Enhance Tools 独立开发者 Kutaze，支持爱发电按月赞助与微信赞赏码。">
+  <link rel="canonical" href="https://antigravity-enhance-tools.github.io/sponsor.html">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon.png">
+  <link rel="shortcut icon" href="favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root, [data-theme="light"] {
+      --bg-body: #f8fafc;
+      --bg-card: rgba(255, 255, 255, 0.94);
+      --bg-card-hover: #ffffff;
+      --border-color: rgba(226, 232, 240, 0.9);
+      --border-hover: rgba(99, 102, 241, 0.4);
+      --border-subtle: rgba(241, 245, 249, 0.9);
+      --primary: #4f46e5;
+      --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #db2777 100%);
+      --accent-cyan: #0284c7;
+      --accent-emerald: #059669;
+      --accent-amber: #d97706;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --text-dim: #94a3b8;
+      --nav-bg: rgba(255, 255, 255, 0.88);
+      --shadow-card: 0 10px 30px -5px rgba(0, 0, 0, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
+      --shadow-glow: 0 0 30px rgba(99, 102, 241, 0.15);
+    }
+
+    [data-theme="dark"] {
+      --bg-body: #0a0d17;
+      --bg-card: rgba(18, 24, 38, 0.85);
+      --bg-card-hover: rgba(26, 34, 54, 0.95);
+      --border-color: rgba(255, 255, 255, 0.1);
+      --border-hover: rgba(99, 102, 241, 0.5);
+      --border-subtle: rgba(255, 255, 255, 0.05);
+      --primary: #6366f1;
+      --primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+      --accent-cyan: #06b6d4;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --nav-bg: rgba(10, 13, 23, 0.85);
+      --shadow-card: 0 10px 30px -5px rgba(0, 0, 0, 0.6);
+      --shadow-glow: 0 0 35px rgba(99, 102, 241, 0.28);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+
+    body {
+      background: var(--bg-body);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Ambient background blobs */
+    .bg-blobs {
+      position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0;
+    }
+    .blob { position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.18; }
+    .blob-1 { width: 600px; height: 600px; background: #6366f1; top: -100px; left: -100px; }
+    .blob-2 { width: 700px; height: 700px; background: #ec4899; top: 30%; right: -200px; }
+    .blob-3 { width: 500px; height: 500px; background: #06b6d4; bottom: -100px; left: 20%; }
+
+    /* Top Sticky Nav */
+    header {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--nav-bg); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 0.8rem 1.5rem;
+    }
+    .nav-container {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .logo-area {
+      display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: var(--text-main); font-weight: 800; font-size: 1.1rem;
+    }
+    .logo-img { width: 34px; height: 34px; object-fit: contain; }
+    .nav-links { display: flex; align-items: center; gap: 1.5rem; list-style: none; }
+    .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 0.92rem; font-weight: 600; transition: color 0.2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--primary); }
+    .nav-actions { display: flex; align-items: center; gap: 0.75rem; }
+
+    .theme-toggle-btn {
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      width: 40px; height: 40px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; transition: all 0.2s; color: var(--text-main);
+    }
+    .theme-toggle-btn:hover { border-color: var(--primary); transform: scale(1.05); }
+
+    .btn-pill {
+      display: inline-flex; align-items: center; gap: 0.5rem; height: 38px; padding: 0 1.1rem; border-radius: 999px;
+      font-size: 0.88rem; font-weight: 700; text-decoration: none; transition: all 0.2s;
+    }
+    .btn-discord { background: #5865f2; color: #fff; box-shadow: 0 2px 10px rgba(88, 101, 242, 0.35); }
+    .btn-discord:hover { filter: brightness(1.1); transform: translateY(-1px); }
+    .btn-home { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); }
+    .btn-home:hover { border-color: var(--primary); color: var(--primary); }
+
+    /* Main Container */
+    main {
+      flex: 1; position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 3.5rem 1.5rem 6rem; width: 100%;
+    }
+
+    /* Hero Header */
+    .sponsor-hero {
+      text-align: center; max-width: 780px; margin: 0 auto 4rem;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: rgba(236, 72, 153, 0.12); color: #ec4899; border: 1px solid rgba(236, 72, 153, 0.3);
+      padding: 0.35rem 1.2rem; border-radius: 999px; font-size: 0.88rem; font-weight: 800; margin-bottom: 1.2rem;
+    }
+    .sponsor-hero h1 {
+      font-size: 2.8rem; font-weight: 900; letter-spacing: -0.025em; line-height: 1.2; margin-bottom: 1rem;
+      background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .sponsor-hero p {
+      font-size: 1.15rem; color: var(--text-muted); line-height: 1.7;
+    }
+
+    /* Dual Columns (WeChat + Afdian Main) */
+    .sponsor-main-grid {
+      display: grid; grid-template-columns: 1fr 1.25fr; gap: 2.5rem; margin-bottom: 4rem;
+    }
+
+    .card-box {
+      background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 26px;
+      padding: 2.5rem; box-shadow: var(--shadow-card); backdrop-filter: blur(16px);
+      display: flex; flex-direction: column; align-items: center; text-align: center;
+      transition: all 0.3s ease; position: relative;
+    }
+    .card-box:hover {
+      border-color: var(--border-hover); box-shadow: var(--shadow-glow), var(--shadow-card);
+      transform: translateY(-3px);
+    }
+
+    /* WeChat Pay Card */
+    .wechat-tag {
+      background: rgba(16, 185, 129, 0.12); color: var(--accent-emerald); border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 4px 16px; border-radius: 999px; font-size: 0.85rem; font-weight: 800; margin-bottom: 1.5rem;
+    }
+    .qr-frame {
+      background: #ffffff; padding: 14px; border-radius: 22px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12); margin-bottom: 1.5rem;
+      transition: transform 0.3s ease;
+    }
+    .qr-frame:hover { transform: scale(1.02); }
+    .qr-image {
+      width: 250px; height: 250px; object-fit: contain; display: block; border-radius: 12px;
+    }
+    .wechat-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem; }
+    .wechat-quote { font-size: 1.05rem; font-weight: 700; color: #ef4444; margin-bottom: 0.5rem; }
+    .wechat-desc { font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; }
+
+    /* Afdian Card */
+    .afdian-tag {
+      background: rgba(148, 108, 230, 0.15); color: #946ce6; border: 1px solid rgba(148, 108, 230, 0.35);
+      padding: 4px 16px; border-radius: 999px; font-size: 0.85rem; font-weight: 800; margin-bottom: 1.5rem;
+    }
+    .afdian-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem; }
+    .afdian-desc { font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.5rem; }
+
+    .tiers-grid {
+      display: flex; flex-direction: column; gap: 0.85rem; width: 100%; margin-bottom: 1.8rem;
+    }
+    .tier-row {
+      background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-subtle);
+      border-radius: 16px; padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between;
+      text-align: left; transition: all 0.2s;
+    }
+    .tier-row:hover {
+      background: rgba(99, 102, 241, 0.08); border-color: rgba(99, 102, 241, 0.3); transform: translateX(3px);
+    }
+    .tier-info h4 { font-size: 1.05rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 0.4rem; }
+    .tier-info p { font-size: 0.85rem; color: var(--text-muted); margin-top: 2px; }
+    .tier-price { font-size: 1.25rem; font-weight: 900; color: var(--primary); text-align: right; }
+    .tier-price span { font-size: 0.85rem; font-weight: 600; color: var(--text-dim); }
+
+    .btn-afdian-cta {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.75rem;
+      width: 100%; height: 52px; border-radius: 26px;
+      background: linear-gradient(135deg, #946ce6 0%, #7232e0 100%);
+      color: #ffffff !important; text-decoration: none; font-size: 1.08rem; font-weight: 800;
+      box-shadow: 0 6px 20px rgba(114, 50, 224, 0.4); transition: all 0.25s;
+    }
+    .btn-afdian-cta:hover {
+      transform: translateY(-2px); box-shadow: 0 10px 28px rgba(114, 50, 224, 0.55); filter: brightness(1.08);
+    }
+
+    /* Benefits Perks Section */
+    .perks-box {
+      background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 26px;
+      padding: 2.8rem; box-shadow: var(--shadow-card);
+    }
+    .perks-header { text-align: center; margin-bottom: 2rem; }
+    .perks-header h3 { font-size: 1.8rem; font-weight: 900; margin-bottom: 0.5rem; }
+    .perks-header p { color: var(--text-muted); font-size: 1rem; }
+
+    .perks-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2rem;
+    }
+    .perk-item {
+      background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-subtle);
+      border-radius: 18px; padding: 1.5rem; text-align: left;
+    }
+    .perk-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+    .perk-item h4 { font-size: 1.15rem; font-weight: 800; margin-bottom: 0.4rem; color: var(--text-main); }
+    .perk-item p { font-size: 0.92rem; color: var(--text-muted); line-height: 1.6; }
+
+    .claim-guide {
+      background: rgba(88, 101, 242, 0.1); border: 1px solid rgba(88, 101, 242, 0.25);
+      border-radius: 18px; padding: 1.5rem 2rem; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem;
+    }
+    .claim-text h5 { font-size: 1.1rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.25rem; }
+    .claim-text p { font-size: 0.92rem; color: var(--text-muted); }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border-color); background: var(--nav-bg); padding: 2.5rem 1.5rem;
+      text-align: center; font-size: 0.92rem; color: var(--text-muted);
+    }
+    .footer-wrap {
+      max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+    }
+
+    @media (max-width: 900px) {
+      .sponsor-main-grid { grid-template-columns: 1fr; }
+      .perks-grid { grid-template-columns: 1fr; }
+      .claim-guide { flex-direction: column; text-align: center; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Blobs -->
+  <div class="bg-blobs">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="nav-container">
+      <a href="index.html" class="logo-area">
+        <img src="assets/logo_glyph_transparent.png" alt="Logo" class="logo-img">
+        <span>Antigravity Enhance Tools</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="index.html">产品首页</a></li>
+        <li><a href="index.html#features">功能矩阵</a></li>
+        <li><a href="index.html#installer">下载安装</a></li>
+        <li><a href="index.html#author">关于作者</a></li>
+        <li><a href="sponsor.html" class="active">💖 赞助支持</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <button class="theme-toggle-btn" onclick="toggleTheme()" title="切换浅色/深色模式">🌙</button>
+        <a href="index.html" class="btn-pill btn-home">← 返回官网</a>
+        <a href="https://discord.gg/QRsPcNrSB" target="_blank" class="btn-pill btn-discord">💬 Discord</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <!-- Hero -->
+    <div class="sponsor-hero">
+      <div class="hero-badge">💖 开源守护 · 纯净相伴</div>
+      <h1>赞助与支持 (Sponsors)</h1>
+      <p>
+        <strong>Antigravity Enhance Tools</strong> 承诺核心功能 <strong>永远 100% 开源免费、零广告植入、纯净本地运行</strong>。<br>
+        工具的高频逆向适配、功能突破、DOM 架构重构与多平台打包均由作者在业余时间独立投入。<br>
+        您的每一份发电与赞赏，都是支持本项目长期高频迭代的最大动力！
+      </p>
+    </div>
+
+    <!-- Main Dual Grid (WeChat + Afdian) -->
+    <div class="sponsor-main-grid">
+
+      <!-- Left: WeChat Pay -->
+      <div class="card-box">
+        <div class="wechat-tag">💚 微信扫码 · 自由随心投喂</div>
+        
+        <div class="qr-frame">
+          <img src="assets/wechat_sponsor.png" alt="微信赞赏码" class="qr-image">
+        </div>
+
+        <h3 class="wechat-title">微信赞赏码 (WeChat Pay)</h3>
+        <div class="wechat-quote">“一分钱也是爱 ❤️❤️ · 乐禾泽”</div>
+        <p class="wechat-desc">
+          使用微信直接扫码，支持任意自定义金额随心投喂。<br>
+          即扫即付，感谢您的每一份暖心支持！
+        </p>
+      </div>
+
+      <!-- Right: Afdian Membership -->
+      <div class="card-box">
+        <div class="afdian-tag">⚡ 爱发电会员赞助 · 专属回报</div>
+
+        <h3 class="afdian-title">爱发电会员制赞助</h3>
+        <p class="afdian-desc">
+          按月订阅支持作者持续迭代，解锁 Discord 专属彩色身份组与功能优先排期！
+        </p>
+
+        <!-- Tier List with latest prices: 6.66 / 12 / 29.9 / 99.9 -->
+        <div class="tiers-grid">
+          <div class="tier-row">
+            <div class="tier-info">
+              <h4>☕ 请作者喝杯咖啡</h4>
+              <p>精神鼓励 · 官网与项目 README 鸣谢名单收录</p>
+            </div>
+            <div class="tier-price">¥6.66 <span>/ 月</span></div>
+          </div>
+
+          <div class="tier-row" style="border-color: rgba(99, 102, 241, 0.4); background: rgba(99, 102, 241, 0.08);">
+            <div class="tier-info">
+              <h4>⚡ 极客能量包 / 续命红牛 <span style="font-size:0.75rem; background:#6366f1; color:#fff; padding:2px 8px; border-radius:999px; margin-left:4px;">主力推荐</span></h4>
+              <p>驱动工具高频迭代 · <strong>Discord 彩色 Sponsor 专属身份组</strong> + 路线图剧透</p>
+            </div>
+            <div class="tier-price" style="color:#38bdf8;">¥12.00 <span>/ 月</span></div>
+          </div>
+
+          <div class="tier-row">
+            <div class="tier-info">
+              <h4>🚀 高能探索者 / 深度共创官</h4>
+              <p>【Feature Request】需求最高优先排期 + 专属 1V1 技术交流答疑</p>
+            </div>
+            <div class="tier-price" style="color:#ec4899;">¥29.90 <span>/ 月</span></div>
+          </div>
+
+          <div class="tier-row">
+            <div class="tier-info">
+              <h4>👑 荣誉守护者 / 顶级赞助商</h4>
+              <p>首页专属大徽章/Logo致谢 + 专属远程 1 对 1 技术支持通道</p>
+            </div>
+            <div class="tier-price" style="color:#eab308;">¥99.90 <span>/ 月</span></div>
+          </div>
+        </div>
+
+        <a href="https://afdian.com/a/Kutaze" target="_blank" rel="noopener noreferrer" class="btn-afdian-cta">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+          </svg>
+          <span>立即前往爱发电赞助 (afdian.com/a/Kutaze) →</span>
+        </a>
+      </div>
+
+    </div>
+
+    <!-- Perks & Claim Guide -->
+    <div class="perks-box">
+      <div class="perks-header">
+        <h3>🎁 赞助者专属回报与特权</h3>
+        <p>每一位赞助者的支持都会被认真对待并赋予专属社区荣誉</p>
+      </div>
+
+      <div class="perks-grid">
+        <div class="perk-item">
+          <div class="perk-icon">🎖️</div>
+          <h4>Sponsor 荣誉鸣谢</h4>
+          <p>您的昵称、主页或个人博客将永久镌刻收录在项目官网与 GitHub README 赞助者名单中。</p>
+        </div>
+
+        <div class="perk-item">
+          <div class="perk-icon">💬</div>
+          <h4>Discord 彩色身份组</h4>
+          <p>在官方 Discord 社区享有专属高亮彩色身份标识，解锁核心赞助者专属讨论频道与 Alpha 尝鲜。</p>
+        </div>
+
+        <div class="perk-item">
+          <div class="perk-icon">🚀</div>
+          <h4>需求排期最高优先</h4>
+          <p>您提出的合理功能建议、交互改进与 Bug 修复，将享受作者最高优先级的技术评估与排期开发。</p>
+        </div>
+      </div>
+
+      <div class="claim-guide">
+        <div class="claim-text">
+          <h5>⚡ 如何领取您的专属社区身份组？</h5>
+          <p>赞助完成后，加入官方 Discord 社区直接私信管理员 <strong>@Kutaze</strong>，出示赞助记录截图即可秒级领取！</p>
+        </div>
+        <a href="https://discord.gg/QRsPcNrSB" target="_blank" class="btn-pill btn-discord" style="height:44px; padding:0 1.5rem; font-size:0.95rem;">
+          💬 加入 Discord 社区领取
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-wrap">
+      <div>Designed & Engineered with ❤️ by <a href="https://github.com/Kutaze" target="_blank" style="color:var(--primary); font-weight:700; text-decoration:none;">Kutaze</a> · Antigravity Enhance Tools</div>
+      <div style="display:flex; gap:1.5rem;">
+        <a href="index.html" style="color:var(--text-muted); text-decoration:none;">产品首页</a>
+        <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools" target="_blank" style="color:var(--text-muted); text-decoration:none;">GitHub</a>
+        <a href="https://afdian.com/a/Kutaze" target="_blank" style="color:#946ce6; font-weight:700; text-decoration:none;">爱发电主页</a>
+        <a href="https://discord.gg/QRsPcNrSB" target="_blank" style="color:#5865f2; font-weight:700; text-decoration:none;">Discord</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function toggleTheme() {
+      const htmlEl = document.documentElement;
+      const currentTheme = htmlEl.getAttribute('data-theme') || 'light';
+      const targetTheme = currentTheme === 'light' ? 'dark' : 'light';
+      htmlEl.setAttribute('data-theme', targetTheme);
+      localStorage.setItem('antigravity_site_theme', targetTheme);
+    }
+
+    (function initTheme() {
+      const savedTheme = localStorage.getItem('antigravity_site_theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+</body>
+</html>

@@ -243,35 +243,47 @@ Continuous reverse engineering, AST patching, performance tuning, and cross-plat
 
 <div align="center">
 
-<table>
+<table style="border: none; border-collapse: collapse;">
   <tr>
-    <td align="center" width="50%" valign="top">
+    <td align="center" width="50%" valign="middle" style="padding: 24px 30px; border-right: 1px solid rgba(226, 232, 240, 0.2);">
       <br />
-      <img src="docs/assets/wechat_sponsor.png" alt="WeChat Pay QR Code" width="260" style="border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);" />
+      <img src="docs/assets/wechat_sponsor.png" alt="WeChat Pay QR Code" width="240" style="border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);" />
       <br /><br />
-      <b>WeChat Pay (微信赞赏码)</b>
-      <br />
+      <h3 style="margin: 8px 0 4px;">💚 WeChat Pay (微信赞赏码)</h3>
       <sub>“一分钱也是爱 ❤️❤️ · 乐禾泽”</sub>
-      <br /><br />
+      <br />
       <sub>Scan with WeChat app to support freely</sub>
       <br /><br />
     </td>
-    <td align="center" width="50%" valign="top">
+    <td align="center" width="50%" valign="middle" style="padding: 24px 30px;">
       <br />
       <a href="https://afdian.com/a/Kutaze" target="_blank" rel="noopener noreferrer">
         <img src="assets/afdian_button.svg" alt="Afdian Sponsor" width="240" />
       </a>
       <br /><br />
-      <b>Afdian Membership / Donation</b>
-      <br />
-      <sub><a href="https://afdian.com/a/Kutaze">https://afdian.com/a/Kutaze</a></sub>
+      <h3 style="margin: 8px 0 4px;">⚡ Afdian Membership (爱发电)</h3>
+      <a href="https://afdian.com/a/Kutaze"><code>https://afdian.com/a/Kutaze</code></a>
       <br /><br />
-      <div align="left" style="display: inline-block; font-size: 13px; line-height: 1.6; color: #64748b;">
-        ☕ <b>¥6.66/mo</b> · Coffee Support (Sponsors Wall)<br />
-        ⚡ <b>¥12/mo</b> · Geek Energy (Discord Sponsor Role)<br />
-        🚀 <b>¥29.9/mo</b> · Co-Creator (Priority Feature Requests)<br />
-        👑 <b>¥99.9/mo</b> · Honor Guardian (Top Badge + 1v1 Support)
-      </div>
+      <table align="center" style="border: none; border-collapse: collapse; text-align: left; font-size: 13.5px; line-height: 1.8;">
+        <tr>
+          <td style="border: none; padding: 4px 8px; white-space: nowrap;">☕ <b>¥6.66 / mo</b></td>
+          <td style="border: none; padding: 4px 8px; color: #64748b;">Coffee Support · Sponsors Wall</td>
+        </tr>
+        <tr>
+          <td style="border: none; padding: 4px 8px; white-space: nowrap;">⚡ <b>¥12.00 / mo</b></td>
+          <td style="border: none; padding: 4px 8px; color: #64748b;">Geek Energy · <b>Discord Sponsor Role</b></td>
+        </tr>
+        <tr>
+          <td style="border: none; padding: 4px 8px; white-space: nowrap;">🚀 <b>¥29.90 / mo</b></td>
+          <td style="border: none; padding: 4px 8px; color: #64748b;">Co-Creator · Priority Feature Requests</td>
+        </tr>
+        <tr>
+          <td style="border: none; padding: 4px 8px; white-space: nowrap;">👑 <b>¥99.90 / mo</b></td>
+          <td style="border: none; padding: 4px 8px; color: #64748b;">Honor Guardian · Top Badge + 1v1 Support</td>
+        </tr>
+      </table>
+      <br />
+      <sub><a href="https://antigravity-enhance-tools.github.io/sponsor.html" target="_blank">🌐 Visit official sponsor page for perks & details →</a></sub>
       <br /><br />
     </td>
   </tr>
