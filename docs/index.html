@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Antigravity Enhance Tools - 官方产品首页</title>
+  <meta name="description" content="专为 Google Antigravity 官方桌面客户端打造的全界面原生深度汉化、多账号管理与交互增强套件。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    /* ========================================================
+       CSS VARIABLES & DUAL THEME ENGINE
+       ======================================================== */
+    :root, [data-theme="light"] {
+      --bg-body: #f8fafc;
+      --bg-card: rgba(255, 255, 255, 0.92);
+      --bg-card-hover: #ffffff;
+      --bg-card-solid: #ffffff;
+      --border-color: rgba(226, 232, 240, 0.9);
+      --border-hover: rgba(99, 102, 241, 0.35);
+      --border-subtle: rgba(241, 245, 249, 0.8);
+      --primary: #4f46e5;
+      --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #db2777 100%);
+      --accent-cyan: #0284c7;
+      --accent-emerald: #059669;
+      --accent-amber: #d97706;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --text-dim: #94a3b8;
+      --nav-bg: rgba(255, 255, 255, 0.88);
+      --mockup-bg: #f1f5f9;
+      --mockup-header-bg: #e2e8f0;
+      --blob-opacity: 0.12;
+      --shadow-card: 0 10px 30px -5px rgba(0, 0, 0, 0.07), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
+      --shadow-glow: 0 0 30px rgba(99, 102, 241, 0.15);
+      --tag-bg: rgba(99, 102, 241, 0.1);
+      --tag-color: #4f46e5;
+      --pain-bg: #fef2f2;
+      --pain-color: #b91c1c;
+      --pain-border: #f87171;
+      --solution-bg: #ecfdf5;
+      --solution-color: #047857;
+      --solution-border: #34d399;
+      --comm-bg: linear-gradient(135deg, rgba(88, 101, 242, 0.08) 0%, rgba(99, 102, 241, 0.03) 100%);
+      --comm-border: rgba(88, 101, 242, 0.2);
+      --author-bg: linear-gradient(135deg, rgba(99, 102, 241, 0.06) 0%, rgba(139, 92, 246, 0.03) 100%);
+      --author-border: rgba(99, 102, 241, 0.18);
+    }
+
+    [data-theme="dark"] {
+      --bg-body: #0a0d17;
+      --bg-card: rgba(18, 24, 38, 0.78);
+      --bg-card-hover: rgba(26, 34, 54, 0.9);
+      --bg-card-solid: #111726;
+      --border-color: rgba(255, 255, 255, 0.1);
+      --border-hover: rgba(99, 102, 241, 0.45);
+      --border-subtle: rgba(255, 255, 255, 0.05);
+      --primary: #6366f1;
+      --primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+      --accent-cyan: #06b6d4;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --nav-bg: rgba(10, 13, 23, 0.82);
+      --mockup-bg: #0d1220;
+      --mockup-header-bg: #141b2d;
+      --blob-opacity: 0.22;
+      --shadow-card: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+      --shadow-glow: 0 0 35px rgba(99, 102, 241, 0.25);
+      --tag-bg: rgba(99, 102, 241, 0.15);
+      --tag-color: #a5b4fc;
+      --pain-bg: rgba(239, 68, 68, 0.1);
+      --pain-color: #fca5a5;
+      --pain-border: #ef4444;
+      --solution-bg: rgba(16, 185, 129, 0.1);
+      --solution-color: #6ee7b7;
+      --solution-border: #10b981;
+      --comm-bg: linear-gradient(135deg, rgba(88, 101, 242, 0.2) 0%, rgba(99, 102, 241, 0.08) 100%);
+      --comm-border: rgba(88, 101, 242, 0.35);
+      --author-bg: linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(139, 92, 246, 0.06) 100%);
+      --author-border: rgba(99, 102, 241, 0.25);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      overflow-x: hidden;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Ambient Background Glow */
+    .bg-lights {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .light-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(140px);
+      opacity: var(--blob-opacity);
+      animation: float 20s infinite alternate ease-in-out;
+    }
+    .blob-1 {
+      width: 600px;
+      height: 600px;
+      background: #6366f1;
+      top: -150px;
+      left: 10%;
+    }
+    .blob-2 {
+      width: 500px;
+      height: 500px;
+      background: #06b6d4;
+      top: 35%;
+      right: 5%;
+      animation-delay: -5s;
+    }
+    .blob-3 {
+      width: 700px;
+      height: 700px;
+      background: #a855f7;
+      bottom: -100px;
+      left: 20%;
+      animation-delay: -10s;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0px) scale(1); }
+      100% { transform: translateY(50px) scale(1.08); }
+    }
+
+    /* ========================================================
+       TOP NAVIGATION BAR
+       ======================================================== */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      background: var(--nav-bg);
+      border-bottom: 1px solid var(--border-color);
+    }
+    .nav-container {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.25rem;
+    }
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: inherit;
+      flex-shrink: 0;
+    }
+    .logo-img {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 8px rgba(99, 102, 241, 0.35));
+    }
+    .logo-text {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+    }
+    .version-tag {
+      background: var(--tag-bg);
+      color: var(--tag-color);
+      border: 1px solid rgba(99, 102, 241, 0.35);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.15rem 0.55rem;
+      border-radius: 9999px;
+    }
+
+    /* Center Nav Links */
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.75rem;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 600;
+      transition: color 0.2s ease;
+    }
+    .nav-links a:hover {
+      color: var(--text-main);
+    }
+
+    /* Right Action Cluster */
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      flex-shrink: 0;
+    }
+
+    /* Theme Switcher Button */
+    .theme-toggle-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+    [data-theme="light"] .theme-toggle-btn {
+      background: rgba(0, 0, 0, 0.05);
+    }
+    .theme-toggle-btn:hover {
+      background: rgba(99, 102, 241, 0.15);
+      border-color: rgba(99, 102, 241, 0.4);
+      transform: rotate(15deg);
+    }
+
+    /* Proper Aspect Ratio Discord Button */
+    .discord-nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      height: 38px;
+      padding: 0 1rem;
+      border-radius: 19px;
+      background: linear-gradient(135deg, #5865f2 0%, #4752c4 100%);
+      color: #ffffff !important;
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 700;
+      box-shadow: 0 3px 12px rgba(88, 101, 242, 0.35);
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .discord-nav-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 5px 18px rgba(88, 101, 242, 0.5);
+      filter: brightness(1.05);
+    }
+    .discord-icon {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+
+    /* GitHub Button */
+    .github-nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      height: 38px;
+      padding: 0 1.05rem;
+      border-radius: 10px;
+      background: var(--primary-gradient);
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 700;
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .github-nav-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
+    }
+
+    /* ========================================================
+       HERO SECTION
+       ======================================================== */
+    main {
+      position: relative;
+      z-index: 1;
+    }
+    .hero-section {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 4.5rem 1.5rem 3.5rem;
+      text-align: center;
+    }
+    .hero-top-badges {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.8rem;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--tag-bg);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      padding: 0.4rem 1.1rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--tag-color);
+    }
+
+    /* Author Hero Micro-Badge */
+    .author-hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-color);
+      padding: 0.35rem 0.95rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    [data-theme="light"] .author-hero-pill {
+      background: #ffffff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+    .author-hero-pill:hover {
+      border-color: var(--primary);
+      color: var(--text-main);
+      transform: translateY(-1px);
+    }
+    .author-avatar-xs {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1.5px solid var(--primary);
+    }
+
+    .hero-title {
+      font-size: 3.6rem;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      line-height: 1.18;
+      margin-bottom: 1.5rem;
+    }
+    .gradient-text {
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-desc {
+      max-width: 820px;
+      margin: 0 auto 2.5rem;
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+    .hero-btns {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.1rem;
+      flex-wrap: wrap;
+      margin-bottom: 3.5rem;
+    }
+    .hero-cta {
+      padding: 0.95rem 2rem;
+      border-radius: 12px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      transition: all 0.25s ease;
+      cursor: pointer;
+      flex: 0 0 auto;
+      white-space: nowrap;
+    }
+    .hero-cta-primary {
+      background: var(--primary-gradient);
+      color: #ffffff;
+      box-shadow: 0 6px 25px rgba(99, 102, 241, 0.4);
+    }
+    .hero-cta-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 35px rgba(99, 102, 241, 0.55);
+    }
+    .hero-cta-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+    }
+    [data-theme="light"] .hero-cta-secondary {
+      background: #ffffff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    .hero-cta-secondary:hover {
+      background: rgba(99, 102, 241, 0.1);
+      border-color: rgba(99, 102, 241, 0.35);
+      transform: translateY(-2px);
+    }
+
+    /* Discord CTA Button (Hero) */
+    .hero-cta-discord {
+      background: linear-gradient(135deg, #5865f2 0%, #454fbf 100%);
+      color: #ffffff;
+      box-shadow: 0 6px 20px rgba(88, 101, 242, 0.35);
+    }
+    .hero-cta-discord:hover {
+      background: #4752c4;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(88, 101, 242, 0.5);
+    }
+
+    /* Metrics Strip */
+    .metrics-bar {
+      max-width: 1080px;
+      margin: 0 auto 4.5rem;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.25rem;
+    }
+    .metric-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 1.25rem 1rem;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow-card);
+      transition: all 0.25s ease;
+    }
+    .metric-card:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-3px);
+    }
+    .metric-num {
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--text-main);
+      margin-bottom: 0.2rem;
+    }
+    .metric-label {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* Mockup Display */
+    .hero-mockup-wrapper {
+      max-width: 1140px;
+      margin: 0 auto;
+      border-radius: 20px;
+      padding: 8px;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.35), rgba(236, 72, 153, 0.2), rgba(6, 182, 212, 0.25));
+      box-shadow: 0 25px 70px -15px rgba(0, 0, 0, 0.7), var(--shadow-glow);
+    }
+    .hero-mockup-inner {
+      background: var(--mockup-bg);
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+    .mockup-header {
+      background: var(--mockup-header-bg);
+      padding: 0.85rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .mockup-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    .dot-red { background: #ef4444; }
+    .dot-yellow { background: #f59e0b; }
+    .dot-green { background: #10b981; }
+    .mockup-tab-title {
+      margin-left: 0.6rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .mockup-img-container {
+      position: relative;
+      background: var(--bg-card-solid);
+      line-height: 0;
+    }
+    .mockup-img {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: contain;
+    }
+
+    /* ========================================================
+       SECTIONS & HEADINGS
+       ======================================================== */
+    .section-container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 5rem 1.5rem;
+    }
+    .section-header {
+      text-align: center;
+      max-width: 780px;
+      margin: 0 auto 3.5rem;
+    }
+    .section-tag {
+      text-transform: uppercase;
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      color: var(--accent-cyan);
+      margin-bottom: 0.6rem;
+      display: block;
+    }
+    .section-title {
+      font-size: 2.6rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+    .section-subtitle {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    /* ========================================================
+       "WHY" PAIN POINTS VS SOLUTIONS GRID
+       ======================================================== */
+    .why-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.75rem;
+      margin-bottom: 4rem;
+    }
+    .why-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      padding: 2.2rem;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow-card);
+      transition: all 0.3s ease;
+    }
+    .why-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--primary-gradient);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .why-card:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-4px);
+    }
+    .why-card:hover::before {
+      opacity: 1;
+    }
+    .why-card-icon {
+      font-size: 2.2rem;
+      margin-bottom: 1.25rem;
+      display: inline-block;
+    }
+    .why-pain {
+      background: var(--pain-bg);
+      border-left: 3px solid var(--pain-border);
+      padding: 0.75rem 1rem;
+      border-radius: 0 8px 8px 0;
+      font-size: 0.88rem;
+      color: var(--pain-color);
+      margin-bottom: 1rem;
+      font-weight: 500;
+    }
+    .why-solution {
+      background: var(--solution-bg);
+      border-left: 3px solid var(--solution-border);
+      padding: 0.75rem 1rem;
+      border-radius: 0 8px 8px 0;
+      font-size: 0.92rem;
+      color: var(--solution-color);
+      font-weight: 700;
+    }
+    .why-card-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 0.75rem;
+      color: var(--text-main);
+    }
+    .why-card-text {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-top: 0.85rem;
+    }
+
+    /* ========================================================
+       FEATURE SHOWCASE ROWS
+       ======================================================== */
+    .feature-showcase-row {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 3.5rem;
+      align-items: center;
+      margin-bottom: 6rem;
+    }
+    .feature-showcase-row.reverse {
+      grid-template-columns: 1fr 1.15fr;
+    }
+    .feature-showcase-row.reverse .feature-media {
+      order: 1;
+    }
+    .feature-showcase-row.reverse .feature-content {
+      order: 2;
+    }
+    .feature-media {
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-card);
+      background: var(--bg-card-solid);
+      transition: all 0.3s ease;
+    }
+    .feature-media:hover {
+      border-color: rgba(99, 102, 241, 0.4);
+      transform: scale(1.015);
+    }
+    .feature-media img {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: contain;
+    }
+    .feature-badge-mini {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.3rem 0.75rem;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+    }
+    .badge-purple { background: rgba(139, 92, 246, 0.15); color: #8b5cf6; border: 1px solid rgba(139, 92, 246, 0.3); }
+    .badge-cyan { background: rgba(6, 182, 212, 0.15); color: #0284c7; border: 1px solid rgba(6, 182, 212, 0.3); }
+    .badge-emerald { background: rgba(16, 185, 129, 0.15); color: #059669; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-amber { background: rgba(245, 158, 11, 0.15); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.3); }
+
+    .feature-content h3 {
+      font-size: 2.1rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+      line-height: 1.25;
+      color: var(--text-main);
+    }
+    .feature-content p {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      line-height: 1.75;
+      margin-bottom: 1.5rem;
+    }
+    .feature-bullets {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+    .feature-bullets li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      font-size: 0.95rem;
+      color: var(--text-main);
+    }
+    .feature-bullets li span.check {
+      color: var(--accent-emerald);
+      font-weight: 900;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* Dual Theme Installer Comparison Grid */
+    .installer-dual-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    .installer-theme-box {
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-card);
+      text-align: center;
+    }
+    .installer-theme-box img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .installer-theme-label {
+      padding: 0.6rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+      background: var(--mockup-header-bg);
+      color: var(--text-muted);
+    }
+
+    /* ========================================================
+       AUTHOR SHOWCASE CARD (关于作者)
+       ======================================================== */
+    .author-section {
+      max-width: 1100px;
+      margin: 1rem auto 4.5rem;
+      padding: 0 1.5rem;
+    }
+    .author-card {
+      background: var(--author-bg);
+      border: 1px solid var(--author-border);
+      border-radius: 22px;
+      padding: 2.75rem;
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow-card);
+      display: flex;
+      align-items: center;
+      gap: 2.5rem;
+    }
+    .author-avatar-wrap {
+      position: relative;
+      flex-shrink: 0;
+    }
+    .author-avatar-lg {
+      width: 108px;
+      height: 108px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--primary);
+      box-shadow: 0 8px 25px rgba(99, 102, 241, 0.35);
+      display: block;
+    }
+    .author-online-badge {
+      position: absolute;
+      bottom: 4px;
+      right: 4px;
+      width: 18px;
+      height: 18px;
+      background: #10b981;
+      border: 3px solid var(--bg-body);
+      border-radius: 50%;
+    }
+    .author-details {
+      flex: 1;
+    }
+    .author-title-row {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      margin-bottom: 0.6rem;
+      flex-wrap: wrap;
+    }
+    .author-name {
+      font-size: 1.75rem;
+      font-weight: 900;
+      color: var(--text-main);
+      letter-spacing: -0.02em;
+    }
+    .author-tag {
+      background: var(--tag-bg);
+      color: var(--tag-color);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+    }
+    .author-bio {
+      font-size: 1rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: 1.35rem;
+    }
+    .author-links-row {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      flex-wrap: wrap;
+    }
+    .author-link-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 0.5rem 1.05rem;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    [data-theme="light"] .author-link-pill {
+      background: #ffffff;
+    }
+    .author-link-pill:hover {
+      background: rgba(99, 102, 241, 0.15);
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    /* ========================================================
+       COMMUNITY & DISCORD SECTION (Fixed Proportion)
+       ======================================================== */
+    .community-box {
+      max-width: 1100px;
+      margin: 1rem auto 5rem;
+      background: var(--comm-bg);
+      border: 1px solid var(--comm-border);
+      border-radius: 22px;
+      padding: 3rem 2.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2.5rem;
+      box-shadow: var(--shadow-card);
+    }
+    .community-text h3 {
+      font-size: 1.9rem;
+      font-weight: 800;
+      margin-bottom: 0.6rem;
+      color: var(--text-main);
+    }
+    .community-text p {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      max-width: 650px;
+      line-height: 1.65;
+    }
+    .community-btn-wrapper {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Fixed-Ratio Discord Button Component */
+    .discord-official-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.8rem;
+      height: 48px;
+      padding: 0 1.6rem;
+      border-radius: 24px;
+      background: linear-gradient(135deg, #5865f2 0%, #454fbf 100%);
+      color: #ffffff !important;
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      box-shadow: 0 4px 18px rgba(88, 101, 242, 0.4);
+      transition: all 0.25s ease;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .discord-official-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(88, 101, 242, 0.55);
+      filter: brightness(1.08);
+    }
+    .discord-official-btn svg {
+      width: 22px;
+      height: 22px;
+      fill: #ffffff;
+      flex-shrink: 0;
+    }
+
+    /* ========================================================
+       FOOTER
+       ======================================================== */
+    footer {
+      border-top: 1px solid var(--border-color);
+      padding: 3rem 1.5rem;
+      background: var(--nav-bg);
+      text-align: center;
+    }
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.92rem;
+      color: var(--text-dim);
+    }
+    .footer-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1.5px solid var(--primary);
+    }
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+    }
+    .footer-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: color 0.2s ease;
+    }
+    .footer-links a:hover {
+      color: var(--primary);
+    }
+
+    /* ========================================================
+       RESPONSIVE ADAPTATIONS (UI 拉伸与缩放适配)
+       ======================================================== */
+    @media (max-width: 1024px) {
+      .hero-title { font-size: 3rem; }
+      .metrics-bar { grid-template-columns: repeat(2, 1fr); }
+      .why-grid { grid-template-columns: 1fr; }
+      .feature-showcase-row, .feature-showcase-row.reverse {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+      .feature-showcase-row.reverse .feature-media { order: 2; }
+      .feature-showcase-row.reverse .feature-content { order: 1; }
+      .author-card {
+        flex-direction: column;
+        text-align: center;
+      }
+      .author-title-row { justify-content: center; }
+      .author-links-row { justify-content: center; }
+      .community-box {
+        flex-direction: column;
+        text-align: center;
+      }
+      .community-text p { margin: 0 auto; }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; } /* Hide center nav on mobile */
+      .hero-title { font-size: 2.3rem; }
+      .hero-desc { font-size: 1.05rem; }
+      .metrics-bar { grid-template-columns: 1fr; }
+      .installer-dual-grid { grid-template-columns: 1fr; }
+      .footer-content {
+        flex-direction: column;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Light Blobs -->
+  <div class="bg-lights">
+    <div class="light-blob blob-1"></div>
+    <div class="light-blob blob-2"></div>
+    <div class="light-blob blob-3"></div>
+  </div>
+
+  <!-- Top Sticky Navigation Bar -->
+  <header>
+    <div class="nav-container">
+      <!-- Logo -->
+      <a href="#" class="logo-area">
+        <img src="assets/logo_glyph_transparent.png" alt="Logo" class="logo-img">
+        <span class="logo-text">Antigravity Enhance Tools</span>
+        <span class="version-tag">v0.1.5</span>
+      </a>
+
+      <!-- Center Nav Links -->
+      <ul class="nav-links">
+        <li><a href="#why">为什么选它</a></li>
+        <li><a href="#features">功能矩阵</a></li>
+        <li><a href="#multi-account">多账号管理</a></li>
+        <li><a href="#thinking-token">思考与遥测</a></li>
+        <li><a href="#skills">技能中心</a></li>
+        <li><a href="#author">关于作者</a></li>
+      </ul>
+
+      <!-- Right Action Cluster -->
+      <div class="nav-actions">
+        <!-- Dual Theme Toggle Button -->
+        <button class="theme-toggle-btn" id="theme-btn" onclick="toggleTheme()" title="切换浅色/深色模式">
+          🌙
+        </button>
+
+        <!-- Discord Button (Fixed Proportion) -->
+        <a href="https://discord.gg/QRsPcNrSB" target="_blank" rel="noopener noreferrer" class="discord-nav-btn" title="加入软件官方交流频道">
+          <svg class="discord-icon" viewBox="0 0 24 24">
+            <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .079.01c.12.098.246.198.373.292a.077.077 0 0 1-.007.128 12.299 12.299 0 0 1-1.873.891.077.077 0 0 0-.04.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.418 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.332-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.418 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.332-.946 2.418-2.157 2.418z"/>
+          </svg>
+          <span>加入 Discord</span>
+        </a>
+
+        <!-- GitHub Button -->
+        <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools" target="_blank" rel="noopener noreferrer" class="github-nav-btn">
+          <span>⭐ GitHub</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ========================================================
+         HERO SECTION
+         ======================================================== -->
+    <section class="hero-section">
+      <div class="hero-top-badges">
+        <div class="hero-badge">
+          ✨ v0.1.5 重磅发布 · 多账号原生动态管理与云端配额自动同步
+        </div>
+        <!-- Author Info in Hero -->
+        <a href="#author" class="author-hero-pill">
+          <img src="assets/author_avatar.png" alt="Kutaze 头像" class="author-avatar-xs">
+          <span>Crafted by <strong>Kutaze</strong></span>
+        </a>
+      </div>
+
+      <h1 class="hero-title">
+        释放 Google Antigravity 的<br>
+        <span class="gradient-text">终极全能生产力体验</span>
+      </h1>
+      <p class="hero-desc">
+        专为官方桌面客户端打造的深度母语汉化与原生 UI 交互增强套件。<br>
+        突破单账号配额限制、消除长程推理消耗焦虑，100% 运行于用户本地，安全、轻量、即装即用。
+      </p>
+
+      <div class="hero-btns">
+        <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases" target="_blank" class="hero-cta hero-cta-primary">
+          📥 下载客户端 (v0.1.5)
+        </a>
+        <a href="#why" class="hero-cta hero-cta-secondary">
+          💡 了解为什么需要它
+        </a>
+        <a href="https://discord.gg/QRsPcNrSB" target="_blank" class="hero-cta hero-cta-discord">
+          <svg style="width:20px; height:20px; fill:#fff;" viewBox="0 0 24 24">
+            <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .079.01c.12.098.246.198.373.292a.077.077 0 0 1-.007.128 12.299 12.299 0 0 1-1.873.891.077.077 0 0 0-.04.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.418 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.332-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.418 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.332-.946 2.418-2.157 2.418z"/>
+          </svg>
+          <span>加入 Discord 社区</span>
+        </a>
+      </div>
+
+      <!-- Metrics Strip -->
+      <div class="metrics-bar">
+        <div class="metric-card">
+          <div class="metric-num">100%</div>
+          <div class="metric-label">全场景原生深度汉化</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-num">∞</div >
+          <div class="metric-label">无上限动态账号池</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-num">4 挡</div>
+          <div class="metric-label">思考预算微调滑块</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-num">0 依赖</div>
+          <div class="metric-label">单文件独立双主题 GUI</div>
+        </div>
+      </div>
+
+      <!-- Mockup Display -->
+      <div class="hero-mockup-wrapper">
+        <div class="hero-mockup-inner">
+          <div class="mockup-header">
+            <span class="mockup-dot dot-red"></span>
+            <span class="mockup-dot dot-yellow"></span>
+            <span class="mockup-dot dot-green"></span>
+            <span class="mockup-tab-title">Antigravity Enhance Tools - 客户端内嵌实测展示</span>
+          </div>
+          <div class="mockup-img-container">
+            <img src="assets/verified_account_switcher_live.png" alt="多账号管理实测截图" class="mockup-img">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         "WHY" PAIN POINTS VS SOLUTIONS SECTION
+         ======================================================== -->
+    <section class="section-container" id="why">
+      <div class="section-header">
+        <span class="section-tag">WHY CHOOSE THIS SUITE</span>
+        <h2 class="section-title">为什么需要这款增强套件？</h2>
+        <p class="section-subtitle">
+          Antigravity 官方客户端能力出色，但在日常高频高强度开发中，诸多限制影响了流畅度。我们为此构建了开箱即用的终极增强方案。
+        </p>
+      </div>
+
+      <div class="why-grid">
+        <!-- Card 1 -->
+        <div class="why-card">
+          <div class="why-card-icon">🌐</div>
+          <div class="why-pain">❌ 原版痛点：全英文界面，快捷键与复杂设置认知门槛高</div>
+          <div class="why-solution">✅ 我们的方案：母语级深度全场景汉化，100% 覆盖核心交互</div>
+          <h3 class="why-card-title">全景原生汉化与零负担使用</h3>
+          <p class="why-card-text">
+            深入底层语法树精准注入，全面汉化系统偏好、快捷键面板、微调参数、模型选项及错误状态，绝非粗暴 DOM 替换，原汁原味流畅度。
+          </p>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="why-card">
+          <div class="why-card-icon">👥</div>
+          <div class="why-pain">❌ 原版痛点：单账号限制，配额用尽需登出重登，频繁跨工具切换臃肿</div>
+          <div class="why-solution">✅ 我们的方案：底栏原生一体化无上限账号池 + 云端真实配额自动同步</div>
+          <h3 class="why-card-title">多账号原生切换与额度雷达</h3>
+          <p class="why-card-text">
+            直接在底栏头像处呼出管理弹窗，支持无限添加 PRO/ULTRA 账号。打开面板即可毫秒级向 Google 官方端点并发同步剩余配额与重置倒计时，JWT 签名物理防串号。
+          </p>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="why-card">
+          <div class="why-card-icon">🧠</div>
+          <div class="why-pain">❌ 原版痛点：思考模型预算无法调节，小任务过度消耗，长任务思考不足</div>
+          <div class="why-solution">✅ 我们的方案：模型菜单内嵌「思考能力 4 挡调节滑块」</div>
+          <h3 class="why-card-title">Thinking 预算按需灵活掌控</h3>
+          <p class="why-card-text">
+            提供「关闭 / 低 / 中 / 高」四挡顺滑滑动条，根据任务难度灵活调节思考深度，极大节省关键配额，最高挡尊享动态光效。
+          </p>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="why-card">
+          <div class="why-card-icon">📊</div>
+          <div class="why-pain">❌ 原版痛点：上下文 Token 消耗完全是“黑盒”，不可预期何时被截断</div>
+          <div class="why-solution">✅ 我们的方案：底栏五段式真实上下文 Token 动态遥测胶囊与悬浮窗</div>
+          <h3 class="why-card-title">上下文预算透明化遥测</h3>
+          <p class="why-card-text">
+            精准展示「已缓存、输入载荷、思维推理、回复生成、剩余可用量」，毫秒级反映会话开销，长程开发胸有成竹。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         DEEP FEATURE SHOWCASES
+         ======================================================== -->
+    <section class="section-container" id="features">
+      <div class="section-header">
+        <span class="section-tag">CORE ARCHITECTURE</span>
+        <h2 class="section-title">核心功能深度拆解</h2>
+        <p class="section-subtitle">
+          每一个模块均经过严苛的稳定性测试，确保与官方最新客户端无缝共存。
+        </p>
+      </div>
+
+      <!-- Feature 1: Multi-Account System -->
+      <div class="feature-showcase-row" id="multi-account">
+        <div class="feature-media">
+          <img src="assets/verified_bottom_profile_tooltip_live.png" alt="底栏悬浮窗与多账号切换">
+        </div>
+        <div class="feature-content">
+          <span class="feature-badge-mini badge-purple">v0.1.5 重磅架构</span>
+          <h3>多账号原生动态管理体系</h3>
+          <p>
+            告别外部独立工具的繁琐调用，底栏头像与切换功能彻底合二为一。微光深色毛玻璃悬浮窗让当前状态一目了然。
+          </p>
+          <ul class="feature-bullets">
+            <li><span class="check">✔</span> <strong>无上限账号池</strong>：支持任意数量 Google 账号，标签筛选与即时搜索；</li>
+            <li><span class="check">✔</span> <strong>云端实时配额同步</strong>：自动向 Google 端点并发同步配额与重置时间，到期自动恢复为 100%；</li>
+            <li><span class="check">✔</span> <strong>本地物理防污染隔离</strong>：每组凭证在本地安全目录物理隔离，彻底杜绝串号；</li>
+            <li><span class="check">✔</span> <strong>深度注销二次确认</strong>：一键擦除 Windows Credential / Keychain 凭据。</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Feature 2: Thinking Slider & Token Telemetry -->
+      <div class="feature-showcase-row reverse" id="thinking-token">
+        <div class="feature-media">
+          <img src="assets/verified_model_slider_live.png" alt="思考滑块与用量遥测">
+        </div>
+        <div class="feature-content">
+          <span class="feature-badge-mini badge-cyan">核心交互革新</span>
+          <h3>思考深度调控 & 上下文动态遥测</h3>
+          <p>
+            将原本隐藏的高级推理参数原生嵌入模型选择菜单，搭配底栏动态彩色胶囊，打造最清晰直观的 AI 协作掌控感。
+          </p>
+          <ul class="feature-bullets">
+            <li><span class="check">✔</span> <strong>思考滑块 4 挡调节</strong>：自由拉拽控制模型 Reasoning 深度，节省宝贵额度；</li>
+            <li><span class="check">✔</span> <strong>五段真实 Token 遥测</strong>：已缓存 / 输入 / 思考 / 生成 / 剩余额度；</li>
+            <li><span class="check">✔</span> <strong>独创 DOM 缓存守卫</strong>：指纹校验杜绝单页应用死循环假死与闪退。</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Feature 3: Skills Hub -->
+      <div class="feature-showcase-row" id="skills">
+        <div class="feature-media">
+          <img src="assets/verified_skills_hub_live.png" alt="可视化技能中心">
+        </div>
+        <div class="feature-content">
+          <span class="feature-badge-mini badge-emerald">生产力飞跃</span>
+          <h3>可视化技能中心 (Skills Hub)</h3>
+          <p>
+            输入框上方工具栏一键呼出，内置 35+ 款官方与生态顶级技能，告别手工查找提示词文件的繁琐。
+          </p>
+          <ul class="feature-bullets">
+            <li><span class="check">✔</span> <strong>6 大技能分类 Tab</strong>：代码设计、UI交互、数据文档、调试测试、兜底分类；</li>
+            <li><span class="check">✔</span> <strong>双维度来源标签</strong>：清晰标明「原生自带」与「用户添加」；</li>
+            <li><span class="check">✔</span> <strong>一键 GitHub 自动安装</strong>：粘贴 GitHub 技能链接，AI 自动解析部署至本地。</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Feature 4: Dual-Theme GUI Installer -->
+      <div class="feature-showcase-row reverse" id="installer">
+        <div class="installer-dual-grid">
+          <div class="installer-theme-box">
+            <img src="assets/gui_installer_light_preview.png" alt="浅色明亮主题">
+            <div class="installer-theme-label">☀️ 浅色明亮模式 (默认)</div>
+          </div>
+          <div class="installer-theme-box">
+            <img src="assets/gui_installer_dark_preview.png" alt="深色极夜主题">
+            <div class="installer-theme-label">🌙 深色极夜模式 (一键切换)</div>
+          </div>
+        </div>
+        <div class="feature-content">
+          <span class="feature-badge-mini badge-amber">优雅开箱即用</span>
+          <h3>现代化双主题 GUI 安装向导</h3>
+          <p>
+            单文件独立免安装程序，体积轻巧。支持自动检测客户端路径、ClearType 高清文字排版与一键无缝切换深色/浅色主题。
+          </p>
+          <ul class="feature-bullets">
+            <li><span class="check">✔</span> <strong>一键注入 / 无损还原</strong>：安全备份官方原版，支持一键复原；</li>
+            <li><span class="check">✔</span> <strong>跨平台支持</strong>：全面支持 Windows、macOS (M系列/Intel) 与 Linux；</li>
+            <li><span class="check">✔</span> <strong>零隐私泄露</strong>：纯本地运行，不上传任何代码与凭证。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         AUTHOR SECTION (关于作者介绍)
+         ======================================================== -->
+    <section class="author-section" id="author">
+      <div class="author-card">
+        <div class="author-avatar-wrap">
+          <img src="assets/author_avatar.png" alt="Kutaze" class="author-avatar-lg">
+          <span class="author-online-badge" title="Developer Active"></span>
+        </div>
+        <div class="author-details">
+          <div class="author-title-row">
+            <h3 class="author-name">Kutaze</h3>
+            <span class="author-tag">项目作者 / 独立全栈开发者</span>
+          </div>
+          <p class="author-bio">
+            致力于打磨极客级 AI 辅助开发工具链与 Electron 原生桌面端交互工程。秉持“母语交互、本地隐私零妥协、开箱即用”的工程哲学，持续为开发者社区打造高质量开源增强组件。
+          </p>
+          <div class="author-links-row">
+            <a href="https://github.com/Kutaze" target="_blank" rel="noopener noreferrer" class="author-link-pill">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+              </svg>
+              <span>GitHub @Kutaze</span>
+            </a>
+            <a href="https://discord.gg/QRsPcNrSB" target="_blank" rel="noopener noreferrer" class="author-link-pill">
+              <span>💬 加入 Discord 社区</span>
+            </a>
+            <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools" target="_blank" rel="noopener noreferrer" class="author-link-pill">
+              <span>⭐ 给项目点个 Star</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Community CTA Box (Fixed Proportion Discord Button) -->
+    <div class="community-box">
+      <div class="community-text">
+        <h3>加入 Discord 官方交流平台</h3>
+        <p>
+          无论你是想要交流提示词工程、寻找最新技能推荐，还是反馈使用问题，我们的开发者社区都在这里为你提供支持！
+        </p>
+      </div>
+      <div class="community-btn-wrapper">
+        <a href="https://discord.gg/QRsPcNrSB" target="_blank" rel="noopener noreferrer" class="discord-official-btn">
+          <svg viewBox="0 0 24 24">
+            <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .079.01c.12.098.246.198.373.292a.077.077 0 0 1-.007.128 12.299 12.299 0 0 1-1.873.891.077.077 0 0 0-.04.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.418 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.332-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.418 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.332-.946 2.418-2.157 2.418z"/>
+          </svg>
+          <span>加入 Discord 交流频道</span>
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer (With Author Info at Bottom) -->
+  <footer>
+    <div class="footer-content">
+      <div class="footer-left">
+        <img src="assets/author_avatar.png" alt="Kutaze 头像" class="footer-avatar">
+        <span>Designed & Engineered with ❤️ by <a href="https://github.com/Kutaze" target="_blank" style="color:var(--primary); font-weight:700; text-decoration:none;">Kutaze</a> · Antigravity Enhance Tools</span>
+      </div>
+      <ul class="footer-links">
+        <li><a href="https://github.com/Kutaze" target="_blank">作者主页</a></li>
+        <li><a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools" target="_blank">GitHub 仓库</a></li>
+        <li><a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases" target="_blank">版本发布</a></li>
+        <li><a href="https://discord.gg/QRsPcNrSB" target="_blank">Discord 频道</a></li>
+        <li><a href="#">回到顶部 ↑</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    // Dual Theme Switcher (Light / Dark)
+    function toggleTheme() {
+      const htmlEl = document.documentElement;
+      const currentTheme = htmlEl.getAttribute('data-theme') || 'light';
+      const targetTheme = currentTheme === 'light' ? 'dark' : 'light';
+      
+      htmlEl.setAttribute('data-theme', targetTheme);
+      localStorage.setItem('antigravity_site_theme', targetTheme);
+      updateThemeButton(targetTheme);
+    }
+
+    function updateThemeButton(theme) {
+      const btn = document.getElementById('theme-btn');
+      if (btn) {
+        btn.textContent = theme === 'light' ? '🌙' : '☀️';
+        btn.title = theme === 'light' ? '切换为深色极夜模式' : '切换为浅色明亮模式';
+      }
+    }
+
+    // Load saved theme on boot (default to light)
+    (function initTheme() {
+      const savedTheme = localStorage.getItem('antigravity_site_theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      updateThemeButton(savedTheme);
+    })();
+  </script>
+</body>
+</html>
