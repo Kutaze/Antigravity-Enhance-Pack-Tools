@@ -8,6 +8,9 @@ All notable changes to the **Antigravity Enhance Tools** project will be documen
 
 ### 鱼眼波浪刻度导航轴（Timeline Fisheye Scrubber）与安装器核心修复
 - **彻底根治主进程启动崩溃与语法报错（SyntaxError: Unexpected token '}' 修复）**：修复由于 `app.asar.bak.unpacked` 缺失导致提取回退到已污染底包、以及向 `ipcHandlers.js` 重复注入导致末尾产生孤立闭合括号 `}` 的缺陷；重构注入逻辑，确保始终从原生官方包提取纯净模块，并彻底移除对 `ipcHandlers.js` 的多余侵入，启动 100% 零报错；
+- **默认聚焦底部最新对话与 ScrollSpy 智能吸底（Default Latest Turn Focus）**：修复打开会话时刻度轴初始焦点错误定位在顶部第 1 轮（最旧轮次）的缺陷，初始化与无滚动状态下默认聚焦在最底部的最新对话节点，并在用户浏览至底部区域时自动锁定最新轮次高亮；
+- **全静默启动设计（Silent Startup Mode）**：彻底移除客户端初次启动时底部弹出的“增强套件已生效/刻度导航轴已就绪”提示浮窗，界面启动体验回归 100% 极简静默无打扰；
+- **消除渲染进程并发死循环卡死（Re-entrancy Lock & DOM Stability）**：修复历史数据异步同步时由于状态别名与未及时置位导致的并发重入递归死循环，加入强原子互斥锁与稳定 DOM 复用逻辑，彻底杜绝启动卡死；
 - **全历史会话底层日志免滚动直读（Native Transcript Stream Bridge）**：彻底解决打开长会话时前端虚拟化滚动仅加载视口内 2~3 条消息导致左侧刻度轴必须手动往上滑才能加载的痛点。新增 `antigravity:get-conversation-turns` 原生 IPC 桥接通道，打开会话或切换侧边栏时，直接以高性能流式读取 `~/.gemini/antigravity/brain/<id>/.system_generated/logs/transcript.jsonl`，0 毫秒延迟加载全量历史轮次（即使是包含数百轮对话的超长上下文），左侧时空刻度轴瞬间就绪，彻底免除手动滑动缓存；
 - **超长上下文自动跳采样与 1/3 高度限制（Large-scale Jump Navigation）**：左侧导航轴专为大范围快速跳跃移动设计，轴总高度严格限制在屏幕窗口高度的三分之一以内（$\le \text{window.innerHeight} / 3$）；遇到几十轮甚至上百轮超长上下文时，自动采用均匀跳采样算法（Subsampling）提炼出 6~20 组关键里程碑节点，杜绝刻度拉伸出屏幕；
 - **连续流体余弦波浪自动跟随鼠标流动（Fluid Fisheye Wave）**：重构波浪动画引擎，基于光标与各个刻度中心之间的垂直像素距离差实时计算连续余弦钟形波（Cosine Wave），移除了阻碍高频刷新的过渡延迟，实现 60/120fps 毫秒级跟手流体波浪放大效果，并支持在刻度轴上直接滑动鼠标滚轮联动滚动聊天内容；

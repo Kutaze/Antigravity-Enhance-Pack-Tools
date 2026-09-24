@@ -6006,6 +6006,9 @@
         if (!window.electronNative || typeof window.electronNative.getConversationTurns !== 'function') return;
         const targetId = (convId && convId !== 'active_chat' && convId !== 'unknown') ? convId : '';
 
+        window.__AGY_SYNCED_CONVS__ = window.__AGY_SYNCED_CONVS__ || new Set();
+        if (targetId && window.__AGY_SYNCED_CONVS__.has(targetId)) return;
+
         window.__AGY_SYNCING_CONV__ = window.__AGY_SYNCING_CONV__ || {};
         const syncKey = targetId || 'active';
         if (window.__AGY_SYNCING_CONV__[syncKey]) return;
@@ -6015,31 +6018,46 @@
             delete window.__AGY_SYNCING_CONV__[syncKey];
             if (res && res.success && Array.isArray(res.turns) && res.turns.length > 0) {
                 const resolvedId = res.conversationId || targetId || 'active_chat';
+                window.__AGY_SYNCED_CONVS__.add(resolvedId);
+                if (targetId) window.__AGY_SYNCED_CONVS__.add(targetId);
+
                 window.__AGY_CONV_TURNS_CACHE__ = window.__AGY_CONV_TURNS_CACHE__ || new Map();
                 if (!window.__AGY_CONV_TURNS_CACHE__.has(resolvedId)) {
                     window.__AGY_CONV_TURNS_CACHE__.set(resolvedId, new Map());
                 }
                 const sMap = window.__AGY_CONV_TURNS_CACHE__.get(resolvedId);
 
+                let added = false;
                 res.turns.forEach((t) => {
                     const stepKey = t.stepId || ('turn_' + t.turn);
                     const existing = sMap.get(stepKey);
-                    sMap.set(stepKey, {
-                        turn: t.turn,
-                        userPrompt: t.userPrompt,
-                        aiSnippet: t.aiSnippet || '点击大范围快速定位至本轮...',
-                        stepIndex: t.stepIndex,
-                        stepId: stepKey,
-                        el: existing ? existing.el : null
-                    });
+                    if (!existing || !existing.userPrompt || existing.userPrompt.startsWith('第 ')) {
+                        sMap.set(stepKey, {
+                            turn: t.turn,
+                            userPrompt: t.userPrompt,
+                            aiSnippet: t.aiSnippet || '点击大范围快速定位至本轮...',
+                            stepIndex: t.stepIndex,
+                            stepId: stepKey,
+                            el: existing ? existing.el : null
+                        });
+                        added = true;
+                    }
                 });
                 sMap.__syncedFromDisk = true;
 
-                if (resolvedId !== 'active_chat') {
-                    window.__AGY_CONV_TURNS_CACHE__.set('active_chat', sMap);
+                if (convId && convId !== resolvedId) {
+                    window.__AGY_CONV_TURNS_CACHE__.set(convId, sMap);
+                    window.__AGY_SYNCED_CONVS__.add(convId);
                 }
+                window.__AGY_CONV_TURNS_CACHE__.set('active_chat', sMap);
 
-                setTimeout(mountFisheyeTimeline, 20);
+                // 防震荡防抖重新渲染刻度导航轴
+                if (added || sMap.size >= 2) {
+                    if (window.__AGY_TIMELINE_MOUNT_TIMER__) clearTimeout(window.__AGY_TIMELINE_MOUNT_TIMER__);
+                    window.__AGY_TIMELINE_MOUNT_TIMER__ = setTimeout(() => {
+                        mountFisheyeTimeline();
+                    }, 60);
+                }
             }
         }).catch(() => {
             delete window.__AGY_SYNCING_CONV__[syncKey];
@@ -6076,8 +6094,9 @@
         }
         const sessionMap = window.__AGY_CONV_TURNS_CACHE__.get(currentConvId);
 
-        // 若当前会话尚未从磁盘同步完整历史，立即发起异步静默拉取
+        // 若当前会话尚未从磁盘同步完整历史，立即标记并静默拉取，严禁重入循环
         if (!sessionMap.__syncedFromDisk && window.electronNative && typeof window.electronNative.getConversationTurns === 'function') {
+            sessionMap.__syncedFromDisk = true;
             syncConversationTurnsAsync(currentConvId);
         }
 
@@ -6440,21 +6459,33 @@
             }
         }
 
-        agyFisheyeTurns = sampledTurns;
+        const isSameTurns = (
+            agyFisheyeTurns &&
+            agyFisheyeTurns.length === sampledTurns.length &&
+            agyFisheyeTicks &&
+            agyFisheyeTicks.length === sampledTurns.length &&
+            agyFisheyeTurns[0]?.turn === sampledTurns[0]?.turn &&
+            agyFisheyeTurns[sampledTurns.length - 1]?.turn === sampledTurns[sampledTurns.length - 1]?.turn
+        );
 
-        const track = document.getElementById('agy-fisheye-track');
-        track.innerHTML = '';
-        agyFisheyeTicks = [];
+        if (!isSameTurns) {
+            agyFisheyeTurns = sampledTurns;
+            const track = document.getElementById('agy-fisheye-track');
+            track.innerHTML = '';
+            agyFisheyeTicks = [];
 
-        sampledTurns.forEach((item, index) => {
-            const tick = document.createElement('div');
-            tick.className = 'agy-fisheye-tick' + (index === 0 ? ' focus' : '');
-            tick.setAttribute('data-turn', item.turn);
-            track.appendChild(tick);
-            agyFisheyeTicks.push(tick);
-        });
+            const defaultFocusIdx = Math.max(0, sampledTurns.length - 1);
 
-        applyFisheyeWave(0);
+            sampledTurns.forEach((item, index) => {
+                const tick = document.createElement('div');
+                tick.className = 'agy-fisheye-tick' + (index === defaultFocusIdx ? ' focus' : '');
+                tick.setAttribute('data-turn', item.turn);
+                track.appendChild(tick);
+                agyFisheyeTicks.push(tick);
+            });
+
+            applyFisheyeWave(defaultFocusIdx);
+        }
 
         // 绑定事件 (仅绑定一次)
         if (!timeline.__agyEventsBound) {
@@ -6534,12 +6565,22 @@
                 requestAnimationFrame(syncScrollSpy);
             }, { passive: true });
         }
+        requestAnimationFrame(syncScrollSpy);
     }
 
     function syncScrollSpy() {
         if (!agyActiveScrollContainer || !agyFisheyeTurns.length) return;
         const maxScroll = agyActiveScrollContainer.scrollHeight - agyActiveScrollContainer.clientHeight;
-        if (maxScroll <= 0) return;
+        if (maxScroll <= 0) {
+            applyFisheyeWave(agyFisheyeTurns.length - 1);
+            return;
+        }
+
+        // 若处于视口最底部区域（余量 60px 内），自动锁定最新对话刻度
+        if (agyActiveScrollContainer.scrollTop >= maxScroll - 60) {
+            applyFisheyeWave(agyFisheyeTurns.length - 1);
+            return;
+        }
 
         const currentRatio = agyActiveScrollContainer.scrollTop / maxScroll;
         let nearestIdx = 0;
@@ -9309,14 +9350,6 @@
             }
         }, true);
     }
-
-    // Boot welcome toast confirming v0.1.6
-    setTimeout(() => {
-        if (window.__AGY_SHOW_TOAST__ && !window.__AGY_BOOT_TOAST_SHOWN__) {
-            window.__AGY_BOOT_TOAST_SHOWN__ = true;
-            window.__AGY_SHOW_TOAST__('🧭 Antigravity 增强套件 v0.1.6 已生效 · 刻度导航轴已就绪');
-        }
-    }, 1800);
 
     console.log('[Antigravity Guardian] Single Master UI Coordinator active and stable.');
 })();
