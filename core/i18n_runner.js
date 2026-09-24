@@ -5970,6 +5970,82 @@
         return false;
     }
 
+    function extractConversationId(el) {
+        if (!el) return null;
+        let curr = el;
+        while (curr && curr !== document.body) {
+            if (curr.getAttribute) {
+                for (const attr of ['data-conversation-id', 'data-session-id', 'data-chat-id', 'id']) {
+                    const val = curr.getAttribute(attr);
+                    if (val && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val)) {
+                        return val;
+                    }
+                }
+            }
+            const fKey = Object.keys(curr).find(k => k.startsWith('__reactFiber$'));
+            if (fKey && curr[fKey]) {
+                let fib = curr[fKey];
+                for (let d = 0; fib && d < 12; d++, fib = fib.return) {
+                    const p = fib.memoizedProps;
+                    if (p) {
+                        const cands = [p.conversationId, p.sessionId, p.chatId, p.id, p.conversation?.id, p.session?.id, p.item?.id, p.data?.id];
+                        for (const cand of cands) {
+                            if (typeof cand === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(cand)) {
+                                return cand;
+                            }
+                        }
+                    }
+                }
+            }
+            curr = curr.parentElement;
+        }
+        return null;
+    }
+
+    function syncConversationTurnsAsync(convId) {
+        if (!window.electronNative || typeof window.electronNative.getConversationTurns !== 'function') return;
+        const targetId = (convId && convId !== 'active_chat' && convId !== 'unknown') ? convId : '';
+
+        window.__AGY_SYNCING_CONV__ = window.__AGY_SYNCING_CONV__ || {};
+        const syncKey = targetId || 'active';
+        if (window.__AGY_SYNCING_CONV__[syncKey]) return;
+        window.__AGY_SYNCING_CONV__[syncKey] = true;
+
+        window.electronNative.getConversationTurns(targetId).then((res) => {
+            delete window.__AGY_SYNCING_CONV__[syncKey];
+            if (res && res.success && Array.isArray(res.turns) && res.turns.length > 0) {
+                const resolvedId = res.conversationId || targetId || 'active_chat';
+                window.__AGY_CONV_TURNS_CACHE__ = window.__AGY_CONV_TURNS_CACHE__ || new Map();
+                if (!window.__AGY_CONV_TURNS_CACHE__.has(resolvedId)) {
+                    window.__AGY_CONV_TURNS_CACHE__.set(resolvedId, new Map());
+                }
+                const sMap = window.__AGY_CONV_TURNS_CACHE__.get(resolvedId);
+
+                res.turns.forEach((t) => {
+                    const stepKey = t.stepId || ('turn_' + t.turn);
+                    const existing = sMap.get(stepKey);
+                    sMap.set(stepKey, {
+                        turn: t.turn,
+                        userPrompt: t.userPrompt,
+                        aiSnippet: t.aiSnippet || '点击大范围快速定位至本轮...',
+                        stepIndex: t.stepIndex,
+                        stepId: stepKey,
+                        el: existing ? existing.el : null
+                    });
+                });
+                sMap.__syncedFromDisk = true;
+
+                if (resolvedId !== 'active_chat') {
+                    window.__AGY_CONV_TURNS_CACHE__.set('active_chat', sMap);
+                }
+
+                setTimeout(mountFisheyeTimeline, 20);
+            }
+        }).catch(() => {
+            delete window.__AGY_SYNCING_CONV__[syncKey];
+        });
+    }
+
     function findRealUserTurns() {
         // 门禁 1：若在插件中心弹层、历史会话全屏列表或设置面板中，坚决不渲染刻度轴
         const pluginOverlay = document.getElementById('agy-plugin-center-overlay');
@@ -5999,6 +6075,11 @@
             window.__AGY_CONV_TURNS_CACHE__.set(currentConvId, new Map());
         }
         const sessionMap = window.__AGY_CONV_TURNS_CACHE__.get(currentConvId);
+
+        // 若当前会话尚未从磁盘同步完整历史，立即发起异步静默拉取
+        if (!sessionMap.__syncedFromDisk && window.electronNative && typeof window.electronNative.getConversationTurns === 'function') {
+            syncConversationTurnsAsync(currentConvId);
+        }
 
         let steps = [];
         if (state) {
@@ -6160,9 +6241,15 @@
             return [];
         }
 
-        return Array.from(sessionMap.values()).map((item, idx) => ({
+        const turnsList = Array.from(sessionMap.values()).filter(it => it && it.userPrompt);
+        turnsList.sort((a, b) => {
+            if (a.stepIndex != null && b.stepIndex != null) return a.stepIndex - b.stepIndex;
+            return (a.turn || 0) - (b.turn || 0);
+        });
+
+        return turnsList.map((item, idx) => ({
             ...item,
-            turn: idx + 1
+            turn: item.turn || (idx + 1)
         }));
     }
 
@@ -6205,6 +6292,19 @@
         if (!item) return;
         const scrollContainer = agyActiveScrollContainer;
 
+        // 若 item.el 未绑定或已被卸载，先检索当前 DOM 尝试动态关联
+        if (!item.el || !document.body.contains(item.el)) {
+            const domCandidates = Array.from(document.querySelectorAll('[data-testid="user-input-step"], [role="article"][aria-label="User message"], [aria-label="User message"]'));
+            for (const n of domCandidates) {
+                const txt = (n.innerText || '').trim();
+                const mLen = Math.min(15, (item.userPrompt || '').length);
+                if (mLen > 3 && (txt.includes(item.userPrompt.substring(0, mLen)) || item.userPrompt.includes(txt.substring(0, mLen)))) {
+                    item.el = n.closest('.scroll-mt-4, [class*="scroll-mt-4"], [class*="group/user-input-step"]') || n.parentElement || n;
+                    break;
+                }
+            }
+        }
+
         // 若当前 DOM 节点在视口树中存在，平滑居中滚入，并为内层实际气泡添加贴合一致的外框
         if (item.el && document.body.contains(item.el)) {
             try {
@@ -6224,12 +6324,17 @@
             if (maxScroll > 0) {
                 const targetScroll = Math.round(item.ratio * maxScroll);
                 scrollContainer.scrollTo({ top: targetScroll, behavior: smooth ? 'smooth' : 'auto' });
-                // 滚动后延时检查虚拟列表挂载出的 DOM 节点并加上贴合外框
-                setTimeout(() => {
+                // 若定位到靠前轮次，且距离顶部极近，触发微滚动以唤醒虚拟列表懒加载
+                if (item.ratio < 0.25 && targetScroll < 60) {
+                    scrollContainer.scrollTop = 0;
+                    try { scrollContainer.dispatchEvent(new Event('scroll')); } catch(e) {}
+                }
+                const tryHighlight = () => {
                     const nodes = Array.from(document.querySelectorAll('[data-testid="user-input-step"], [role="article"][aria-label="User message"], [aria-label="User message"]'));
                     for (const n of nodes) {
                         const txt = (n.innerText || '').trim();
-                        if (item.userPrompt && (txt.includes(item.userPrompt.substring(0, 15)) || item.userPrompt.includes(txt.substring(0, 15)))) {
+                        const mLen = Math.min(15, (item.userPrompt || '').length);
+                        if (mLen > 3 && (txt.includes(item.userPrompt.substring(0, mLen)) || item.userPrompt.includes(txt.substring(0, mLen)))) {
                             const turnContainer = n.closest('.scroll-mt-4, [class*="scroll-mt-4"], [class*="group/user-input-step"]') || n.parentElement || n;
                             item.el = turnContainer;
                             const bubble = turnContainer.querySelector('[data-testid="user-input-step"], [role="article"]') || turnContainer;
@@ -6237,10 +6342,14 @@
                             void bubble.offsetWidth;
                             bubble.classList.add('agy-target-pulse');
                             setTimeout(() => { try { bubble.classList.remove('agy-target-pulse'); } catch(e) {} }, 1600);
-                            break;
+                            return true;
                         }
                     }
-                }, 200);
+                    return false;
+                };
+                setTimeout(tryHighlight, 180);
+                setTimeout(tryHighlight, 400);
+                setTimeout(tryHighlight, 750);
             }
         }
     }
@@ -6455,6 +6564,7 @@
         if (origPush) {
             history.pushState = function() {
                 const res = origPush.apply(this, arguments);
+                syncConversationTurnsAsync();
                 setTimeout(mountFisheyeTimeline, 80);
                 setTimeout(mountFisheyeTimeline, 300);
                 return res;
@@ -6465,6 +6575,7 @@
         if (origReplace) {
             history.replaceState = function() {
                 const res = origReplace.apply(this, arguments);
+                syncConversationTurnsAsync();
                 setTimeout(mountFisheyeTimeline, 80);
                 setTimeout(mountFisheyeTimeline, 300);
                 return res;
@@ -6472,6 +6583,7 @@
         }
 
         window.addEventListener('popstate', () => {
+            syncConversationTurnsAsync();
             setTimeout(mountFisheyeTimeline, 80);
             setTimeout(mountFisheyeTimeline, 300);
         });
@@ -6481,6 +6593,17 @@
             const inLeftZone = e.clientX < 340;
             const inNav = e.target.closest('aside, nav, [class*="sidebar"], .bg-sidebar, [role="navigation"], [data-testid*="session"], [data-testid*="conversation"], [data-testid*="new-chat"], button');
             if (inLeftZone || inNav) {
+                const clickedConvId = extractConversationId(e.target);
+                if (clickedConvId) {
+                    syncConversationTurnsAsync(clickedConvId);
+                } else {
+                    setTimeout(() => {
+                        const getCasc = typeof findCascadeContext === 'function' ? findCascadeContext : null;
+                        const casc = (typeof getCasc === 'function' ? getCasc() : null) || window.__AGY_CASCADE_CONTEXT__;
+                        const cid = casc?.state?.conversationId || casc?.state?.id;
+                        syncConversationTurnsAsync(cid);
+                    }, 80);
+                }
                 setTimeout(mountFisheyeTimeline, 60);
                 setTimeout(mountFisheyeTimeline, 180);
                 setTimeout(mountFisheyeTimeline, 400);
@@ -6489,6 +6612,11 @@
             }
         }, true);
     }
+
+    // 初次加载延迟自动静默拉取当前会话完整历史
+    setTimeout(() => {
+        try { syncConversationTurnsAsync(); } catch(e) {}
+    }, 400);
 
     window.__AGY_MOUNT_FISHEYE_TIMELINE__ = mountFisheyeTimeline;
 

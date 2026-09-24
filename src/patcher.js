@@ -394,6 +394,95 @@ try {
             }
         });
 
+        _ipc.handle('antigravity:get-conversation-turns', async (_e, convId) => {
+            try {
+                const _readline = require('readline');
+                const brainDir = _path.join(home, '.gemini', 'antigravity', 'brain');
+                let targetId = convId;
+                if (!targetId || targetId === 'active_chat' || targetId === 'unknown') {
+                    if (_fs.existsSync(brainDir)) {
+                        const entries = _fs.readdirSync(brainDir, { withFileTypes: true });
+                        let latestTime = 0;
+                        let latestFolder = '';
+                        for (const ent of entries) {
+                            if (ent.isDirectory() && ent.name !== 'tempmediaStorage') {
+                                try {
+                                    const stat = _fs.statSync(_path.join(brainDir, ent.name));
+                                    if (stat.mtimeMs > latestTime) {
+                                        latestTime = stat.mtimeMs;
+                                        latestFolder = ent.name;
+                                    }
+                                } catch(e) {}
+                            }
+                        }
+                        if (latestFolder) targetId = latestFolder;
+                    }
+                }
+                if (!targetId) return { success: false, turns: [] };
+
+                const convDir = _path.join(brainDir, targetId);
+                if (!_fs.existsSync(convDir)) {
+                    return { success: false, error: 'Conversation folder not found', turns: [] };
+                }
+
+                let logPath = _path.join(convDir, '.system_generated', 'logs', 'transcript.jsonl');
+                if (!_fs.existsSync(logPath)) {
+                    logPath = _path.join(convDir, '.system_generated', 'logs', 'transcript_full.jsonl');
+                }
+                if (!_fs.existsSync(logPath)) {
+                    return { success: false, error: 'Transcript log not found', turns: [] };
+                }
+
+                const fileStream = _fs.createReadStream(logPath, { encoding: 'utf8' });
+                const rl = _readline.createInterface({ input: fileStream, crlfDelay: Infinity });
+
+                const turns = [];
+                let turnCounter = 0;
+                let lastUserTurn = null;
+
+                for await (const line of rl) {
+                    if (!line || !line.trim()) continue;
+                    try {
+                        const obj = JSON.parse(line);
+                        const isUser = (obj.type === 'USER_INPUT' || obj.source === 'USER_EXPLICIT');
+                        if (isUser) {
+                            turnCounter++;
+                            let text = obj.content || '';
+                            const m = text.match(/<USER_REQUEST>([\\s\\S]*?)<\\/USER_REQUEST>/);
+                            if (m) text = m[1].trim();
+                            else {
+                                text = text.replace(/<[^>]+>/g, '').trim();
+                            }
+                            const snippet = text.replace(/\\s+/g, ' ').substring(0, 90);
+                            lastUserTurn = {
+                                turn: turnCounter,
+                                stepIndex: obj.step_index != null ? obj.step_index : (turnCounter - 1),
+                                userPrompt: snippet || ('第 ' + turnCounter + ' 轮 · 用户提问'),
+                                aiSnippet: '',
+                                stepId: 'conv_step_' + (obj.step_index != null ? obj.step_index : turnCounter)
+                            };
+                            turns.push(lastUserTurn);
+                        } else if (lastUserTurn && !lastUserTurn.aiSnippet) {
+                            let aiText = '';
+                            if (typeof obj.content === 'string') {
+                                aiText = obj.content;
+                            } else if (typeof obj.thinking === 'string') {
+                                aiText = obj.thinking;
+                            }
+                            aiText = (aiText || '').replace(/<[^>]+>/g, '').replace(/\\s+/g, ' ').trim();
+                            if (aiText && aiText.length > 5) {
+                                lastUserTurn.aiSnippet = aiText.substring(0, 110);
+                            }
+                        }
+                    } catch(e) {}
+                }
+
+                return { success: true, conversationId: targetId, turns: turns };
+            } catch(err) {
+                return { success: false, error: err.message, turns: [] };
+            }
+        });
+
         // Antigravity Multi-Account Profile & Quota Switcher IPC Handlers
         const _profilesDir = _path.join(home, '.gemini', 'account_profiles');
         const _metaFile = _path.join(_profilesDir, 'profiles_meta.json');
@@ -1504,6 +1593,7 @@ try {
     takeScreenshot: () => electron_1.ipcRenderer.invoke('antigravity:screenshot'),
     getClipboardImage: () => electron_1.ipcRenderer.invoke('antigravity:clipboard-image'),
     getSkills: () => electron_1.ipcRenderer.invoke('antigravity:get-skills'),
+    getConversationTurns: (convId) => electron_1.ipcRenderer.invoke('antigravity:get-conversation-turns', convId),
     openPath: (p) => electron_1.ipcRenderer.invoke('antigravity:open-path', p),
     openExternal: (url) => electron_1.ipcRenderer.invoke('antigravity:open-external', url),
     getAccountProfiles: () => electron_1.ipcRenderer.invoke('antigravity:get-account-profiles'),
@@ -1546,6 +1636,14 @@ try {
                 preloadContent = preloadContent.replace(
                     "deleteAccountProfile: (email) => electron_1.ipcRenderer.invoke('antigravity:delete-account-profile', email),",
                     "deleteAccountProfile: (email) => electron_1.ipcRenderer.invoke('antigravity:delete-account-profile', email),\n    logoutCurrentAccount: () => electron_1.ipcRenderer.invoke('antigravity:logout-current-account'),"
+                );
+                fs.writeFileSync(preloadJs, preloadContent, 'utf8');
+            }
+
+            if (preloadContent.includes('getSkills:') && !preloadContent.includes('getConversationTurns:')) {
+                preloadContent = preloadContent.replace(
+                    "getSkills: () => electron_1.ipcRenderer.invoke('antigravity:get-skills'),",
+                    "getSkills: () => electron_1.ipcRenderer.invoke('antigravity:get-skills'),\n    getConversationTurns: (convId) => electron_1.ipcRenderer.invoke('antigravity:get-conversation-turns', convId),"
                 );
                 fs.writeFileSync(preloadJs, preloadContent, 'utf8');
             }
