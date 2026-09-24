@@ -4,6 +4,19 @@ All notable changes to the **Antigravity Enhance Tools** project will be documen
 
 ---
 
+## [v0.1.6] - 2026-09-24
+
+### 鱼眼波浪刻度导航轴（Timeline Fisheye Scrubber）与安装器核心修复
+- **彻底根治主进程启动崩溃与语法报错（SyntaxError: Unexpected token '}' 修复）**：修复由于 `app.asar.bak.unpacked` 缺失导致提取回退到已污染底包、以及向 `ipcHandlers.js` 重复注入导致末尾产生孤立闭合括号 `}` 的缺陷；重构注入逻辑，确保始终从原生官方包提取纯净模块，并彻底移除对 `ipcHandlers.js` 的多余侵入，启动 100% 零报错；
+- **全景历史会话免上滑直读（Fiber Redux 深度直读 + 持久缓存）**：打破 DOM 虚拟滚动列表（Virtual List）仅渲染可视视窗内 2 条历史记录的限制，深入底层 React Fiber 树与 Redux 状态切片（`state.trajectorySlice.stepsInSlice`），原生提取多轮全景对话提问与 AI 回复片段，建立会话持久缓存，无需再手动从右侧滚动条向上划动缓存；
+- **超长上下文自动跳采样与 1/3 高度限制（Large-scale Jump Navigation）**：左侧导航轴专为大范围快速跳跃移动设计，轴总高度严格限制在屏幕窗口高度的三分之一以内（$\le \text{window.innerHeight} / 3$）；遇到几十轮甚至超长上下文时，自动采用均匀跳采样算法（Subsampling）提炼出 6~20 组关键里程碑节点，杜绝刻度拉伸出屏幕；
+- **连续流体余弦波浪自动跟随鼠标流动（Fluid Fisheye Wave）**：重构波浪动画引擎，基于光标与各个刻度中心之间的垂直像素距离差实时计算连续余弦钟形波（Cosine Wave），移除了阻碍高频刷新的过渡延迟，实现 60/120fps 毫秒级跟手流体波浪放大效果，并支持在刻度轴上直接滑动鼠标滚轮联动滚动聊天内容；
+- **极简单色深浅色灰阶设计（Monochrome Gray Aesthetics）**：全面剔除所有紫色与高饱和色彩，深色模式采用高质感冷灰白微晶阶梯，浅色模式采用低饱和深灰阶梯，悬浮面板采用极简单色磨砂质感；
+- **贴合一致的四边内包裹定位框（Target Bubble Pulse）**：彻底修复旧版宽容器边框裁剪造成的两侧脱节竖线问题，自动定位至真实用户气泡节点，应用贴合圆角弧度的单色平滑微光光晕动画；
+- **智能会话切换联动与全局页面门禁（Session Switching & Gatekeeper）**：监听路由与全局导航点击事件，切换不同会话时进度条毫秒级联动更新；在新建会话（0~1条）、定时任务 Cron 列表、插件中心、历史会话全屏管理等非多轮对话界面自动绝对隐匿，保持界面极致纯净。
+
+---
+
 ## [v0.1.5] - 2026-09-23
 
 ### 多账号原生动态管理体系（对比 v0.1.4 深度重构）

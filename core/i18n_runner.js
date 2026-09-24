@@ -3113,6 +3113,7 @@
             <div class="agy-quota-header">
                 <div class="agy-quota-title-wrap">
                     <span class="agy-quota-title">当前实时额度</span>
+                    <span class="agy-quota-version-tag" style="font-size: 9.5px; font-weight: 700; padding: 1.5px 5.5px; border-radius: 4px; background: rgba(99, 102, 241, 0.16); color: #818cf8; margin-left: 5px; vertical-align: middle; letter-spacing: 0.2px;" title="Antigravity Enhance Tools v0.1.6 Pro">v0.1.6</span>
                     <div class="agy-quota-tabs">
                         <button class="agy-quota-tab ${activeModelTab === 'gemini' ? 'active' : ''}" id="agy-tab-gemini">Gemini</button>
                         <button class="agy-quota-tab ${activeModelTab === 'claude' ? 'active' : ''}" id="agy-tab-claude">Claude</button>
@@ -3160,59 +3161,69 @@
         }
     }
 
-    // Helper: Retrieve User Profile (Account Name & Avatar & Subscription Tier)
+    // Helper: Retrieve User Profile (Account Name & Avatar & Subscription Tier - Cached & Instant)
+    let agyCachedProfile = null;
     function getUserProfile() {
+        if (agyCachedProfile && agyCachedProfile.name) return agyCachedProfile;
         try {
-            const root = document.getElementById('root');
-            if (root) {
-                const rKey = Object.keys(root).find(k => k.startsWith('__reactContainer$') || k.startsWith('__reactFiber$'));
-                let queue = [root[rKey]];
-                let steps = 0;
-                while (queue.length > 0 && steps < 6000) {
-                    steps++;
-                    const cur = queue.shift();
-                    if (!cur) continue;
-                    if (cur.memoizedProps && cur.memoizedProps.userStatus) {
-                        const u = cur.memoizedProps.userStatus;
-                        let tier = '';
-                        const tierId = (u.userTier?.id || '').toLowerCase();
-                        const tierName = (u.userTier?.name || '').toLowerCase();
-                        const planName = (u.planStatus?.planInfo?.planName || '').toLowerCase();
-                        const str = `${tierId} ${tierName} ${planName}`;
-                        if (str.includes('ultra')) tier = 'ULTRA';
-                        else if (str.includes('pro')) tier = 'PRO';
-                        else if (str.includes('plus')) tier = 'PLUS';
-
-                        const defActive = window.__AGY_BOOTSTRAP_PROFILES__?.active || localStorage.getItem('__AGY_ACTIVE_EMAIL__') || '';
-                        const profile = {
-                            name: u.name || (defActive ? defActive.split('@')[0] : '用户'),
-                            email: u.email || defActive,
-                            avatar: u.profilePictureUrl || '',
-                            tier: tier || 'PRO'
-                        };
-                        try {
-                            localStorage.setItem('__AGY_USER_PROFILE__', JSON.stringify(profile));
-                        } catch(e) {}
-                        return profile;
-                    }
-                    if (cur.child) queue.push(cur.child);
-                    if (cur.sibling) queue.push(cur.sibling);
-                }
-            }
-
             const cached = localStorage.getItem('__AGY_USER_PROFILE__');
             if (cached) {
                 const profile = JSON.parse(cached);
-                if (profile && profile.name) return profile;
+                if (profile && profile.name) {
+                    agyCachedProfile = profile;
+                    return profile;
+                }
+            }
+
+            const root = document.getElementById('root');
+            if (root) {
+                const rKey = Object.keys(root).find(k => k.startsWith('__reactContainer$') || k.startsWith('__reactFiber$'));
+                if (rKey && root[rKey]) {
+                    let queue = [root[rKey]];
+                    let steps = 0;
+                    while (queue.length > 0 && steps < 300) {
+                        steps++;
+                        const cur = queue.shift();
+                        if (!cur) continue;
+                        if (cur.memoizedProps && cur.memoizedProps.userStatus) {
+                            const u = cur.memoizedProps.userStatus;
+                            let tier = '';
+                            const tierId = (u.userTier?.id || '').toLowerCase();
+                            const tierName = (u.userTier?.name || '').toLowerCase();
+                            const planName = (u.planStatus?.planInfo?.planName || '').toLowerCase();
+                            const str = `${tierId} ${tierName} ${planName}`;
+                            if (str.includes('ultra')) tier = 'ULTRA';
+                            else if (str.includes('pro')) tier = 'PRO';
+                            else if (str.includes('plus')) tier = 'PLUS';
+
+                            const defActive = window.__AGY_BOOTSTRAP_PROFILES__?.active || localStorage.getItem('__AGY_ACTIVE_EMAIL__') || '';
+                            const profile = {
+                                name: u.name || (defActive ? defActive.split('@')[0] : '用户'),
+                                email: u.email || defActive,
+                                avatar: u.profilePictureUrl || '',
+                                tier: tier || 'PRO'
+                            };
+                            try {
+                                localStorage.setItem('__AGY_USER_PROFILE__', JSON.stringify(profile));
+                            } catch(e) {}
+                            agyCachedProfile = profile;
+                            return profile;
+                        }
+                        if (cur.child) queue.push(cur.child);
+                        if (cur.sibling) queue.push(cur.sibling);
+                    }
+                }
             }
 
             const defActive = window.__AGY_BOOTSTRAP_PROFILES__?.active || localStorage.getItem('__AGY_ACTIVE_EMAIL__') || '';
-            return {
+            const fallback = {
                 name: (defActive ? defActive.split('@')[0] : '用户'),
                 email: defActive,
                 avatar: '',
                 tier: 'PRO'
             };
+            agyCachedProfile = fallback;
+            return fallback;
         } catch(e) {
             const defActive = window.__AGY_BOOTSTRAP_PROFILES__?.active || localStorage.getItem('__AGY_ACTIVE_EMAIL__') || '';
             return {
@@ -5141,24 +5152,37 @@
             document.querySelector('div[contenteditable="true"], textarea, [data-lexical-editor="true"]'),
             document.querySelector('button[type="submit"], [data-tooltip-id*="submit"], button[aria-label*="Send"]'),
             document.querySelector('[data-tooltip-id="input-send-button-record-tooltip"]'),
+            document.querySelector('[data-testid="user-input-step"], [role="article"]'),
+            document.querySelector('[data-radix-scroll-area-viewport]'),
             document.getElementById('root')
         ];
         for (let el of candidates) {
-            while (el) {
-                const key = Object.keys(el).find(k => k.startsWith('__reactFiber$'));
-                if (key && el[key]) {
-                    let f = el[key];
+            let curr = el;
+            while (curr) {
+                const key = Object.keys(curr).find(k => k.startsWith('__reactFiber$'));
+                if (key && curr[key]) {
+                    let f = curr[key];
                     while (f) {
                         if (f.memoizedProps && f.memoizedProps.cascadeContext) {
+                            window.__AGY_CASCADE_CONTEXT__ = f.memoizedProps.cascadeContext;
                             return f.memoizedProps.cascadeContext;
+                        }
+                        if (f.memoizedProps && f.memoizedProps.value && f.memoizedProps.value.agentStateProvider) {
+                            window.__AGY_CASCADE_CONTEXT__ = f.memoizedProps.value;
+                            return f.memoizedProps.value;
+                        }
+                        if (f.memoizedState && f.memoizedState.cascadeContext) {
+                            window.__AGY_CASCADE_CONTEXT__ = f.memoizedState.cascadeContext;
+                            return f.memoizedState.cascadeContext;
                         }
                         f = f.return;
                     }
                 }
-                el = el.parentElement;
+                curr = curr.parentElement;
             }
         }
-        return null;
+        window.__AGY_FIND_CASCADE_CONTEXT__ = findCascadeContext;
+        return window.__AGY_CASCADE_CONTEXT__ || null;
     }
 
     function getActiveModelLimit(cascadeContext) {
@@ -5225,6 +5249,9 @@
                         asp.onDidChange(() => {
                             if (typeof window.__AGY_MOUNT_CONTEXT_USAGE__ === 'function') {
                                 window.__AGY_MOUNT_CONTEXT_USAGE__();
+                            }
+                            if (typeof window.__AGY_MOUNT_FISHEYE_TIMELINE__ === 'function') {
+                                window.__AGY_MOUNT_FISHEYE_TIMELINE__();
                             }
                         });
                     } catch(e) {}
@@ -5496,6 +5523,974 @@
     if (!window.__AGY_HEARTBEAT_TIMER__) {
         window.__AGY_HEARTBEAT_TIMER__ = setInterval(mountContextUsage, 1000);
     }
+
+    // ==============================================================
+    // 2.5 FISHEYE TIMELINE SCRUBBER (左侧边栏右侧·鱼眼波浪拖拽刻度导航轴·浅色/深色自适应)
+    // ==============================================================
+    function isAntigravityDarkTheme() {
+        if (document.documentElement.classList.contains('dark')) return true;
+        if (document.body.classList.contains('theme-dark')) return true;
+        if (document.body.classList.contains('theme-light')) return false;
+        
+        try {
+            const bg = window.getComputedStyle(document.body).backgroundColor;
+            const rgb = bg.match(/\d+/g);
+            if (rgb && rgb.length >= 3) {
+                const brightness = (parseInt(rgb[0]) * 299 + parseInt(rgb[1]) * 587 + parseInt(rgb[2]) * 114) / 1000;
+                return brightness < 128;
+            }
+        } catch(e) {}
+        
+        try {
+            const bgVar = getComputedStyle(document.documentElement).getPropertyValue('--background');
+            if (bgVar && bgVar.includes('#')) {
+                const hex = bgVar.replace('#', '').trim();
+                if (hex.length === 6) {
+                    const r = parseInt(hex.substr(0, 2), 16);
+                    const g = parseInt(hex.substr(2, 2), 16);
+                    const b = parseInt(hex.substr(4, 2), 16);
+                    return ((r * 299 + g * 587 + b * 114) / 1000) < 128;
+                }
+            }
+        } catch(e) {}
+
+        return false;
+    }
+
+    (function initFisheyeTimelineStyles() {
+        const styleId = 'agy-fisheye-timeline-style';
+        if (document.getElementById(styleId)) return;
+        const style = document.createElement('style');
+        style.id = styleId;
+        style.textContent = `
+            /* ===== 导航轴轨道容器 (无背景·纯净单色悬浮刻度条·上限窗口高1/3) ===== */
+            .agy-fisheye-timeline {
+                position: fixed;
+                left: 260px;
+                top: 50%;
+                transform: translateY(-50%);
+                z-index: 998;
+                user-select: none;
+                cursor: pointer;
+                display: none;
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 12px 34px 12px 14px;
+                touch-action: none;
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                border-radius: 0 !important;
+                transition: left 0.15s ease, opacity 0.2s ease;
+            }
+
+            .agy-fisheye-timeline[data-theme="dark"],
+            body.theme-dark .agy-fisheye-timeline,
+            html.dark .agy-fisheye-timeline,
+            .agy-fisheye-timeline[data-theme="light"],
+            body.theme-light .agy-fisheye-timeline,
+            body:not(.theme-dark):not(.dark) .agy-fisheye-timeline {
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+            }
+
+            /* ===== 刻度轨道与刻度线条 ===== */
+            .agy-fisheye-track {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+                position: relative;
+                padding: 2px;
+                background: transparent !important;
+            }
+
+            .agy-fisheye-tick {
+                height: 2.5px;
+                width: 8px;
+                border-radius: 2px;
+                transform-origin: left center;
+                position: relative;
+                opacity: 0.4;
+                transition: opacity 0.15s ease, background 0.15s ease;
+            }
+            .agy-fisheye-timeline:not(:hover) .agy-fisheye-tick {
+                transition: width 0.18s ease-out, height 0.18s ease-out, opacity 0.18s ease, background 0.18s ease;
+            }
+
+            /* 深色模式·单色灰白质感刻度线条 */
+            .agy-fisheye-timeline[data-theme="dark"] .agy-fisheye-tick,
+            body.theme-dark .agy-fisheye-tick,
+            html.dark .agy-fisheye-tick {
+                background: rgba(255, 255, 255, 0.32);
+            }
+            .agy-fisheye-timeline[data-theme="dark"] .agy-fisheye-tick.focus,
+            body.theme-dark .agy-fisheye-tick.focus,
+            html.dark .agy-fisheye-tick.focus {
+                background: #ffffff !important;
+                opacity: 1 !important;
+                box-shadow: 0 0 7px rgba(255, 255, 255, 0.7);
+            }
+
+            /* 浅色模式·单色低饱和深灰刻度线条 */
+            .agy-fisheye-timeline[data-theme="light"] .agy-fisheye-tick,
+            body.theme-light .agy-fisheye-tick,
+            body:not(.theme-dark):not(.dark) .agy-fisheye-tick {
+                background: rgba(0, 0, 0, 0.28);
+            }
+            .agy-fisheye-timeline[data-theme="light"] .agy-fisheye-tick.focus,
+            body.theme-light .agy-fisheye-tick.focus,
+            body:not(.theme-dark):not(.dark) .agy-fisheye-tick.focus {
+                background: #18181b !important;
+                opacity: 1 !important;
+                box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
+            }
+
+            /* ===== 悬浮气泡弹窗 (单色灰系·无紫色) ===== */
+            .agy-fisheye-popover {
+                position: fixed;
+                width: 360px;
+                border-radius: 12px;
+                padding: 12px 15px;
+                z-index: 1000;
+                opacity: 0;
+                pointer-events: none;
+                transform: translateY(-50%);
+                transition: opacity 0.12s ease, top 0.05s ease-out, background 0.2s ease, border-color 0.2s ease;
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+                font-family: inherit;
+            }
+            .agy-fisheye-popover.visible {
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+            /* 深色模式·悬浮窗 (极简冷灰质感) */
+            .agy-fisheye-popover[data-theme="dark"],
+            body.theme-dark .agy-fisheye-popover,
+            html.dark .agy-fisheye-popover {
+                background: rgba(24, 24, 27, 0.96);
+                backdrop-filter: blur(18px);
+                -webkit-backdrop-filter: blur(18px);
+                border: 1px solid rgba(255, 255, 255, 0.12);
+                box-shadow: 0 12px 30px -4px rgba(0, 0, 0, 0.6);
+            }
+            .agy-fisheye-popover[data-theme="dark"] .agy-popover-badge-row,
+            body.theme-dark .agy-popover-badge-row {
+                color: #a1a1aa;
+            }
+            .agy-fisheye-popover[data-theme="dark"] .agy-popover-badge,
+            body.theme-dark .agy-popover-badge {
+                color: #f4f4f5;
+                background: rgba(255, 255, 255, 0.08);
+                border: 1px solid rgba(255, 255, 255, 0.16);
+            }
+            .agy-fisheye-popover[data-theme="dark"] .agy-popover-prompt,
+            body.theme-dark .agy-popover-prompt {
+                color: #fafafa;
+            }
+            .agy-fisheye-popover[data-theme="dark"] .agy-popover-snippet,
+            body.theme-dark .agy-popover-snippet {
+                color: #a1a1aa;
+                border-top: 1px dashed rgba(255, 255, 255, 0.12);
+            }
+
+            /* 浅色模式·悬浮窗 (极简纯净灰白) */
+            .agy-fisheye-popover[data-theme="light"],
+            body.theme-light .agy-fisheye-popover,
+            body:not(.theme-dark):not(.dark) .agy-fisheye-popover {
+                background: rgba(255, 255, 255, 0.98);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border: 1px solid rgba(0, 0, 0, 0.12);
+                box-shadow: 0 10px 25px -4px rgba(0, 0, 0, 0.12), 0 4px 10px rgba(0, 0, 0, 0.04);
+            }
+            .agy-fisheye-popover[data-theme="light"] .agy-popover-badge-row,
+            body.theme-light .agy-popover-badge-row,
+            body:not(.theme-dark):not(.dark) .agy-popover-badge-row {
+                color: #71717a;
+            }
+            .agy-fisheye-popover[data-theme="light"] .agy-popover-badge,
+            body.theme-light .agy-popover-badge,
+            body:not(.theme-dark):not(.dark) .agy-popover-badge {
+                color: #27272a;
+                background: rgba(0, 0, 0, 0.06);
+                border: 1px solid rgba(0, 0, 0, 0.12);
+            }
+            .agy-fisheye-popover[data-theme="light"] .agy-popover-prompt,
+            body.theme-light .agy-popover-prompt,
+            body:not(.theme-dark):not(.dark) .agy-popover-prompt {
+                color: #09090b;
+            }
+            .agy-fisheye-popover[data-theme="light"] .agy-popover-snippet,
+            body.theme-light .agy-popover-snippet,
+            body:not(.theme-dark):not(.dark) .agy-popover-snippet {
+                color: #71717a;
+                border-top: 1px dashed rgba(0, 0, 0, 0.1);
+            }
+
+            .agy-popover-badge-row {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                font-size: 11px;
+            }
+            .agy-popover-badge {
+                font-weight: 600;
+                padding: 2px 7px;
+                border-radius: 5px;
+                font-size: 11px;
+                letter-spacing: 0.2px;
+            }
+            .agy-popover-prompt {
+                font-size: 13px;
+                font-weight: 600;
+                line-height: 1.45;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .agy-popover-snippet {
+                font-size: 11.5px;
+                line-height: 1.5;
+                display: -webkit-box;
+                -webkit-line-clamp: 3;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                padding-top: 5px;
+            }
+            /* 贴合一致的单色平滑定位高亮 (无脱节竖线·全包裹外框) */
+            .agy-target-pulse {
+                position: relative !important;
+                outline: 2px solid rgba(113, 113, 122, 0.7) !important;
+                outline-offset: 3px !important;
+                border-radius: inherit !important;
+                animation: agyTargetHighlight 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+            }
+            @keyframes agyTargetHighlight {
+                0% {
+                    outline-color: rgba(113, 113, 122, 0.9) !important;
+                    box-shadow: 0 0 0 4px rgba(113, 113, 122, 0.2) !important;
+                }
+                70% {
+                    outline-color: rgba(113, 113, 122, 0.4) !important;
+                    box-shadow: 0 0 0 2px rgba(113, 113, 122, 0.08) !important;
+                }
+                100% {
+                    outline-color: transparent !important;
+                    box-shadow: none !important;
+                }
+            }
+            body.agy-is-scrubbing {
+                cursor: ns-resize !important;
+            }
+            body.agy-is-scrubbing * {
+                cursor: ns-resize !important;
+                user-select: none !important;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Real-time theme change listener
+        try {
+            const themeObserver = new MutationObserver(() => {
+                const isDark = isAntigravityDarkTheme();
+                const themeStr = isDark ? 'dark' : 'light';
+                const tl = document.getElementById('agy-fisheye-timeline');
+                if (tl) tl.setAttribute('data-theme', themeStr);
+                const pop = document.getElementById('agy-fisheye-popover');
+                if (pop) pop.setAttribute('data-theme', themeStr);
+            });
+            themeObserver.observe(document.body, { attributes: true, attributeFilter: ['class', 'style'] });
+            themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class', 'style'] });
+        } catch(e) {}
+    })();
+
+    let agyFisheyeTicks = [];
+    let agyFisheyeTurns = [];
+    let agyFisheyeFocusIdx = 0;
+    let agyIsScrubbing = false;
+    let agyPopoverTimer = null;
+    let agyActiveScrollContainer = null;
+
+    // 鼠标在刻度轴移动时，以坐标像素差计算流畅鱼眼波浪
+    function applyFisheyeWaveByCoord(clientY) {
+        if (!agyFisheyeTicks.length) return 0;
+        const MIN_W = 8;
+        const MAX_W = 24;
+        const WAVE_RADIUS = 55; // 像素感应扩散半径
+
+        let closestIdx = 0;
+        let closestDist = Infinity;
+
+        for (let i = 0; i < agyFisheyeTicks.length; i++) {
+            const tick = agyFisheyeTicks[i];
+            const rect = tick.getBoundingClientRect();
+            const tickCenterY = rect.top + rect.height / 2;
+            const distPx = Math.abs(tickCenterY - clientY);
+
+            if (distPx < closestDist) {
+                closestDist = distPx;
+                closestIdx = i;
+            }
+
+            if (distPx < WAVE_RADIUS) {
+                // 平滑余弦波形连续流动放大
+                const factor = Math.cos((Math.PI / 2) * (distPx / WAVE_RADIUS));
+                const w = MIN_W + (MAX_W - MIN_W) * factor * factor;
+                tick.style.width = w.toFixed(1) + 'px';
+                tick.style.height = (2.5 + factor * 0.9).toFixed(1) + 'px';
+                tick.style.opacity = (0.45 + factor * 0.55).toFixed(2);
+            } else {
+                tick.style.width = MIN_W + 'px';
+                tick.style.height = '2.5px';
+                tick.style.opacity = '0.4';
+            }
+        }
+
+        agyFisheyeFocusIdx = closestIdx;
+        for (let i = 0; i < agyFisheyeTicks.length; i++) {
+            if (i === closestIdx) agyFisheyeTicks[i].classList.add('focus');
+            else agyFisheyeTicks[i].classList.remove('focus');
+        }
+
+        return closestIdx;
+    }
+
+    function applyFisheyeWave(focusIdx) {
+        if (!agyFisheyeTicks.length) return;
+        agyFisheyeFocusIdx = Math.max(0, Math.min(agyFisheyeTicks.length - 1, focusIdx));
+        const MIN_W = 8;
+        const MAX_W = 24;
+        const RADIUS = 3;
+
+        for (let i = 0; i < agyFisheyeTicks.length; i++) {
+            const tick = agyFisheyeTicks[i];
+            const dist = Math.abs(i - agyFisheyeFocusIdx);
+            if (dist === 0) {
+                tick.style.width = MAX_W + 'px';
+                tick.style.height = '3.4px';
+                tick.style.opacity = '1';
+                tick.classList.add('focus');
+            } else if (dist <= RADIUS) {
+                const factor = Math.pow(Math.cos((Math.PI * dist) / (2 * (RADIUS + 1))), 2);
+                const w = MIN_W + (MAX_W - MIN_W) * factor;
+                tick.style.width = w.toFixed(1) + 'px';
+                tick.style.height = (2.5 + factor * 0.8).toFixed(1) + 'px';
+                tick.style.opacity = (0.5 + factor * 0.45).toFixed(2);
+                tick.classList.remove('focus');
+            } else {
+                tick.style.width = MIN_W + 'px';
+                tick.style.height = '2.5px';
+                tick.style.opacity = '0.4';
+                tick.classList.remove('focus');
+            }
+        }
+    }
+
+    function updateFisheyePopover(idx, clientY) {
+        const item = agyFisheyeTurns[idx];
+        if (!item) return;
+
+        let popover = document.getElementById('agy-fisheye-popover');
+        if (!popover) {
+            popover = document.createElement('div');
+            popover.id = 'agy-fisheye-popover';
+            popover.className = 'agy-fisheye-popover';
+            document.body.appendChild(popover);
+        }
+
+        const isDark = isAntigravityDarkTheme();
+        popover.setAttribute('data-theme', isDark ? 'dark' : 'light');
+
+        const totalInfo = item.totalTurns ? (' (共 ' + item.totalTurns + ' 轮)') : '';
+        const badgeText = item.turn ? ('第 ' + item.turn + ' 轮 · 大范围定位' + totalInfo) : '大范围导航';
+
+        popover.innerHTML = '<div class="agy-popover-badge-row">' +
+            '<span class="agy-popover-badge">' + badgeText + '</span>' +
+            '<span style="font-size:10.5px; opacity:0.65;">点击快速定位</span>' +
+            '</div>' +
+            '<div class="agy-popover-prompt">' + (item.userPrompt || '提问内容') + '</div>' +
+            '<div class="agy-popover-snippet">' + (item.aiSnippet || '点击跳转定位本轮对话...') + '</div>';
+
+        // Precise vertical positioning following mouse cursor or active tick
+        const tick = agyFisheyeTicks[idx];
+        let targetY = clientY;
+        if (targetY == null && tick) {
+            const rect = tick.getBoundingClientRect();
+            targetY = rect.top + rect.height / 2;
+        }
+        if (targetY == null) targetY = window.innerHeight / 2;
+
+        const popoverH = 110;
+        const safeTop = Math.max(40, Math.min(window.innerHeight - popoverH - 20, targetY));
+        popover.style.top = safeTop + 'px';
+
+        const timeline = document.getElementById('agy-fisheye-timeline');
+        const trackEl = document.getElementById('agy-fisheye-track') || timeline;
+        const trackRect = trackEl ? trackEl.getBoundingClientRect() : { right: 280 };
+        popover.style.left = (Math.round(trackRect.right + 14)) + 'px';
+
+        popover.classList.add('visible');
+    }
+
+    function hideFisheyePopover() {
+        if (agyPopoverTimer) clearTimeout(agyPopoverTimer);
+        agyPopoverTimer = setTimeout(() => {
+            if (!agyIsScrubbing) {
+                const p = document.getElementById('agy-fisheye-popover');
+                if (p) p.classList.remove('visible');
+            }
+        }, 150);
+    }
+
+    function isSidebarOrMenubar(el) {
+        if (!el || el === document.body || el === document.documentElement) return true;
+        if (el.closest('header, nav, aside, [class*="menubar"], [class*="titlebar"], [class*="topbar"], [class*="top-bar"], [class*="sidebar"], .bg-sidebar, #agy-sidebar-quota-card, #agy-plugin-center-overlay')) {
+            return true;
+        }
+        try {
+            const r = el.getBoundingClientRect();
+            // Sidebar or its direct children are strictly located in the left 0~330px zone
+            if (r.left < 50 && r.right < 330) {
+                return true;
+            }
+            if (r.width < 340 && r.left < 100) {
+                return true;
+            }
+        } catch(e) {}
+        return false;
+    }
+
+    function findRealUserTurns() {
+        // 门禁 1：若在插件中心弹层、历史会话全屏列表或设置面板中，坚决不渲染刻度轴
+        const pluginOverlay = document.getElementById('agy-plugin-center-overlay');
+        if (pluginOverlay && pluginOverlay.style.display !== 'none' && pluginOverlay.offsetHeight > 100) {
+            return [];
+        }
+
+        // 门禁 2：若当前视口为主界面非对话模块（如定时任务 Cron 列表、设置页、历史记录管理等），坚决返回空
+        const activeNavBtn = document.querySelector('button[aria-selected="true"], [data-state="active"]');
+        if (activeNavBtn) {
+            const btnText = (activeNavBtn.innerText || '').trim();
+            if (btnText.includes('定时任务') || btnText.includes('设置') || btnText.includes('插件') || btnText.includes('历史记录')) {
+                return [];
+            }
+        }
+
+        // 1. 同步提取底层 React Fiber / Redux 完整会话全景历史数据
+        const getCascade = typeof findCascadeContext === 'function' ? findCascadeContext : (window.__AGY_FIND_CASCADE_CONTEXT__ || null);
+        const cascade = (typeof getCascade === 'function' ? getCascade() : null) || window.__AGY_CASCADE_CONTEXT__;
+        const asp = cascade && cascade.state && cascade.state.agentStateProvider;
+        const state = asp && typeof asp.getState === 'function' ? asp.getState() : null;
+
+        // 维护每会话持久历史缓存，彻底杜绝虚拟滚动列表卸载导致的历史丢失
+        window.__AGY_CONV_TURNS_CACHE__ = window.__AGY_CONV_TURNS_CACHE__ || new Map();
+        const currentConvId = (state && (state.conversationId || state.id)) || window.location.hash || window.location.pathname || 'active_chat';
+        if (!window.__AGY_CONV_TURNS_CACHE__.has(currentConvId)) {
+            window.__AGY_CONV_TURNS_CACHE__.set(currentConvId, new Map());
+        }
+        const sessionMap = window.__AGY_CONV_TURNS_CACHE__.get(currentConvId);
+
+        let steps = [];
+        if (state) {
+            if (Array.isArray(state.trajectorySlice?.stepsInSlice) && state.trajectorySlice.stepsInSlice.length > 0) {
+                steps = state.trajectorySlice.stepsInSlice;
+            } else if (Array.isArray(state.trajectory?.steps) && state.trajectory.steps.length > 0) {
+                steps = state.trajectory.steps;
+            } else if (Array.isArray(state.steps) && state.steps.length > 0) {
+                steps = state.steps;
+            } else if (Array.isArray(state.allSteps) && state.allSteps.length > 0) {
+                steps = state.allSteps;
+            } else if (Array.isArray(state.conversationHistory) && state.conversationHistory.length > 0) {
+                steps = state.conversationHistory;
+            } else if (Array.isArray(state.messages) && state.messages.length > 0) {
+                steps = state.messages;
+            }
+        }
+
+        // 兜底扫描滚动区域 React Fiber 组件树以提取完整 steps / items
+        if (!steps || steps.length < 5) {
+            try {
+                const scrollArea = document.querySelector('[data-radix-scroll-area-viewport], .overflow-y-auto');
+                if (scrollArea) {
+                    let el = scrollArea;
+                    for (let depth = 0; el && depth < 8; depth++, el = el.parentElement) {
+                        const fKey = Object.keys(el).find(k => k.startsWith('__reactFiber$'));
+                        if (!fKey || !el[fKey]) continue;
+                        let fib = el[fKey];
+                        for (let fDepth = 0; fib && fDepth < 15; fDepth++, fib = fib.return) {
+                            const props = fib.memoizedProps;
+                            if (props) {
+                                const candidates = [props.steps, props.items, props.messages, props.history, props.trajectory?.steps, props.conversation?.steps];
+                                for (const cand of candidates) {
+                                    if (Array.isArray(cand) && cand.length > steps.length) {
+                                        steps = cand;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (steps.length > 5) break;
+                        }
+                        if (steps.length > 5) break;
+                    }
+                }
+            } catch(e) {}
+        }
+
+        if (Array.isArray(steps) && steps.length > 0) {
+            let userTurnCount = 0;
+            for (let i = 0; i < steps.length; i++) {
+                const st = steps[i];
+                if (!st) continue;
+                const isUser = (
+                    (st.step && (st.step.case === 'userInput' || st.step.case === 'user' || st.step.userInput != null)) ||
+                    st.type === 'USER_INPUT' || st.type === 'userInput' || st.type === 'user' || st.type === 1 ||
+                    st.source === 'USER_EXPLICIT' || st.source === 'user' || st.source === 1 ||
+                    st.userInput != null || st.user_input != null || st.role === 'user' ||
+                    (st.message && (st.message.role === 'user' || st.message.type === 'user')) ||
+                    st.sender === 'user'
+                );
+                if (isUser) {
+                    userTurnCount++;
+                    let promptTxt = '';
+                    if (st.step && st.step.value) {
+                        if (typeof st.step.value === 'string') promptTxt = st.step.value;
+                        else if (Array.isArray(st.step.value.items)) {
+                            promptTxt = st.step.value.items.map(it => (typeof it === 'string' ? it : it.chunk?.value || it.value || it.text || '')).join('');
+                        } else if (typeof st.step.value.content === 'string') promptTxt = st.step.value.content;
+                        else if (typeof st.step.value.text === 'string') promptTxt = st.step.value.text;
+                    }
+                    if (!promptTxt) {
+                        if (typeof st.content === 'string') promptTxt = st.content;
+                        else if (st.userInput) promptTxt = typeof st.userInput === 'string' ? st.userInput : st.userInput.content || st.userInput.text || '';
+                        else if (st.user_input) promptTxt = typeof st.user_input === 'string' ? st.user_input : st.user_input.content || '';
+                        else if (typeof st.text === 'string') promptTxt = st.text;
+                        else if (st.message && typeof st.message.content === 'string') promptTxt = st.message.content;
+                    }
+                    promptTxt = (promptTxt || '').trim().replace(/\s+/g, ' ');
+                    if (!promptTxt) promptTxt = '第 ' + userTurnCount + ' 轮 · 用户提问';
+
+                    let aiTxt = '';
+                    for (let j = i + 1; j < Math.min(steps.length, i + 6); j++) {
+                        const nextSt = steps[j];
+                        if (!nextSt) continue;
+                        const nextIsUser = (
+                            (nextSt.step && (nextSt.step.case === 'userInput' || nextSt.step.case === 'user')) ||
+                            nextSt.type === 'USER_INPUT' || nextSt.role === 'user' || nextSt.source === 'USER_EXPLICIT'
+                        );
+                        if (nextIsUser) break;
+                        let cand = '';
+                        if (typeof nextSt.content === 'string') cand = nextSt.content;
+                        else if (nextSt.step && nextSt.step.value) {
+                            if (typeof nextSt.step.value === 'string') cand = nextSt.step.value;
+                            else if (typeof nextSt.step.value.content === 'string') cand = nextSt.step.value.content;
+                            else if (typeof nextSt.step.value.text === 'string') cand = nextSt.step.value.text;
+                            else if (Array.isArray(nextSt.step.value.items)) {
+                                cand = nextSt.step.value.items.map(it => (typeof it === 'string' ? it : it.chunk?.value || it.value || it.text || '')).join('');
+                            }
+                        } else if (typeof nextSt.text === 'string') cand = nextSt.text;
+                        cand = (cand || '').trim().replace(/\s+/g, ' ');
+                        if (cand && cand.length > 5) {
+                            aiTxt = cand;
+                            break;
+                        }
+                    }
+                    if (!aiTxt) aiTxt = '点击大范围快速定位至本轮...';
+
+                    const stepKey = st.id || ('turn_' + userTurnCount);
+                    if (!sessionMap.has(stepKey)) {
+                        sessionMap.set(stepKey, {
+                            turn: userTurnCount,
+                            userPrompt: promptTxt.substring(0, 110),
+                            aiSnippet: aiTxt.substring(0, 120),
+                            stepId: stepKey
+                        });
+                    }
+                }
+            }
+        }
+
+        // 2. 抓取当前已在 DOM 中渲染的用户消息真实节点，融合绑定
+        const domUserNodes = Array.from(document.querySelectorAll(
+            '[data-testid="user-input-step"], [role="article"][aria-label="User message"], [aria-label="User message"]'
+        )).filter(el => {
+            if (isSidebarOrMenubar(el)) return false;
+            if (el.offsetHeight < 10 || el.offsetWidth < 50) return false;
+            return true;
+        });
+
+        if (domUserNodes.length > 0) {
+            domUserNodes.forEach((node) => {
+                const turnContainer = node.closest('.scroll-mt-4, [class*="scroll-mt-4"], [class*="group/user-input-step"]') || node.parentElement || node;
+                const text = (node.innerText || '').trim().replace(/\s+/g, ' ');
+                if (!text) return;
+
+                let matched = false;
+                for (let [k, item] of sessionMap.entries()) {
+                    if (item.userPrompt.includes(text.substring(0, 15)) || text.includes(item.userPrompt.substring(0, 15))) {
+                        item.el = turnContainer;
+                        matched = true;
+                        break;
+                    }
+                }
+                if (!matched) {
+                    const tNum = sessionMap.size + 1;
+                    const domKey = 'dom_' + tNum + '_' + text.substring(0, 15);
+                    sessionMap.set(domKey, {
+                        turn: tNum,
+                        userPrompt: text.substring(0, 110),
+                        aiSnippet: '点击大范围快速定位至本轮...',
+                        el: turnContainer,
+                        stepId: domKey
+                    });
+                }
+            });
+        }
+
+        if (sessionMap.size === 0) {
+            return [];
+        }
+
+        return Array.from(sessionMap.values()).map((item, idx) => ({
+            ...item,
+            turn: idx + 1
+        }));
+    }
+
+    function findChatScrollContainer(turns) {
+        // 优先从 DOM 节点的父级向上溯源滚动容器
+        if (turns && turns.length > 0) {
+            for (let t of turns) {
+                if (t.el) {
+                    let curr = t.el.parentElement;
+                    while (curr && curr !== document.body && curr !== document.documentElement) {
+                        if (isSidebarOrMenubar(curr)) {
+                            curr = curr.parentElement;
+                            continue;
+                        }
+                        const cs = window.getComputedStyle(curr);
+                        const oy = cs.overflowY;
+                        if ((oy === 'auto' || oy === 'scroll') && curr.clientHeight > 150) {
+                            return curr;
+                        }
+                        curr = curr.parentElement;
+                    }
+                }
+            }
+        }
+
+        // 兜底路径：在主内容区检索滚动视口
+        const candidates = document.querySelectorAll('[data-radix-scroll-area-viewport], .overflow-y-auto, [class*="overflow-y-auto"]');
+        for (const c of candidates) {
+            if (!isSidebarOrMenubar(c) && c.offsetHeight > 150) {
+                const r = c.getBoundingClientRect();
+                if (r.left >= 180 && r.width >= 320) {
+                    return c;
+                }
+            }
+        }
+        return null;
+    }
+
+    function scrollToTurnItem(item, smooth = true) {
+        if (!item) return;
+        const scrollContainer = agyActiveScrollContainer;
+
+        // 若当前 DOM 节点在视口树中存在，平滑居中滚入，并为内层实际气泡添加贴合一致的外框
+        if (item.el && document.body.contains(item.el)) {
+            try {
+                item.el.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'center' });
+                const bubble = item.el.querySelector('[data-testid="user-input-step"], [role="article"]') || item.el;
+                bubble.classList.remove('agy-target-pulse');
+                void bubble.offsetWidth;
+                bubble.classList.add('agy-target-pulse');
+                setTimeout(() => { try { bubble.classList.remove('agy-target-pulse'); } catch(e) {} }, 1600);
+                return;
+            } catch(e) {}
+        }
+
+        // 若节点因虚拟化尚未挂载，使用大范围跳跃定位公式
+        if (scrollContainer && typeof item.ratio === 'number') {
+            const maxScroll = scrollContainer.scrollHeight - scrollContainer.clientHeight;
+            if (maxScroll > 0) {
+                const targetScroll = Math.round(item.ratio * maxScroll);
+                scrollContainer.scrollTo({ top: targetScroll, behavior: smooth ? 'smooth' : 'auto' });
+                // 滚动后延时检查虚拟列表挂载出的 DOM 节点并加上贴合外框
+                setTimeout(() => {
+                    const nodes = Array.from(document.querySelectorAll('[data-testid="user-input-step"], [role="article"][aria-label="User message"], [aria-label="User message"]'));
+                    for (const n of nodes) {
+                        const txt = (n.innerText || '').trim();
+                        if (item.userPrompt && (txt.includes(item.userPrompt.substring(0, 15)) || item.userPrompt.includes(txt.substring(0, 15)))) {
+                            const turnContainer = n.closest('.scroll-mt-4, [class*="scroll-mt-4"], [class*="group/user-input-step"]') || n.parentElement || n;
+                            item.el = turnContainer;
+                            const bubble = turnContainer.querySelector('[data-testid="user-input-step"], [role="article"]') || turnContainer;
+                            bubble.classList.remove('agy-target-pulse');
+                            void bubble.offsetWidth;
+                            bubble.classList.add('agy-target-pulse');
+                            setTimeout(() => { try { bubble.classList.remove('agy-target-pulse'); } catch(e) {} }, 1600);
+                            break;
+                        }
+                    }
+                }, 200);
+            }
+        }
+    }
+
+    function mountFisheyeTimeline() {
+        const fullTurns = findRealUserTurns();
+        let timeline = document.getElementById('agy-fisheye-timeline');
+
+        // 门禁：仅在有2轮或更多真实历史对话轮次时呈现；在新会话(0~1条)、定时任务、历史记录列表、插件等页面绝对隐匿
+        if (!fullTurns || fullTurns.length < 2) {
+            if (timeline) timeline.style.display = 'none';
+            const pop = document.getElementById('agy-fisheye-popover');
+            if (pop) pop.classList.remove('visible');
+            return;
+        }
+
+        const scrollContainer = findChatScrollContainer(fullTurns);
+        if (!scrollContainer) {
+            if (timeline) timeline.style.display = 'none';
+            return;
+        }
+
+        if (!timeline) {
+            timeline = document.createElement('div');
+            timeline.id = 'agy-fisheye-timeline';
+            timeline.className = 'agy-fisheye-timeline';
+            timeline.title = '时空刻度导航轴 · 随鼠标流动波浪 · 按住拖拽快速大范围定位';
+            const track = document.createElement('div');
+            track.id = 'agy-fisheye-track';
+            track.className = 'agy-fisheye-track';
+            timeline.appendChild(track);
+            document.body.appendChild(timeline);
+        }
+
+        // 动态自适应浅色与深色主题
+        const isDark = isAntigravityDarkTheme();
+        timeline.setAttribute('data-theme', isDark ? 'dark' : 'light');
+
+        // 精准动态定位在「左侧边栏右侧」
+        let sidebarRight = 250;
+        const quotaCard = document.getElementById('agy-sidebar-quota-card');
+        const bottomRow = document.getElementById('agy-sidebar-bottom-row');
+        const settingsBtn = Array.from(document.querySelectorAll('button')).find(b => b.innerText && b.innerText.trim() === '设置' && !b.closest('#agy-plugin-center-overlay'));
+        const sidebar = document.querySelector('aside, nav, [class*="sidebar"], .bg-sidebar, [data-testid*="sidebar"]');
+
+        if (quotaCard) {
+            sidebarRight = quotaCard.getBoundingClientRect().right;
+        } else if (bottomRow) {
+            sidebarRight = bottomRow.getBoundingClientRect().right;
+        } else if (settingsBtn) {
+            sidebarRight = settingsBtn.getBoundingClientRect().right;
+        } else if (sidebar) {
+            sidebarRight = sidebar.getBoundingClientRect().right;
+        }
+
+        // 核心约束：高度严格限制为窗口高度的三分之一 (window.innerHeight / 3)，彻底杜绝超长溢出
+        const maxTimelineH = Math.max(120, Math.floor(window.innerHeight / 3));
+        timeline.style.maxHeight = maxTimelineH + 'px';
+        timeline.style.left = (Math.round(sidebarRight) + 6) + 'px';
+        timeline.style.display = 'flex';
+
+        // 核心采样规则：左侧负责大范围快速移动，跳采样限制刻度总量
+        const TICK_STEP_H = 7.5; // 2.5px tick + 5px gap
+        const MAX_TICKS = Math.max(6, Math.min(20, Math.floor(maxTimelineH / TICK_STEP_H)));
+
+        let sampledTurns = [];
+        const total = fullTurns.length;
+        if (total <= MAX_TICKS) {
+            sampledTurns = fullTurns.map((item, idx) => ({
+                ...item,
+                turn: item.turn || (idx + 1),
+                turnIdx: idx,
+                totalTurns: total,
+                ratio: total > 1 ? (idx / (total - 1)) : 0
+            }));
+        } else {
+            // 超长上下文：均匀跳采样 MAX_TICKS 组大范围导航节点
+            for (let k = 0; k < MAX_TICKS; k++) {
+                const turnIdx = Math.round(k * (total - 1) / (MAX_TICKS - 1));
+                const base = fullTurns[turnIdx] || {};
+                sampledTurns.push({
+                    ...base,
+                    turn: base.turn || (turnIdx + 1),
+                    turnIdx: turnIdx,
+                    totalTurns: total,
+                    ratio: total > 1 ? (turnIdx / (total - 1)) : 0
+                });
+            }
+        }
+
+        agyFisheyeTurns = sampledTurns;
+
+        const track = document.getElementById('agy-fisheye-track');
+        track.innerHTML = '';
+        agyFisheyeTicks = [];
+
+        sampledTurns.forEach((item, index) => {
+            const tick = document.createElement('div');
+            tick.className = 'agy-fisheye-tick' + (index === 0 ? ' focus' : '');
+            tick.setAttribute('data-turn', item.turn);
+            track.appendChild(tick);
+            agyFisheyeTicks.push(tick);
+        });
+
+        applyFisheyeWave(0);
+
+        // 绑定事件 (仅绑定一次)
+        if (!timeline.__agyEventsBound) {
+            timeline.__agyEventsBound = true;
+
+            // 鼠标指针移动事件：实现随鼠标连续平滑波浪放大流动
+            let waveRaf = null;
+            timeline.addEventListener('pointermove', (e) => {
+                if (agyIsScrubbing) return;
+                const clientY = e.clientY;
+                if (waveRaf) cancelAnimationFrame(waveRaf);
+                waveRaf = requestAnimationFrame(() => {
+                    const idx = applyFisheyeWaveByCoord(clientY);
+                    updateFisheyePopover(idx, clientY);
+                });
+            });
+
+            // 滚轮事件穿透：在刻度轴上滑动鼠标滚轮时联动主聊天视口
+            timeline.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                if (agyActiveScrollContainer) {
+                    agyActiveScrollContainer.scrollTop += e.deltaY;
+                }
+            }, { passive: false });
+
+            timeline.addEventListener('mouseleave', () => {
+                if (agyIsScrubbing) return;
+                hideFisheyePopover();
+                for (let i = 0; i < agyFisheyeTicks.length; i++) {
+                    const tick = agyFisheyeTicks[i];
+                    tick.style.width = '8px';
+                    tick.style.height = '2.5px';
+                    tick.style.opacity = '0.4';
+                    tick.classList.remove('focus');
+                }
+                syncScrollSpy();
+            });
+
+            // 按住快速大范围拖拽/点击定位
+            timeline.addEventListener('pointerdown', (e) => {
+                e.preventDefault();
+                agyIsScrubbing = true;
+                document.body.classList.add('agy-is-scrubbing');
+
+                const idx = applyFisheyeWaveByCoord(e.clientY);
+                updateFisheyePopover(idx, e.clientY);
+                if (agyFisheyeTurns[idx]) scrollToTurnItem(agyFisheyeTurns[idx], false);
+
+                function onPointerMove(me) {
+                    if (!agyIsScrubbing) return;
+                    const mIdx = applyFisheyeWaveByCoord(me.clientY);
+                    updateFisheyePopover(mIdx, me.clientY);
+                    if (agyFisheyeTurns[mIdx]) scrollToTurnItem(agyFisheyeTurns[mIdx], false);
+                }
+
+                function onPointerUp(ue) {
+                    agyIsScrubbing = false;
+                    document.body.classList.remove('agy-is-scrubbing');
+                    window.removeEventListener('pointermove', onPointerMove);
+                    window.removeEventListener('pointerup', onPointerUp);
+
+                    const finalIdx = applyFisheyeWaveByCoord(ue.clientY);
+                    if (agyFisheyeTurns[finalIdx]) scrollToTurnItem(agyFisheyeTurns[finalIdx], true);
+                    hideFisheyePopover();
+                }
+
+                window.addEventListener('pointermove', onPointerMove);
+                window.addEventListener('pointerup', onPointerUp);
+            });
+        }
+
+        // 绑定 ScrollSpy
+        if (agyActiveScrollContainer !== scrollContainer) {
+            agyActiveScrollContainer = scrollContainer;
+            scrollContainer.addEventListener('scroll', () => {
+                if (agyIsScrubbing) return;
+                requestAnimationFrame(syncScrollSpy);
+            }, { passive: true });
+        }
+    }
+
+    function syncScrollSpy() {
+        if (!agyActiveScrollContainer || !agyFisheyeTurns.length) return;
+        const maxScroll = agyActiveScrollContainer.scrollHeight - agyActiveScrollContainer.clientHeight;
+        if (maxScroll <= 0) return;
+
+        const currentRatio = agyActiveScrollContainer.scrollTop / maxScroll;
+        let nearestIdx = 0;
+        let minDist = Infinity;
+
+        for (let i = 0; i < agyFisheyeTurns.length; i++) {
+            const item = agyFisheyeTurns[i];
+            const d = Math.abs((item.ratio || 0) - currentRatio);
+            if (d < minDist) {
+                minDist = d;
+                nearestIdx = i;
+            }
+        }
+        applyFisheyeWave(nearestIdx);
+    }
+
+    // 监听路由变更与页面会话切换，实现进度条毫秒级联动切换
+    if (!window.__AGY_SESSION_SWITCH_BOUND__) {
+        window.__AGY_SESSION_SWITCH_BOUND__ = true;
+
+        const origPush = history.pushState;
+        if (origPush) {
+            history.pushState = function() {
+                const res = origPush.apply(this, arguments);
+                setTimeout(mountFisheyeTimeline, 80);
+                setTimeout(mountFisheyeTimeline, 300);
+                return res;
+            };
+        }
+
+        const origReplace = history.replaceState;
+        if (origReplace) {
+            history.replaceState = function() {
+                const res = origReplace.apply(this, arguments);
+                setTimeout(mountFisheyeTimeline, 80);
+                setTimeout(mountFisheyeTimeline, 300);
+                return res;
+            };
+        }
+
+        window.addEventListener('popstate', () => {
+            setTimeout(mountFisheyeTimeline, 80);
+            setTimeout(mountFisheyeTimeline, 300);
+        });
+
+        document.addEventListener('click', (e) => {
+            // 左侧边栏点击（X坐标在左侧340px区域内，或命中了各类会话导航列表按钮）
+            const inLeftZone = e.clientX < 340;
+            const inNav = e.target.closest('aside, nav, [class*="sidebar"], .bg-sidebar, [role="navigation"], [data-testid*="session"], [data-testid*="conversation"], [data-testid*="new-chat"], button');
+            if (inLeftZone || inNav) {
+                setTimeout(mountFisheyeTimeline, 60);
+                setTimeout(mountFisheyeTimeline, 180);
+                setTimeout(mountFisheyeTimeline, 400);
+                setTimeout(mountFisheyeTimeline, 800);
+                setTimeout(mountFisheyeTimeline, 1500);
+            }
+        }, true);
+    }
+
+    window.__AGY_MOUNT_FISHEYE_TIMELINE__ = mountFisheyeTimeline;
 
 
     // 3. MODEL SELECTOR PANEL THINKING SLIDER INJECTION
@@ -5918,8 +6913,6 @@
 
     function ensureBrandHeaderLogo() {
         try {
-            if (document.getElementById('agy-sidebar-fusion-logo')) return;
-
             const allElements = document.querySelectorAll('h1, h2, h3, span, div, p');
             for (let i = 0; i < allElements.length; i++) {
                 const el = allElements[i];
@@ -5927,7 +6920,7 @@
                     if (el.closest('#agy-plugin-center-overlay') || el.closest('#agy-sidebar-quota-card')) continue;
                     
                     const parent = el.parentElement;
-                    if (!parent || parent.querySelector('#agy-sidebar-fusion-logo')) continue;
+                    if (!parent) continue;
 
                     const prevDisplay = window.getComputedStyle(parent).display;
                     if (!prevDisplay.includes('flex')) {
@@ -5935,16 +6928,47 @@
                     }
                     parent.style.alignItems = 'center';
 
-                    const img = document.createElement('img');
-                    img.id = 'agy-sidebar-fusion-logo';
-                    img.src = FUSION_LOGO_B64;
-                    img.alt = 'Antigravity Gemini';
-                    img.style.cssText = 'width: 22px; height: 22px; margin-right: 8px; vertical-align: middle; display: inline-block; object-fit: contain; flex-shrink: 0; filter: drop-shadow(0 2px 5px rgba(99,102,241,0.3)); transition: transform 0.2s ease; cursor: pointer;';
-                    img.title = 'Antigravity × Google Gemini';
-                    img.onmouseenter = () => { img.style.transform = 'scale(1.12) rotate(4deg)'; };
-                    img.onmouseleave = () => { img.style.transform = 'scale(1) rotate(0deg)'; };
+                    // Mount Logo if not present
+                    if (!parent.querySelector('#agy-sidebar-fusion-logo')) {
+                        const img = document.createElement('img');
+                        img.id = 'agy-sidebar-fusion-logo';
+                        img.src = FUSION_LOGO_B64;
+                        img.alt = 'Antigravity Gemini';
+                        img.style.cssText = 'width: 22px; height: 22px; margin-right: 8px; vertical-align: middle; display: inline-block; object-fit: contain; flex-shrink: 0; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15)); transition: transform 0.2s ease; cursor: pointer;';
+                        img.title = 'Antigravity × Google Gemini';
+                        img.onmouseenter = () => { img.style.transform = 'scale(1.12) rotate(4deg)'; };
+                        img.onmouseleave = () => { img.style.transform = 'scale(1) rotate(0deg)'; };
+                        parent.insertBefore(img, el);
+                    }
 
-                    parent.insertBefore(img, el);
+                    // Mount Version Badge if not present
+                    if (!parent.querySelector('#agy-brand-version-badge')) {
+                        const verBadge = document.createElement('span');
+                        verBadge.id = 'agy-brand-version-badge';
+                        verBadge.className = 'agy-brand-version-badge';
+                        verBadge.textContent = 'v0.1.6';
+                        verBadge.title = 'Antigravity Enhance Tools v0.1.6 Pro\n• 鱼眼波浪刻度导航轴已装载\n• 多账号配额实时动态同步\n• 全景母语汉化与防卡死守卫已生效';
+                        verBadge.style.cssText = 'font-size: 10px; font-weight: 700; padding: 1.5px 6.5px; border-radius: 9999px; background: rgba(113, 113, 122, 0.16); color: #71717a; margin-left: 6px; letter-spacing: 0.3px; border: 1px solid rgba(113, 113, 122, 0.28); vertical-align: middle; display: inline-flex; align-items: center; line-height: 1; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.06);';
+                        verBadge.onmouseenter = () => {
+                            verBadge.style.background = 'rgba(113, 113, 122, 0.26)';
+                            verBadge.style.transform = 'scale(1.06)';
+                        };
+                        verBadge.onmouseleave = () => {
+                            verBadge.style.background = 'rgba(113, 113, 122, 0.16)';
+                            verBadge.style.transform = 'scale(1)';
+                        };
+                        verBadge.onclick = (ev) => {
+                            ev.stopPropagation();
+                            if (window.__AGY_SHOW_TOAST__) {
+                                window.__AGY_SHOW_TOAST__('🧭 Antigravity 增强套件 v0.1.6 · 运行正常');
+                            }
+                        };
+                        if (el.nextSibling) {
+                            parent.insertBefore(verBadge, el.nextSibling);
+                        } else {
+                            parent.appendChild(verBadge);
+                        }
+                    }
                     break;
                 }
             }
@@ -8044,6 +9068,9 @@
             if (typeof window.__AGY_MOUNT_SWITCH_ACCOUNT_BTN__ === 'function') {
                 window.__AGY_MOUNT_SWITCH_ACCOUNT_BTN__();
             }
+            if (typeof window.__AGY_MOUNT_FISHEYE_TIMELINE__ === 'function') {
+                window.__AGY_MOUNT_FISHEYE_TIMELINE__();
+            }
         } catch (e) {
             console.error('[Antigravity Master Sync] Error:', e);
         } finally {
@@ -8051,13 +9078,23 @@
         }
     }
 
+    let agySyncTimer = null;
+    let agyLastSyncTime = 0;
+
     function scheduleMasterSync() {
-        if (agyRafPending) return;
-        agyRafPending = true;
-        requestAnimationFrame(() => {
-            agyRafPending = false;
-            runMasterSync();
-        });
+        if (isAgyUpdating) return;
+        const now = Date.now();
+        if (agySyncTimer) clearTimeout(agySyncTimer);
+
+        if (now - agyLastSyncTime > 350) {
+            agyLastSyncTime = now;
+            requestAnimationFrame(runMasterSync);
+        } else {
+            agySyncTimer = setTimeout(() => {
+                agyLastSyncTime = Date.now();
+                runMasterSync();
+            }, 100);
+        }
     }
 
     // Run initial sync
@@ -8144,6 +9181,14 @@
             }
         }, true);
     }
+
+    // Boot welcome toast confirming v0.1.6
+    setTimeout(() => {
+        if (window.__AGY_SHOW_TOAST__ && !window.__AGY_BOOT_TOAST_SHOWN__) {
+            window.__AGY_BOOT_TOAST_SHOWN__ = true;
+            window.__AGY_SHOW_TOAST__('🧭 Antigravity 增强套件 v0.1.6 已生效 · 刻度导航轴已就绪');
+        }
+    }, 1800);
 
     console.log('[Antigravity Guardian] Single Master UI Coordinator active and stable.');
 })();

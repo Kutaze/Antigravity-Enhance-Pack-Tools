@@ -125,6 +125,15 @@ const tempOutAsar = path.join(__dirname, '.temp_patched.asar');
         if (fs.existsSync(tempSandbox)) {
             fs.rmSync(tempSandbox, { recursive: true, force: true });
         }
+        // Ensure backup unpacked junction exists to guarantee asar.extractAll succeeds cleanly
+        const bakUnpacked = backupPath + '.unpacked';
+        const liveUnpacked = asarPath + '.unpacked';
+        if (!fs.existsSync(bakUnpacked) && fs.existsSync(liveUnpacked)) {
+            try {
+                fs.symlinkSync(liveUnpacked, bakUnpacked, 'junction');
+            } catch(e) {}
+        }
+
         process.noAsar = false;
         // Always extract from official backup to avoid layering patches on top of each other
         if (fs.existsSync(backupPath)) {
@@ -136,7 +145,6 @@ const tempOutAsar = path.join(__dirname, '.temp_patched.asar');
                 asar.extractAll(asarPath, tempSandbox);
             }
             // Copy the live unpacked dir into sandbox to supplement any missing native modules
-            const liveUnpacked = asarPath + '.unpacked';
             const sandboxUnpacked = path.join(tempSandbox, 'node_modules');
             if (fs.existsSync(liveUnpacked)) {
                 const copyDirSync = (src, dst) => {
@@ -147,7 +155,6 @@ const tempOutAsar = path.join(__dirname, '.temp_patched.asar');
                         else if (!fs.existsSync(d)) try { fs.copyFileSync(s, d); } catch(e) {}
                     }
                 };
-                // liveUnpacked contains node_modules subfolders - merge into sandbox node_modules
                 try {
                     const nodeModsInUnpacked = path.join(liveUnpacked, 'node_modules');
                     if (fs.existsSync(nodeModsInUnpacked)) copyDirSync(nodeModsInUnpacked, sandboxUnpacked);
@@ -167,6 +174,17 @@ const tempOutAsar = path.join(__dirname, '.temp_patched.asar');
                     fs.writeFileSync(path.join(tempSandbox, 'icon.png'), officialIconBuf);
                 }
             } catch (e) {}
+            // Always restore pristine official utils.js and ipcHandlers.js directly from backup
+            try {
+                const cleanUtils = asar.extractFile(backupPath, 'dist/utils.js');
+                if (cleanUtils && cleanUtils.length > 0) {
+                    fs.writeFileSync(path.join(tempSandbox, 'dist', 'utils.js'), cleanUtils);
+                }
+                const cleanIpc = asar.extractFile(backupPath, 'dist/ipcHandlers.js');
+                if (cleanIpc && cleanIpc.length > 0) {
+                    fs.writeFileSync(path.join(tempSandbox, 'dist', 'ipcHandlers.js'), cleanIpc);
+                }
+            } catch(e) {}
         }
 
         const distDir = path.join(tempSandbox, 'dist');
@@ -187,10 +205,16 @@ const tempOutAsar = path.join(__dirname, '.temp_patched.asar');
         // 6. Patch utils.js
         let utilsContent = fs.readFileSync(utilsJs, 'utf8');
 
-        // Remove ALL previous AGY injection blocks to prevent stacking (use global replace)
+        // Remove ALL previous AGY injection blocks to prevent stacking
+        const AGY_START_TAG = '/* === ANTIGRAVITY_ENHANCE_START === */';
+        const AGY_END_TAG = '/* === ANTIGRAVITY_ENHANCE_END === */';
+        if (utilsContent.includes(AGY_START_TAG) && utilsContent.includes(AGY_END_TAG)) {
+            const sIdx = utilsContent.indexOf(AGY_START_TAG);
+            const eIdx = utilsContent.indexOf(AGY_END_TAG) + AGY_END_TAG.length;
+            utilsContent = utilsContent.substring(0, sIdx) + utilsContent.substring(eIdx);
+        }
         const topFuncRegex = /const injectAntigravityI18n =[\s\S]*?exports\.injectAntigravityI18n = injectAntigravityI18n;\s*/g;
         utilsContent = utilsContent.replace(topFuncRegex, '');
-        // Also remove the IPC bridge block if present (global replace to catch all copies)
         const ipcBridgeRegex = /\/\/ Antigravity Native Screenshot[\s\S]*?} catch\(e\) \{\}\s*/g;
         utilsContent = utilsContent.replace(ipcBridgeRegex, '');
 
@@ -670,7 +694,7 @@ try {
                         headers: {
                             'Authorization': 'Bearer ' + accessToken,
                             'Content-Type': 'application/json',
-                            'User-Agent': 'antigravity/0.1.5'
+                            'User-Agent': 'antigravity/0.1.6'
                         },
                         timeout: 6000
                     }, (res) => {
@@ -1436,11 +1460,12 @@ try {
 } catch(e) {}
 `;
 
+        const fullInject = '\n' + AGY_START_TAG + '\n' + safeInjectFn + '\n' + AGY_END_TAG + '\n';
         const exportMarker = 'exports.setupNodeWrapper = setupNodeWrapper;';
         if (utilsContent.includes(exportMarker)) {
-            utilsContent = utilsContent.replace(exportMarker, exportMarker + '\n' + safeInjectFn);
+            utilsContent = utilsContent.replace(exportMarker, exportMarker + fullInject);
         } else {
-            utilsContent = safeInjectFn + '\n' + utilsContent;
+            utilsContent = fullInject + utilsContent;
         }
 
         if (!utilsContent.includes("win.webContents.on('dom-ready'")) {
@@ -1469,19 +1494,6 @@ try {
         }
 
         fs.writeFileSync(utilsJs, utilsContent, 'utf8');
-
-        // 6.2 Patch ipcHandlers.js (The Official Startup IPC registration module)
-        const ipcHandlersJs = path.join(distDir, 'ipcHandlers.js');
-        if (fs.existsSync(ipcHandlersJs)) {
-            let ipcContent = fs.readFileSync(ipcHandlersJs, 'utf8');
-            if (!ipcContent.includes('antigravity:save-current-profile')) {
-                const lastBraceIdx = ipcContent.lastIndexOf('}');
-                if (lastBraceIdx !== -1) {
-                    ipcContent = ipcContent.substring(0, lastBraceIdx) + '\n' + safeInjectFn + '\n}\n';
-                    fs.writeFileSync(ipcHandlersJs, ipcContent, 'utf8');
-                }
-            }
-        }
 
         // 7. Patch preload.js to expose screenshot bridge, skills & account switcher bridge
         const preloadJs = path.join(distDir, 'preload.js');
@@ -1640,6 +1652,7 @@ try {
         console.log('  ✔ 模型思考能力 4 挡动态滑块 (最高挡专属紫粉渐变，动静态模型绑定)');
         console.log('  ✔ 自定义插件中心扩展');
         console.log('  ✔ 聊天输入框原生截图工具唤起与剪贴板图像自动填入');
+        console.log('  ✔ 超长上下文鱼眼波浪刻度导航轴 (左侧边栏右侧停靠、阻尼拖拽定位与右侧无遮挡预览)');
         console.log('  ✔ 防死循环与防卡死主控协调器 (Master Coordinator)');
         console.log('====================================================\n');
         process.exit(0);

@@ -21,46 +21,67 @@ namespace AntigravityInstaller
         [STAThread]
         public static void Main(string[] args)
         {
-            var app = new App();
-            bool isDark = false; // Default to clean modern light theme
-            bool doCapture = false;
-            if (args != null && args.Length >= 4 && (args[0].Equals("/mockup", StringComparison.OrdinalIgnoreCase) || args[0].Equals("--mockup", StringComparison.OrdinalIgnoreCase)))
+            AppDomain.CurrentDomain.UnhandledException += (s, e) =>
             {
-                AntigravityInstaller.MainWindow.CustomLogoPath = args[1];
-                string outLight = args[2];
-                string outDark = args[3];
-                var win = new AntigravityInstaller.MainWindow(false);
-                win.SetupMockupState();
-                AntigravityInstaller.MainWindow.SaveVisualAsPng((FrameworkElement)win.Content, outLight);
-                win.ApplyTheme(true);
-                AntigravityInstaller.MainWindow.SaveVisualAsPng((FrameworkElement)win.Content, outDark);
-                return;
-            }
-            if (args != null && args.Length > 0)
+                string msg = e.ExceptionObject != null ? e.ExceptionObject.ToString() : "未知异常";
+                MessageBox.Show(
+                    "程序运行时发生未捕获异常：\n\n" + msg,
+                    "Antigravity Enhance Tools - 错误",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            };
+
+            try
             {
-                foreach (var a in args)
+                var app = new App();
+                bool isDark = false; // Default to clean modern light theme
+                bool doCapture = false;
+                if (args != null && args.Length >= 4 && (args[0].Equals("/mockup", StringComparison.OrdinalIgnoreCase) || args[0].Equals("--mockup", StringComparison.OrdinalIgnoreCase)))
                 {
-                    if (a.Equals("/capture", StringComparison.OrdinalIgnoreCase) || a.Equals("--capture", StringComparison.OrdinalIgnoreCase))
+                    AntigravityInstaller.MainWindow.CustomLogoPath = args[1];
+                    string outLight = args[2];
+                    string outDark = args[3];
+                    var win = new AntigravityInstaller.MainWindow(false);
+                    win.SetupMockupState();
+                    AntigravityInstaller.MainWindow.SaveVisualAsPng((FrameworkElement)win.Content, outLight);
+                    win.ApplyTheme(true);
+                    AntigravityInstaller.MainWindow.SaveVisualAsPng((FrameworkElement)win.Content, outDark);
+                    return;
+                }
+                if (args != null && args.Length > 0)
+                {
+                    foreach (var a in args)
                     {
-                        doCapture = true;
-                    }
-                    else if (a.Equals("/dark", StringComparison.OrdinalIgnoreCase) || a.Equals("-dark", StringComparison.OrdinalIgnoreCase))
-                    {
-                        isDark = true;
-                    }
-                    else if (a.Equals("/light", StringComparison.OrdinalIgnoreCase) || a.Equals("-light", StringComparison.OrdinalIgnoreCase))
-                    {
-                        isDark = false;
+                        if (a.Equals("/capture", StringComparison.OrdinalIgnoreCase) || a.Equals("--capture", StringComparison.OrdinalIgnoreCase))
+                        {
+                            doCapture = true;
+                        }
+                        else if (a.Equals("/dark", StringComparison.OrdinalIgnoreCase) || a.Equals("-dark", StringComparison.OrdinalIgnoreCase))
+                        {
+                            isDark = true;
+                        }
+                        else if (a.Equals("/light", StringComparison.OrdinalIgnoreCase) || a.Equals("-light", StringComparison.OrdinalIgnoreCase))
+                        {
+                            isDark = false;
+                        }
                     }
                 }
+                var mainWindow = new MainWindow(isDark);
+                if (doCapture)
+                {
+                    mainWindow.ExportPreviews();
+                    return;
+                }
+                app.Run(mainWindow);
             }
-            var mainWindow = new MainWindow(isDark);
-            if (doCapture)
+            catch (Exception ex)
             {
-                mainWindow.ExportPreviews();
-                return;
+                MessageBox.Show(
+                    "程序启动初始化失败：\n\n" + ex.ToString(),
+                    "Antigravity Enhance Tools - 启动错误",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
-            app.Run(mainWindow);
         }
     }
 
@@ -221,7 +242,7 @@ namespace AntigravityInstaller
             };
             verBadgeText = new TextBlock
             {
-                Text = "v0.1.5",
+                Text = "v0.1.6",
                 FontSize = 10.5,
                 FontWeight = FontWeights.Medium
             };
@@ -325,7 +346,7 @@ namespace AntigravityInstaller
             };
             bannerSubtitle = new TextBlock
             {
-                Text = "全界面原生深度汉化 · 动态上下文实时遥测 · 4 挡思考调节滑块 · 额度看板 · 防卡死守护",
+                Text = "全界面原生深度汉化 · 鱼眼波浪刻度导航轴 · 4 挡思考调节滑块 · 额度看板 · 防卡死守护",
                 FontSize = 11,
                 Margin = new Thickness(0, 3, 0, 0)
             };
@@ -409,7 +430,7 @@ namespace AntigravityInstaller
             featuresWrap.Children.Add(AddFeatureChip("📈 动态上下文实时遥测", "会话级消耗毫秒同步，自适应模型上限"));
             featuresWrap.Children.Add(AddFeatureChip("🧠 思考能力 4 挡调节滑块", "模型思维链深度绑定，平滑阻尼调节"));
             featuresWrap.Children.Add(AddFeatureChip("📊 实时额度与用量看板", "支持 Gemini / Claude 额度轮询遥测"));
-            featuresWrap.Children.Add(AddFeatureChip("✨ 现代视效与原生沉浸交互", "重构品牌视效体系，深度适配沉浸式交互流"));
+            featuresWrap.Children.Add(AddFeatureChip("🧭 鱼眼波浪刻度导航轴", "左侧边栏原生停靠，阻尼拖拽定位与无遮挡预览"));
             featuresWrap.Children.Add(AddFeatureChip("🛡️ 防卡死单主控守卫", "DOM 变化防抖节流，杜绝界面卡顿死循环"));
             bodyStack.Children.Add(featuresWrap);
 
@@ -548,7 +569,7 @@ namespace AntigravityInstaller
             cardsGrid.Children.Add(cardAuthor);
 
             // Card 2: Software Model
-            cardModel = CreateFooterCard("🏷️", "软件型号 (Model)", "v0.1.5 Enhance Pro", Color.FromRgb(16, 185, 129), out lblModelTitle, out lblModelVal);
+            cardModel = CreateFooterCard("🏷️", "软件型号 (Model)", "v0.1.6 Enhance Pro", Color.FromRgb(16, 185, 129), out lblModelTitle, out lblModelVal);
             cardModel.Cursor = Cursors.Hand;
             cardModel.ToolTip = "Antigravity 原生深度增强与多账号管理套件 (点击查看关于信息)";
             cardModel.MouseLeftButtonUp += (s, e) => ShowAboutDialog();
@@ -1207,11 +1228,12 @@ namespace AntigravityInstaller
         {
             MessageBox.Show(
                 "Antigravity Enhance Tools (Antigravity 扩展增强工具)\n\n" +
-                "软件型号：v0.1.5 Enhance Pro (全原生 AST 响应式注入)\n" +
+                "软件型号：v0.1.6 Enhance Pro (全原生 AST 响应式注入)\n" +
                 "作者：Kutaze\n" +
                 "开源项目主页：https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools\n\n" +
                 "核心能力：\n" +
                 "• 全界面母语级原生深度汉化与防卡死守卫\n" +
+                "• 超长上下文鱼眼波浪拖拽刻度导航轴 (左侧停靠、阻尼拖拽定位与无遮挡预览)\n" +
                 "• 多账号快捷切换与配额监控 (100% 本地凭据库存储，绝无云端中转)\n" +
                 "• 真实上下文 Token 动态遥测与 5 段式占比面板\n" +
                 "• 4 挡思考深度滑动调节与原生截图集成\n\n" +
@@ -1299,79 +1321,110 @@ namespace AntigravityInstaller
             return null;
         }
 
+        private static string SanitizePathCandidate(string raw)
+        {
+            if (string.IsNullOrWhiteSpace(raw)) return null;
+            string cleaned = raw.Trim().Trim('\"', '\'', ' ', '\t', '\r', '\n');
+            if (string.IsNullOrWhiteSpace(cleaned)) return null;
+
+            int commaIdx = cleaned.IndexOf(',');
+            if (commaIdx > 0 && cleaned.EndsWith(".exe," + cleaned.Substring(commaIdx + 1), StringComparison.OrdinalIgnoreCase))
+            {
+                cleaned = cleaned.Substring(0, commaIdx).Trim().Trim('\"', '\'');
+            }
+
+            try
+            {
+                char[] invalidChars = Path.GetInvalidPathChars();
+                if (cleaned.IndexOfAny(invalidChars) >= 0) return null;
+                return Path.GetFullPath(cleaned);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         private void DetectPath(bool isManual = false)
         {
-            var checkedPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-            // 1. Detect from active running processes
             try
             {
-                var procs = Process.GetProcessesByName("Antigravity");
-                if (procs != null && procs.Length > 0)
+                var checkedPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                // 1. Detect from active running processes
+                try
                 {
-                    foreach (var proc in procs)
+                    var procs = Process.GetProcessesByName("Antigravity");
+                    if (procs != null && procs.Length > 0)
                     {
-                        try
+                        foreach (var proc in procs)
                         {
-                            string procPath = proc.MainModule.FileName;
-                            string dir = Path.GetDirectoryName(procPath);
-                            if (File.Exists(Path.Combine(dir, "resources", "app.asar")))
+                            try
                             {
-                                detectedInstallDir = dir;
-                                txtPath.Text = dir;
-                                Log((isManual ? "✔ [手动检索] " : "✔ [自动识别] ") + "已定位当前运行中的客户端: " + dir);
-                                ValidatePath();
-                                return;
+                                string procPath = proc.MainModule.FileName;
+                                string dir = SanitizePathCandidate(Path.GetDirectoryName(procPath));
+                                if (!string.IsNullOrEmpty(dir) && File.Exists(Path.Combine(dir, "resources", "app.asar")))
+                                {
+                                    detectedInstallDir = dir;
+                                    txtPath.Text = dir;
+                                    Log((isManual ? "✔ [手动检索] " : "✔ [自动识别] ") + "已定位当前运行中的客户端: " + dir);
+                                    ValidatePath();
+                                    return;
+                                }
                             }
+                            catch { }
                         }
-                        catch { }
                     }
                 }
-            }
-            catch { }
+                catch { }
 
-            // 2. Candidate folders
-            var candidates = new List<string>
-            {
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", "antigravity"),
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Antigravity"),
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Antigravity"),
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Programs", "antigravity"),
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "AppData", "Local", "Programs", "antigravity"),
-                @"C:\Users\Lynan\AppData\Local\Programs\antigravity"
-            };
+                // 2. Candidate folders
+                var candidates = new List<string>();
+                try { candidates.Add(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", "antigravity")); } catch { }
+                try { candidates.Add(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Antigravity")); } catch { }
+                try { candidates.Add(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Antigravity")); } catch { }
+                try { candidates.Add(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Programs", "antigravity")); } catch { }
+                try { candidates.Add(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "AppData", "Local", "Programs", "antigravity")); } catch { }
 
-            // 3. Registry Uninstall Entries
-            try
-            {
-                string[] regRoots = new string[]
+                // 3. Registry Uninstall Entries
+                try
                 {
-                    @"Software\Microsoft\Windows\CurrentVersion\Uninstall",
-                    @"Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
-                };
-
-                foreach (var regRoot in regRoots)
-                {
-                    using (var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(regRoot))
+                    string[] regRoots = new string[]
                     {
-                        if (key != null)
+                        @"Software\Microsoft\Windows\CurrentVersion\Uninstall",
+                        @"Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
+                    };
+
+                    foreach (var regRoot in regRoots)
+                    {
+                        using (var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(regRoot))
                         {
-                            foreach (var subKeyName in key.GetSubKeyNames())
+                            if (key != null)
                             {
-                                using (var subKey = key.OpenSubKey(subKeyName))
+                                foreach (var subKeyName in key.GetSubKeyNames())
                                 {
-                                    if (subKey != null)
+                                    using (var subKey = key.OpenSubKey(subKeyName))
                                     {
-                                        var disp = subKey.GetValue("DisplayName") as string;
-                                        if (!string.IsNullOrEmpty(disp) && disp.IndexOf("Antigravity", StringComparison.OrdinalIgnoreCase) >= 0)
+                                        if (subKey != null)
                                         {
-                                            var loc = subKey.GetValue("InstallLocation") as string;
-                                            if (!string.IsNullOrEmpty(loc)) candidates.Add(loc);
-                                            var icon = subKey.GetValue("DisplayIcon") as string;
-                                            if (!string.IsNullOrEmpty(icon))
+                                            var disp = subKey.GetValue("DisplayName") as string;
+                                            if (!string.IsNullOrEmpty(disp) && disp.IndexOf("Antigravity", StringComparison.OrdinalIgnoreCase) >= 0)
                                             {
-                                                string iconDir = Path.GetDirectoryName(icon.Trim('\"', ' '));
-                                                if (!string.IsNullOrEmpty(iconDir)) candidates.Add(iconDir);
+                                                var loc = subKey.GetValue("InstallLocation") as string;
+                                                string safeLoc = SanitizePathCandidate(loc);
+                                                if (!string.IsNullOrEmpty(safeLoc)) candidates.Add(safeLoc);
+
+                                                var icon = subKey.GetValue("DisplayIcon") as string;
+                                                string safeIcon = SanitizePathCandidate(icon);
+                                                if (!string.IsNullOrEmpty(safeIcon))
+                                                {
+                                                    try
+                                                    {
+                                                        string iconDir = Path.GetDirectoryName(safeIcon);
+                                                        if (!string.IsNullOrEmpty(iconDir)) candidates.Add(iconDir);
+                                                    }
+                                                    catch { }
+                                                }
                                             }
                                         }
                                     }
@@ -1380,61 +1433,82 @@ namespace AntigravityInstaller
                         }
                     }
                 }
-            }
-            catch { }
+                catch { }
 
-            foreach (var c in candidates)
-            {
-                if (string.IsNullOrEmpty(c) || checkedPaths.Contains(c)) continue;
-                checkedPaths.Add(c);
-
-                if (File.Exists(Path.Combine(c, "resources", "app.asar")))
+                foreach (var c in candidates)
                 {
-                    detectedInstallDir = c;
-                    txtPath.Text = c;
-                    Log((isManual ? "✔ [手动检索] " : "✔ [自动识别] ") + "已定位 Antigravity 客户端目录: " + c);
-                    ValidatePath();
-                    return;
-                }
-            }
+                    try
+                    {
+                        string safeCandidate = SanitizePathCandidate(c);
+                        if (string.IsNullOrEmpty(safeCandidate) || checkedPaths.Contains(safeCandidate)) continue;
+                        checkedPaths.Add(safeCandidate);
 
-            if (isManual)
-            {
-                Log("⚠ 未能自动检索到客户端目录，请点击“浏览”手动指定 Antigravity 安装目录。");
+                        string asarPath = Path.Combine(safeCandidate, "resources", "app.asar");
+                        if (File.Exists(asarPath))
+                        {
+                            detectedInstallDir = safeCandidate;
+                            txtPath.Text = safeCandidate;
+                            Log((isManual ? "✔ [手动检索] " : "✔ [自动识别] ") + "已定位 Antigravity 客户端目录: " + safeCandidate);
+                            ValidatePath();
+                            return;
+                        }
+                    }
+                    catch { }
+                }
+
+                if (isManual)
+                {
+                    Log("⚠ 未能自动检索到客户端目录，请点击“浏览”手动指定 Antigravity 安装目录。");
+                }
+                else
+                {
+                    Log("未自动定位到默认目录，等待用户指定或点击“自动搜索”。");
+                }
+                ValidatePath();
             }
-            else
+            catch (Exception ex)
             {
-                Log("未自动定位到默认目录，等待用户指定或点击“自动搜索”。");
+                Log("⚠ 检索安装目录时发生异常：" + ex.Message);
             }
-            ValidatePath();
         }
 
         private bool ValidatePath()
         {
-            string p = txtPath.Text.Trim();
-            if (string.IsNullOrEmpty(p))
+            try
             {
-                lblPathStatus.Text = "▲ 请输入或选择 Antigravity 安装目录。";
-                lblPathStatus.Foreground = new SolidColorBrush(isDarkMode ? Color.FromRgb(245, 158, 11) : Color.FromRgb(217, 119, 6)); // Amber
-                btnInstall.IsEnabled = false;
-                btnRestore.IsEnabled = false;
-                return false;
-            }
+                string p = SanitizePathCandidate(txtPath.Text);
+                if (string.IsNullOrEmpty(p))
+                {
+                    lblPathStatus.Text = "▲ 请输入或选择 Antigravity 安装目录。";
+                    lblPathStatus.Foreground = new SolidColorBrush(isDarkMode ? Color.FromRgb(245, 158, 11) : Color.FromRgb(217, 119, 6)); // Amber
+                    btnInstall.IsEnabled = false;
+                    btnRestore.IsEnabled = false;
+                    return false;
+                }
 
-            string asar = Path.Combine(p, "resources", "app.asar");
-            if (File.Exists(asar))
-            {
-                detectedInstallDir = p;
-                lblPathStatus.Text = "● 已定位有效的 Antigravity 客户端目录 (已识别 resources/app.asar)";
-                lblPathStatus.Foreground = new SolidColorBrush(isDarkMode ? Color.FromRgb(16, 185, 129) : Color.FromRgb(5, 150, 105)); // Emerald
-                btnInstall.IsEnabled = !isWorking;
-                btnRestore.IsEnabled = !isWorking;
-                return true;
+                string asar = Path.Combine(p, "resources", "app.asar");
+                if (File.Exists(asar))
+                {
+                    detectedInstallDir = p;
+                    lblPathStatus.Text = "● 已定位有效的 Antigravity 客户端目录 (已识别 resources/app.asar)";
+                    lblPathStatus.Foreground = new SolidColorBrush(isDarkMode ? Color.FromRgb(16, 185, 129) : Color.FromRgb(5, 150, 105)); // Emerald
+                    btnInstall.IsEnabled = !isWorking;
+                    btnRestore.IsEnabled = !isWorking;
+                    return true;
+                }
+                else
+                {
+                    lblPathStatus.Text = "▲ 未在该目录下找到 resources/app.asar，请确认所选目录为 Antigravity 安装根目录。";
+                    lblPathStatus.Foreground = new SolidColorBrush(isDarkMode ? Color.FromRgb(245, 158, 11) : Color.FromRgb(217, 119, 6)); // Amber
+                    btnInstall.IsEnabled = false;
+                    btnRestore.IsEnabled = false;
+                    return false;
+                }
             }
-            else
+            catch
             {
-                lblPathStatus.Text = "▲ 未在该目录下找到 resources/app.asar，请确认所选目录为 Antigravity 安装根目录。";
-                lblPathStatus.Foreground = new SolidColorBrush(isDarkMode ? Color.FromRgb(245, 158, 11) : Color.FromRgb(217, 119, 6)); // Amber
+                lblPathStatus.Text = "▲ 路径格式无效，请重新选择有效的 Antigravity 安装目录。";
+                lblPathStatus.Foreground = new SolidColorBrush(isDarkMode ? Color.FromRgb(239, 68, 68) : Color.FromRgb(220, 38, 38));
                 btnInstall.IsEnabled = false;
                 btnRestore.IsEnabled = false;
                 return false;
@@ -1572,10 +1646,11 @@ namespace AntigravityInstaller
                         Log("调用 patcher.js 注入核心逻辑并生成原子化 app.asar...");
                     });
 
+                    string cleanInstallDir = (installDir ?? "").Trim().Trim('\"', '\'').TrimEnd('\\', '/');
                     ProcessStartInfo psi = new ProcessStartInfo
                     {
                         FileName = runner,
-                        Arguments = "\"" + patcherJs + "\" \"" + installDir + "\"",
+                        Arguments = "\"" + patcherJs + "\" \"" + cleanInstallDir + "\"",
                         UseShellExecute = false,
                         RedirectStandardOutput = true,
                         RedirectStandardError = true,
@@ -1745,10 +1820,11 @@ namespace AntigravityInstaller
                         Log("执行官方内核还原流程...");
                     });
 
+                    string cleanInstallDir = (installDir ?? "").Trim().Trim('\"', '\'').TrimEnd('\\', '/');
                     ProcessStartInfo psi = new ProcessStartInfo
                     {
                         FileName = runner,
-                        Arguments = "\"" + unpatcherJs + "\" \"" + installDir + "\"",
+                        Arguments = "\"" + unpatcherJs + "\" \"" + cleanInstallDir + "\"",
                         UseShellExecute = false,
                         RedirectStandardOutput = true,
                         RedirectStandardError = true,
