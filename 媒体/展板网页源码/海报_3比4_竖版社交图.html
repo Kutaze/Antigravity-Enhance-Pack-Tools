@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>Antigravity Enhance Tools - 3:4 竖版社交海报</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      width: 1200px;
+      height: 1600px;
+      overflow: hidden;
+      background-color: #070a14;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: #f1f5f9;
+      position: relative;
+    }
+
+    /* Ambient Background Glow */
+    .bg-lights {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .light-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(140px);
+      opacity: 0.32;
+    }
+    .blob-1 {
+      width: 650px;
+      height: 650px;
+      background: radial-gradient(circle, #6366f1 0%, #4338ca 70%);
+      top: -120px;
+      left: 10%;
+    }
+    .blob-2 {
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, #06b6d4 0%, #2563eb 70%);
+      top: 45%;
+      right: -100px;
+    }
+    .blob-3 {
+      width: 550px;
+      height: 550px;
+      background: radial-gradient(circle, #ec4899 0%, #8b5cf6 70%);
+      bottom: -100px;
+      left: 15%;
+      opacity: 0.22;
+    }
+
+    .grid-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 40px 40px;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Poster Container */
+    .poster-container {
+      position: relative;
+      z-index: 2;
+      width: 1200px;
+      height: 1600px;
+      padding: 52px 56px 44px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* Top Brand */
+    .poster-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .brand-logo-img {
+      width: 56px;
+      height: 56px;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 18px rgba(99, 102, 241, 0.7));
+    }
+    .brand-texts h2 {
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+      line-height: 1.15;
+    }
+    .brand-texts p {
+      font-size: 13px;
+      color: #94a3b8;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+    .badge-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .version-pill {
+      background: rgba(99, 102, 241, 0.18);
+      border: 1px solid rgba(99, 102, 241, 0.45);
+      color: #a5b4fc;
+      font-size: 13px;
+      font-weight: 800;
+      padding: 5px 12px;
+      border-radius: 999px;
+    }
+    .safety-pill {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #34d399;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 999px;
+    }
+
+    /* Hero Catchy Section */
+    .hero-area {
+      text-align: center;
+      margin: 18px 0 28px;
+    }
+    .catchy-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.25) 0%, rgba(219, 39, 119, 0.2) 100%);
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      color: #f1f5f9;
+      font-size: 14px;
+      font-weight: 800;
+      padding: 6px 20px;
+      border-radius: 999px;
+      margin-bottom: 16px;
+    }
+    .hero-main-title {
+      font-size: 52px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      line-height: 1.18;
+      margin-bottom: 12px;
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #60a5fa 0%, #c084fc 45%, #f472b6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-sub-text {
+      font-size: 19px;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+    .hero-sub-text strong {
+      color: #e2e8f0;
+    }
+
+    /* 4 Distinct Vertical Stacked Cards */
+    .cards-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      flex: 1;
+      margin-bottom: 24px;
+    }
+
+    .poster-card {
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 22px 26px;
+      display: grid;
+      grid-template-columns: 1.25fr 1fr;
+      gap: 22px;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 14px 32px rgba(0, 0, 0, 0.35);
+    }
+    .poster-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 4px;
+    }
+    .border-cyan::before { background: linear-gradient(180deg, #06b6d4, #3b82f6); }
+    .border-purple::before { background: linear-gradient(180deg, #8b5cf6, #ec4899); }
+    .border-emerald::before { background: linear-gradient(180deg, #10b981, #059669); }
+    .border-amber::before { background: linear-gradient(180deg, #f59e0b, #ef4444); }
+
+    .card-info h3 {
+      font-size: 21px;
+      font-weight: 800;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+    .card-info p {
+      font-size: 14px;
+      color: #94a3b8;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+    .badge-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .micro-pill {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 6px;
+    }
+    .pill-cyan { background: rgba(6, 182, 212, 0.15); color: #38bdf8; border: 1px solid rgba(6, 182, 212, 0.3); }
+    .pill-purple { background: rgba(139, 92, 246, 0.15); color: #c084fc; border: 1px solid rgba(139, 92, 246, 0.3); }
+    .pill-emerald { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .pill-amber { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+
+    /* Interactive Preview Blocks inside each card */
+    .card-preview-box {
+      background: rgba(8, 12, 24, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 14px 16px;
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Preview 1: Quota donut & active list */
+    .p1-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .p1-acc {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+    .p1-acc-avatar {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #6366f1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .p1-quota-tag {
+      font-size: 12px;
+      font-weight: 800;
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.15);
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+    .p1-meter {
+      height: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .p1-fill {
+      width: 85%;
+      height: 100%;
+      background: linear-gradient(90deg, #10b981, #06b6d4);
+      border-radius: 999px;
+    }
+
+    /* Preview 2: Floating model switcher */
+    .p2-model-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      background: rgba(255, 255, 255, 0.03);
+    }
+    .p2-model-item.active {
+      background: rgba(139, 92, 246, 0.22);
+      border: 1px solid rgba(139, 92, 246, 0.4);
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    /* Preview 3: Native localization */
+    .p3-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+      padding: 5px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .p3-item:last-child { border-bottom: none; }
+    .p3-k { color: #94a3b8; }
+    .p3-v { color: #f1f5f9; font-weight: 700; }
+
+    /* Preview 4: Skills Hub */
+    .p4-skills-chips {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    .p4-chip {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 5px;
+      color: #cbd5e1;
+      font-weight: 600;
+    }
+    .p4-installer-note {
+      font-size: 11.5px;
+      color: #34d399;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Bottom Footer Card */
+    .poster-footer {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 22px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .author-circle-img {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 2px solid #6366f1;
+      object-fit: cover;
+    }
+    .footer-meta h4 {
+      font-size: 16px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 3px;
+    }
+    .footer-meta p {
+      font-size: 13px;
+      color: #94a3b8;
+    }
+    .footer-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+    }
+    .search-guide-box {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.25) 0%, rgba(6, 182, 212, 0.2) 100%);
+      border: 1px solid rgba(99, 102, 241, 0.45);
+      padding: 7px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #f8fafc;
+    }
+    .site-guide-link {
+      font-size: 13px;
+      color: #a5b4fc;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Lights -->
+  <div class="bg-lights">
+    <div class="light-blob blob-1"></div>
+    <div class="light-blob blob-2"></div>
+    <div class="light-blob blob-3"></div>
+  </div>
+
+  <div class="grid-overlay"></div>
+
+  <!-- Poster Canvas -->
+  <div class="poster-container">
+
+    <!-- Header Navigation -->
+    <header class="poster-header">
+      <div class="brand-group">
+        <img src="../../docs/assets/logo_glyph_transparent.png" alt="Logo" class="brand-logo-img">
+        <div class="brand-texts">
+          <h2>Antigravity Enhance Tools</h2>
+          <p>官方桌面端原生体验增强套件</p>
+        </div>
+      </div>
+      <div class="badge-group">
+        <span class="version-pill">v0.1.5 PRO</span>
+        <span class="safety-pill">🛡️ 纯本地免安装</span>
+      </div>
+    </header>
+
+    <!-- Catchy Hero Area -->
+    <section class="hero-area">
+      <div class="catchy-tag">
+        🚀 解决额度盲盒与生硬交互 · 交互顺手度提升 10 倍
+      </div>
+      <h1 class="hero-main-title">
+        让 Antigravity 顺手 10 倍！<br>
+        <span class="gradient-text">多账号实时配额 · 界面UI美化</span>
+      </h1>
+      <p class="hero-sub-text">
+        <strong>100% 全场景原生深度汉化</strong> · <strong>悬浮模型随心秒切</strong> · <strong>35+ 技能中心</strong>
+      </p>
+    </section>
+
+    <!-- 4 Feature Stack Cards -->
+    <main class="cards-stack">
+
+      <!-- Card 1 -->
+      <div class="poster-card border-cyan">
+        <div class="card-info">
+          <h3>👥 多账号动态切换 · 实时额度</h3>
+          <p>集成多账号管理池，毫秒级快速切换，实时展示剩余配额与重置倒计时，彻底告别额度焦虑。</p>
+          <div class="badge-row">
+            <span class="micro-pill pill-cyan">底栏一键切换</span>
+            <span class="micro-pill pill-cyan">实时额度同步</span>
+            <span class="micro-pill pill-cyan">多账号无缝轮换</span>
+          </div>
+        </div>
+        <div class="card-preview-box">
+          <div class="p1-row">
+            <div class="p1-acc">
+              <span class="p1-acc-avatar">L</span>
+              <span>主力账号 (Lynan)</span>
+            </div>
+            <span class="p1-quota-tag">85% 充足</span>
+          </div>
+          <div class="p1-meter">
+            <div class="p1-fill"></div>
+          </div>
+          <div style="font-size: 11px; color: #94a3b8; margin-top: 8px; display: flex; justify-content: space-between;">
+            <span>下个重置周期：03:42:15</span>
+            <span>备用账号已就绪</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="poster-card border-purple">
+        <div class="card-info">
+          <h3>🎨 界面 UI 深度美化 · 悬浮模型秒切</h3>
+          <p>毛玻璃质感、科学留白与护眼字阶排版，快捷模型切换呼之即出，双手不离当前思路，交互丝滑极致。</p>
+          <div class="badge-row">
+            <span class="micro-pill pill-purple">悬浮面板秒切</span>
+            <span class="micro-pill pill-purple">毛玻璃视觉重构</span>
+            <span class="micro-pill pill-purple">顺手度拉满</span>
+          </div>
+        </div>
+        <div class="card-preview-box">
+          <div class="p2-model-item active">
+            <span>Claude 3.5 Sonnet (主力推理)</span>
+            <span style="color: #c084fc;">✓</span>
+          </div>
+          <div class="p2-model-item">
+            <span>Gemini 1.5 Pro (超长上下文)</span>
+            <span></span>
+          </div>
+          <div class="p2-model-item">
+            <span>DeepSeek R1 (深度思考)</span>
+            <span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="poster-card border-emerald">
+        <div class="card-info">
+          <h3>🌏 100% 全场景原生深度汉化</h3>
+          <p>深度语义校对与词条润色，菜单、偏好设置、报错弹窗全面母语化，搭载工业级防卡死与防崩溃守卫。</p>
+          <div class="badge-row">
+            <span class="micro-pill pill-emerald">3000+ 词条覆盖</span>
+            <span class="micro-pill pill-emerald">零死循环防抖</span>
+            <span class="micro-pill pill-emerald">快捷键完美保留</span>
+          </div>
+        </div>
+        <div class="card-preview-box">
+          <div class="p3-item">
+            <span class="p3-k">界面母语化</span>
+            <span class="p3-v">简体中文 (原生校对)</span>
+          </div>
+          <div class="p3-item">
+            <span class="p3-k">防卡死守卫</span>
+            <span class="p3-v" style="color: #34d399;">活跃保护中 (零白屏)</span>
+          </div>
+          <div class="p3-item">
+            <span class="p3-k">隐私机制</span>
+            <span class="p3-v">100% 本地运行零上传</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="poster-card border-amber">
+        <div class="card-info">
+          <h3>🧩 35+ 可视化技能中心 & 绿色安装器</h3>
+          <p>预置覆盖代码审查、TDD、设计系统的 35+ 高阶技能，支持 GitHub 链接一键解析，单文件双主题一键无损安装与还原。</p>
+          <div class="badge-row">
+            <span class="micro-pill pill-amber">GitHub 技能一键装</span>
+            <span class="micro-pill pill-amber">深浅双主题 GUI</span>
+            <span class="micro-pill pill-amber">一键无损还原</span>
+          </div>
+        </div>
+        <div class="card-preview-box">
+          <div class="p4-skills-chips">
+            <span class="p4-chip">🔍 三轴审查</span>
+            <span class="p4-chip">🧪 TDD测试先行</span>
+            <span class="p4-chip">🎨 设计系统</span>
+            <span class="p4-chip">⚡ 架构重构</span>
+          </div>
+          <div class="p4-installer-note">
+            <span>🛠️ 单文件绿色向导 · 自动快照备份与还原</span>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Poster Footer -->
+    <footer class="poster-footer">
+      <div class="footer-left">
+        <img src="../../docs/assets/author_avatar.png" alt="Kutaze" class="author-circle-img">
+        <div class="footer-meta">
+          <h4>Crafted by Kutaze</h4>
+          <p>专注于软件前端视觉展示与极致人机交互体验</p>
+        </div>
+      </div>
+      <div class="footer-right">
+        <div class="search-guide-box">
+          👉 GitHub 搜索开源项目名：Antigravity-Enhance-Pack-Tools
+        </div>
+        <div class="site-guide-link">
+          🌐 官方发布网站：antigravity-enhance-tools.github.io
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+</body>
+</html>

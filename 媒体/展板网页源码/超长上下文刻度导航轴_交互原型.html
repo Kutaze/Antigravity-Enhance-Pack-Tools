@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Antigravity 鱼眼波浪刻度导航轴 (Fisheye Timeline Scrubber) 交互原型</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card-bg: #161b22;
+      --bubble-user: #21262d;
+      --bubble-ai: #1c2128;
+      --border: #30363d;
+      --text: #c9d1d9;
+      --text-muted: #8b949e;
+      --accent: #8b5cf6;
+      --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
+      --tick-base: rgba(255, 255, 255, 0.22);
+      --tick-focus: #ffffff;
+      --popover-bg: rgba(22, 27, 34, 0.94);
+      --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.6), 0 8px 12px -6px rgba(0, 0, 0, 0.5);
+    }
+
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --bubble-user: #f1f5f9;
+      --bubble-ai: #ffffff;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --accent: #7c3aed;
+      --accent-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #c026d3 100%);
+      --tick-base: rgba(0, 0, 0, 0.22);
+      --tick-focus: #111827;
+      --popover-bg: rgba(255, 255, 255, 0.96);
+      --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.12), 0 8px 12px -6px rgba(0, 0, 0, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      transition: background 0.25s ease, color 0.25s ease;
+      user-select: none;
+    }
+
+    /* Left Sidebar */
+    .sidebar {
+      width: 250px;
+      background: var(--card-bg);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      flex-shrink: 0;
+      z-index: 20;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand-logo {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: var(--accent-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .brand-title {
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .nav-item {
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      color: var(--text-muted);
+      cursor: pointer;
+      margin-bottom: 4px;
+      transition: all 0.15s;
+    }
+
+    .nav-item.active {
+      background: var(--bubble-user);
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .theme-toggle-btn {
+      margin-top: auto;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text);
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    /* Main Chat Viewport */
+    .chat-container {
+      flex: 1;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .chat-header {
+      height: 52px;
+      border-bottom: 1px solid var(--border);
+      background: var(--card-bg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      font-size: 14px;
+      font-weight: 600;
+      z-index: 10;
+    }
+
+    .badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      background: rgba(139, 92, 246, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      margin-left: 8px;
+    }
+
+    /* Chat scroll container: 给左侧预留 46px 放置刻度导航轴 */
+    .chat-scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 40px 100px 58px;
+      scroll-behavior: auto; /* 拖拽时需即时渲染，平滑交给代码控制 */
+      position: relative;
+    }
+
+    .chat-scroll-area::-webkit-scrollbar {
+      width: 6px;
+    }
+    .chat-scroll-area::-webkit-scrollbar-thumb {
+      background: rgba(128, 128, 128, 0.2);
+      border-radius: 3px;
+    }
+
+    .turn-wrapper {
+      max-width: 820px;
+      margin: 0 auto 36px auto;
+      border-radius: 12px;
+      padding: 16px;
+      transition: box-shadow 0.3s ease;
+      position: relative;
+    }
+
+    .turn-wrapper.target-flash {
+      animation: pulseHighlight 1.8s ease-out;
+    }
+
+    @keyframes pulseHighlight {
+      0% {
+        box-shadow: 0 0 0 3px var(--accent), 0 8px 30px rgba(139, 92, 246, 0.4);
+      }
+      100% {
+        box-shadow: 0 0 0 0px transparent;
+      }
+    }
+
+    .turn-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .turn-number {
+      font-weight: 700;
+      color: var(--accent);
+      background: rgba(139, 92, 246, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .user-bubble {
+      background: var(--bubble-user);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-bottom: 14px;
+      font-size: 14.5px;
+      line-height: 1.6;
+      font-weight: 500;
+      user-select: text;
+    }
+
+    .ai-bubble {
+      background: var(--bubble-ai);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 20px;
+      font-size: 14px;
+      line-height: 1.65;
+      user-select: text;
+    }
+
+    .ai-bubble h4 {
+      margin-bottom: 8px;
+      font-size: 15px;
+      color: var(--text);
+    }
+
+    .code-preview {
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12.5px;
+      margin: 10px 0;
+      border: 1px solid var(--border);
+      overflow-x: auto;
+    }
+
+    /* ============================================================== */
+    /*   左侧边栏右边的「鱼眼曲线拖拽刻度导航轴 (Fisheye Scrubber)」   */
+    /* ============================================================== */
+    .agy-fisheye-timeline {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      z-index: 90;
+      user-select: none;
+      padding: 6px 0;
+      cursor: pointer;
+    }
+
+    /* 刻度槽导轨 (透明热区，方便鼠标滑过与拖动) */
+    .agy-fisheye-track {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 7px;
+      position: relative;
+      padding: 8px 0;
+    }
+
+    /* 单根刻度小横线 */
+    .agy-fisheye-tick {
+      height: 2.5px;
+      width: 8px; /* 默认未激活状态最短 */
+      background: var(--tick-base);
+      border-radius: 2px;
+      transition: width 0.12s cubic-bezier(0.2, 0, 0, 1), height 0.12s ease, background 0.15s ease, opacity 0.15s ease;
+      transform-origin: left center;
+      position: relative;
+      opacity: 0.55;
+    }
+
+    /* 焦点刻度线 (突出高亮，支持深色纯白/暗色纯黑) */
+    .agy-fisheye-tick.focus {
+      background: var(--tick-focus) !important;
+      opacity: 1 !important;
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+    }
+
+    [data-theme="light"] .agy-fisheye-tick.focus {
+      background: #000000 !important;
+      box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
+    }
+
+    /* 紧贴在鼠标/刻度右侧的精巧毛玻璃气泡卡片 (对标豆包原版设计·大窗版) */
+    .agy-fisheye-popover {
+      position: fixed;
+      left: 44px; /* 紧挨在左侧刻度轴的右边 */
+      right: auto;
+      width: 360px; /* 大窗舒展尺寸，清晰展示长文提问与片段简介 */
+      background: var(--popover-bg);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 13px 16px;
+      box-shadow: 0 10px 28px -4px rgba(0, 0, 0, 0.45);
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-50%);
+      transition: opacity 0.12s ease, top 0.06s ease-out;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .agy-fisheye-popover.visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(-50%);
+    }
+
+    .popover-badge-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11.5px;
+      color: var(--text-muted);
+    }
+
+    .popover-badge {
+      font-weight: 700;
+      color: var(--accent);
+      background: rgba(139, 92, 246, 0.15);
+      padding: 2px 7px;
+      border-radius: 6px;
+      font-size: 11px;
+    }
+
+    .popover-user-prompt {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.45;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis; /* 支持两行或单行舒展截断 */
+    }
+
+    .popover-ai-snippet {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      border-top: 1px dashed var(--border);
+      padding-top: 6px;
+    }
+
+
+
+    /* 拖拽中的全局遮罩防护 */
+    body.is-scrubbing {
+      cursor: ns-resize !important;
+    }
+    body.is-scrubbing * {
+      cursor: ns-resize !important;
+      user-select: none !important;
+    }
+
+    /* 底部输入框 */
+    .input-bar-sim {
+      padding: 12px 24px 12px 58px;
+      background: var(--card-bg);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .sim-input {
+      flex: 1;
+      height: 40px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0 14px;
+      color: var(--text);
+      font-size: 13.5px;
+    }
+
+    .sim-btn {
+      padding: 8px 18px;
+      background: var(--accent-gradient);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body data-theme="dark">
+
+  <!-- Left Sidebar (左侧边栏) -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo">AG</div>
+      <div>
+        <div class="brand-title">Antigravity</div>
+        <div style="font-size: 11px; color: var(--text-muted);">Enhance Pack v3.2.0</div>
+      </div>
+    </div>
+
+    <div class="nav-item active">🚀 超长会话波浪拖拽定位</div>
+    <div class="nav-item">💬 多账号配额与思考滑块</div>
+    <div class="nav-item">🧩 自定义技能与插件扩展</div>
+    <div class="nav-item">⚙️ 系统设置与模型配置</div>
+
+    <button class="theme-toggle-btn" id="themeToggleBtn">
+      <span id="themeIcon">☀️</span> <span id="themeText">切换浅色模式</span>
+    </button>
+  </aside>
+
+  <!-- Main Chat Window (右侧主聊天视窗) -->
+  <main class="chat-container">
+    <header class="chat-header">
+      <div style="display: flex; align-items: center;">
+        <span>当前会话：超长上下文项目重构</span>
+        <span class="badge" id="turnCountBadge">共 16 轮长文交互</span>
+      </div>
+      <div style="font-size: 12px; color: var(--text-muted);">
+        ✨ 鼠标在左侧刻度上下划动体验波浪放大 · 按住左键上下拖动毫秒级平滑定位
+      </div>
+    </header>
+
+    <!-- 放置在左侧边栏右侧的「鱼眼波浪拖拽刻度导航轴」 -->
+    <div class="agy-fisheye-timeline" id="agyFisheyeTimeline" title="鼠标上下滑动波浪放大 · 按住左键拖拽定位">
+      <div class="agy-fisheye-track" id="agyFisheyeTrack">
+        <!-- 动态生成 16 轮鱼眼刻度线 -->
+      </div>
+    </div>
+
+    <!-- 向右侧呼出的毛玻璃摘要气泡 -->
+    <div class="agy-fisheye-popover" id="agyFisheyePopover">
+      <div class="popover-badge-row">
+        <span class="popover-badge" id="popoverBadge">第 1 轮提问</span>
+        <span id="popoverTime">按住拖拽定位</span>
+      </div>
+      <div class="popover-user-prompt" id="popoverPrompt">
+        用户提问文字摘要...
+      </div>
+      <div class="popover-ai-snippet" id="popoverSnippet">
+        AI 助手回复内容概览...
+      </div>
+    </div>
+
+    <!-- 聊天内容可滚动区域 -->
+    <div class="chat-scroll-area" id="chatScrollArea">
+      <!-- 动态注入 16 轮对话 -->
+    </div>
+
+    <div class="input-bar-sim">
+      <input type="text" class="sim-input" placeholder="输入消息开始对话...（当前为鱼眼拖拽刻度演示环境）" readonly>
+      <button class="sim-btn">发送</button>
+    </div>
+  </main>
+
+  <script>
+    // 16 组模拟长文对话数据
+    const mockTurns = [
+      {
+        turn: 1,
+        title: "分析 Antigravity 插件架构与注入机制",
+        userPrompt: "分析当前 Antigravity 客户端扩展包的注入机制与加载时序，重点关注 app.asar 解包过程和 preload.js 注入链路。",
+        aiSnippet: "Antigravity 基于 Electron 架构，通过解包 app.asar 将 i18n_runner.js 注入渲染进程，通过 WebContents 的 dom-ready 事件完成双向通信与 UI 挂载。"
+      },
+      {
+        turn: 2,
+        title: "设计思考能力 4 挡动态滑块组件",
+        userPrompt: "如何在模型选择面板上设计一个支持 4 挡调节（OFF、Low、Med、High）的思维链滑块？要求带渐变紫粉辉光。",
+        aiSnippet: "已通过 Shadow DOM 隔离与 CSS 变量系统设计出 .agy-slider-track 与 .agy-slider-thumb 拖拽监听，支持与模型配置参数双向联动。"
+      },
+      {
+        turn: 3,
+        title: "多账号配额卡片与实时 Token 刷新",
+        userPrompt: "在左侧侧边栏底部挂载多账号配额卡片，展示 Gemini 2.5 Pro 与 Claude 3.7 的可用比例与重置倒计时。",
+        aiSnippet: "实现了 mountSidebarFooter() 与五段式颜色进度条，支持根据活跃账号与 OAuth Creds 动态计算剩余 Token 余量并自动预警。"
+      },
+      {
+        turn: 4,
+        title: "左侧边栏右边的超长上下文刻度导航需求",
+        userPrompt: "滚动条要放在界面的左侧边栏的右边，支持拖动定位，并且鼠标指示的位置突出，其他像曲线一样往未突出的地方平滑。",
+        aiSnippet: "收到！我们完全遵循您发来的特写截图，实现了类似 macOS Dock 的鱼眼曲线（Fisheye Magnification Wave）与阻尼拖拽定位轴！"
+      },
+      {
+        turn: 5,
+        title: "鱼眼波浪高斯放大曲线数学模型",
+        userPrompt: "鼠标指示的位置最长最突出，其他刻度像波浪一样平滑衰减，这个曲线算法怎么实现？",
+        aiSnippet: "采用高斯衰减余弦平滑公式：W(d) = W_min + (W_max - W_min) * cos²(π·d / 2R)，实现 3-4 个刻度范围内的自然鱼眼放大！"
+      },
+      {
+        turn: 6,
+        title: "鼠标按住拖拽（Drag / Scrubbing）定位逻辑",
+        userPrompt: "按住鼠标上下拖拽时，页面如何毫秒级响应，气泡卡片如何跟随？",
+        aiSnippet: "全局监听 pointermove，实时映射光标所在刻度，直接平滑计算 targetTurn 的 offsetTop，实现像拉链般即时丝滑拖拽定位！"
+      },
+      {
+        turn: 7,
+        title: "爱发电 2:1 超清横幅与 1:1 赞赏方案配图",
+        userPrompt: "帮我做爱发电的 2:1 背景图和 5 个档位的 1:1 方案配图，包含 6.66、12、29.9、99.9 和自由投喂。",
+        aiSnippet: "已全部交付 2560×1280 2K 黄金比例深色横幅及全套 1000×1000 方案配图，并在官网独立部署专属 sponsor.html 赞助页面！"
+      },
+      {
+        turn: 8,
+        title: "刻度右侧毛玻璃气泡卡片跟随与边界计算",
+        userPrompt: "向右呼出的毛玻璃卡片在拖拽时怎么保证不溢出顶部和底部？",
+        aiSnippet: "每次定位时获取当前焦点刻度的 getBoundingClientRect().top，并在 Math.max(80, Math.min(window.innerHeight - 150, top)) 内自适应钳制。"
+      },
+      {
+        turn: 9,
+        title: "目标轮次到达时的波纹脉冲反馈",
+        userPrompt: "用户松开鼠标定位到目标轮次时，怎么给用户明确的到达感知？",
+        aiSnippet: "为目标轮次容器添加 target-flash 动画，触发 1.8 秒柔和紫金外发光光晕，提醒用户已精准抵达目标问答！"
+      },
+      {
+        turn: 10,
+        title: "单页面双模滚动（ScrollSpy 视口跟随）",
+        userPrompt: "如果用户不用刻度轴，而是直接滚动主聊天视窗，刻度轴会实时联动吗？",
+        aiSnippet: "完全联动！Scroll 监听通过 requestAnimationFrame 动态计算视口焦线最近的轮次，将鱼眼焦点平滑吸附在当前轮次刻度上！"
+      },
+      {
+        turn: 11,
+        title: "超长会话（30-100+轮）刻度轴密度自适应",
+        userPrompt: "当对话达到上百轮时，刻度线太密集怎么办？",
+        aiSnippet: "刻度轴轨道高度固定在视口 60%-70% 范围内，超过 30 轮自动缩减间距（gap: 4px），确保视觉轻盈精致且不溢出。"
+      },
+      {
+        turn: 12,
+        title: "深浅色模式下的突出对比度优化",
+        userPrompt: "在浅色模式下，突出的刻度线怎么保证清晰度？",
+        aiSnippet: "深色模式下焦点刻度为纯白高亮加光晕（#ffffff），浅色模式下焦点刻度为高对比度深黑纯色（#000000），与您截图完全一致！"
+      },
+      {
+        turn: 13,
+        title: "防死循环协调器（Master UI Coordinator）",
+        userPrompt: "在客户端注入这种动态刻度会不会引起界面卡顿？",
+        aiSnippet: "严格通过 isAgyUpdating 锁防重入，所有几何变换使用 GPU 硬件加速的 CSS transform 和 width，完全杜绝 CPU 100% 重排。"
+      },
+      {
+        turn: 14,
+        title: "原生截图工具与剪贴板图像自动填入",
+        userPrompt: "输入框的原生截图工具是怎样的？",
+        aiSnippet: "利用 Windows 10/11 原生 ms-screenclip: 截图工具，监听剪贴板图像后自动包装填入，零外部依赖，体验极佳。"
+      },
+      {
+        turn: 15,
+        title: "WPF 独立安装器与一键注入",
+        userPrompt: "打包成独立 EXE 怎么安装？",
+        aiSnippet: "编译至 core/i18n_runner.js 后，通过 build.bat 封装成单文件 Antigravity Enhance Tools.exe，双击即可一键热打补丁。"
+      },
+      {
+        turn: 16,
+        title: "即刻开工：将鱼眼拖拽刻度轴注入 patcher.js",
+        userPrompt: "太惊艳了！鱼眼波浪动效和拖拽手感完全对味，请正式注入到客户端核心补丁！",
+        aiSnippet: "方案与交互原型已就绪，即刻将鱼眼波浪算法、拖拽定位控制器整合至 core/i18n_runner.js 并完成封包打包！"
+      }
+    ];
+
+    // 初始化 DOM 结构
+    const chatContainer = document.getElementById('chatScrollArea');
+    const track = document.getElementById('agyFisheyeTrack');
+    const timeline = document.getElementById('agyFisheyeTimeline');
+    const popover = document.getElementById('agyFisheyePopover');
+    const turnCountBadge = document.getElementById('turnCountBadge');
+
+    turnCountBadge.innerText = `共 ${mockTurns.length} 轮长文交互`;
+
+    // 1. 渲染聊天对话内容
+    mockTurns.forEach((item, index) => {
+      const turnEl = document.createElement('div');
+      turnEl.className = 'turn-wrapper';
+      turnEl.id = `turn-${item.turn}`;
+      turnEl.setAttribute('data-turn', item.turn);
+
+      turnEl.innerHTML = `
+        <div class="turn-header">
+          <span class="turn-number">第 ${item.turn} 轮对话</span>
+          <span>·</span>
+          <span>${item.title}</span>
+        </div>
+        <div class="user-bubble">
+          <strong>问：</strong>${item.userPrompt}
+        </div>
+        <div class="ai-bubble">
+          <h4>💡 ${item.aiSnippet}</h4>
+          <p>详细解析：本轮消息挂载在 DOM 视窗中，对应刻度轴第 ${item.turn} 号节点，支持鱼眼余弦衰减放大与拖拽直达。</p>
+          <div class="code-preview">// 轮次 ${item.turn} 状态\nconst turn_${item.turn} = { turn: ${item.turn}, focusScale: 1.0, active: true };</div>
+        </div>
+      `;
+      chatContainer.appendChild(turnEl);
+    });
+
+    // 2. 渲染刻度线
+    const tickElements = [];
+    mockTurns.forEach((item, index) => {
+      const tick = document.createElement('div');
+      tick.className = 'agy-fisheye-tick' + (index === 0 ? ' focus' : '');
+      tick.setAttribute('data-turn', item.turn);
+      track.appendChild(tick);
+      tickElements.push(tick);
+    });
+
+    // ==============================================================
+    // 3. 鱼眼放大波浪曲线核心算法 (Fisheye Magnification Wave)
+    // ==============================================================
+    const MIN_WIDTH = 8;    // 基础未突出宽度 (8px)
+    const MAX_WIDTH = 25;   // 焦点最长突出宽度 (25px)
+    const RADIUS = 4;       // 影响半径：焦点周围 4 个刻度受波浪波及
+
+    let currentFocusIndex = 0;
+    let isUserScrubbing = false; // 是否正在按住拖拽
+
+    // 计算并应用鱼眼曲线
+    function applyFisheyeWave(focusIndex) {
+      currentFocusIndex = Math.max(0, Math.min(tickElements.length - 1, focusIndex));
+
+      tickElements.forEach((tick, i) => {
+        const dist = Math.abs(i - currentFocusIndex);
+
+        if (dist === 0) {
+          // 当前焦点：最长、最粗、高亮突出
+          tick.style.width = `${MAX_WIDTH}px`;
+          tick.style.height = '3.5px';
+          tick.classList.add('focus');
+        } else if (dist <= RADIUS) {
+          // 曲线平滑衰减：采用余弦平方曲线 cos²(π·dist / 2R)
+          const factor = Math.pow(Math.cos((Math.PI * dist) / (2 * (RADIUS + 1))), 2);
+          const width = MIN_WIDTH + (MAX_WIDTH - MIN_WIDTH) * factor;
+          tick.style.width = `${Math.round(width)}px`;
+          tick.style.height = `${2.5 + factor * 0.6}px`;
+          tick.classList.remove('focus');
+        } else {
+          // 远离焦点的基础形态
+          tick.style.width = `${MIN_WIDTH}px`;
+          tick.style.height = '2.5px';
+          tick.classList.remove('focus');
+        }
+      });
+    }
+
+    // 初始展示第 1 轮为焦点
+    applyFisheyeWave(0);
+
+    // ==============================================================
+    // 4. 气泡卡片展示与边界防溢出
+    // ==============================================================
+    let popoverTimer = null;
+
+    function updatePopoverContent(index) {
+      const item = mockTurns[index];
+      if (!item) return;
+
+      document.getElementById('popoverBadge').innerText = `第 ${item.turn} 轮 · 用户提问`;
+      document.getElementById('popoverPrompt').innerText = item.userPrompt;
+      document.getElementById('popoverSnippet').innerText = item.aiSnippet;
+
+      const targetTick = tickElements[index];
+      if (targetTick) {
+        const rect = targetTick.getBoundingClientRect();
+        const topPos = rect.top + rect.height / 2;
+        const popoverHeight = 115;
+        const safeTop = Math.max(70, Math.min(window.innerHeight - popoverHeight - 20, topPos));
+        popover.style.top = `${safeTop}px`;
+        const trackRect = track.getBoundingClientRect();
+        popover.style.left = `${Math.round(trackRect.left + 36)}px`;
+      }
+      popover.classList.add('visible');
+    }
+
+    function hidePopover() {
+      if (popoverTimer) clearTimeout(popoverTimer);
+      popoverTimer = setTimeout(() => {
+        if (!isUserScrubbing) {
+          popover.classList.remove('visible');
+        }
+      }, 150);
+    }
+
+    // ==============================================================
+    // 5. 拖拽定位逻辑 (Scrubbing & Dragging)
+    // ==============================================================
+    function getIndexFromClientY(clientY) {
+      const trackRect = track.getBoundingClientRect();
+      const relativeY = clientY - trackRect.top;
+      const totalHeight = trackRect.height;
+      const ratio = Math.max(0, Math.min(1, relativeY / totalHeight));
+      return Math.round(ratio * (tickElements.length - 1));
+    }
+
+    function scrollToTurn(turnNum, smooth = true) {
+      const targetEl = document.getElementById(`turn-${turnNum}`);
+      if (!targetEl) return;
+
+      if (smooth) {
+        targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        targetEl.scrollIntoView({ behavior: 'auto', block: 'start' });
+      }
+    }
+
+    // 鼠标在导航轴上滑动的波浪跟随
+    timeline.addEventListener('mousemove', (e) => {
+      if (isUserScrubbing) return;
+      const idx = getIndexFromClientY(e.clientY);
+      applyFisheyeWave(idx);
+      updatePopoverContent(idx);
+    });
+
+    timeline.addEventListener('mouseleave', () => {
+      if (isUserScrubbing) return;
+      hidePopover();
+      // 鼠标离开时，波浪曲线平滑复原为当前视口所在的焦点
+      syncFocusWithScroll();
+    });
+
+    // 鼠标按下：启动按住拖拽定位
+    timeline.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      isUserScrubbing = true;
+      document.body.classList.add('is-scrubbing');
+
+      const idx = getIndexFromClientY(e.clientY);
+      applyFisheyeWave(idx);
+      updatePopoverContent(idx);
+      scrollToTurn(mockTurns[idx].turn, false); // 拖动时即时定位
+
+      function onPointerMove(moveEvent) {
+        if (!isUserScrubbing) return;
+        const moveIdx = getIndexFromClientY(moveEvent.clientY);
+        applyFisheyeWave(moveIdx);
+        updatePopoverContent(moveIdx);
+        scrollToTurn(mockTurns[moveIdx].turn, false); // 毫秒级跟手滚动
+      }
+
+      function onPointerUp(upEvent) {
+        isUserScrubbing = false;
+        document.body.classList.remove('is-scrubbing');
+        window.removeEventListener('pointermove', onPointerMove);
+        window.removeEventListener('pointerup', onPointerUp);
+
+        const finalIdx = getIndexFromClientY(upEvent.clientY);
+        const finalTurn = mockTurns[finalIdx].turn;
+
+        // 目标轮次波纹高亮提醒
+        const targetEl = document.getElementById(`turn-${finalTurn}`);
+        if (targetEl) {
+          targetEl.classList.remove('target-flash');
+          void targetEl.offsetWidth; // 触发 reflow
+          targetEl.classList.add('target-flash');
+        }
+
+        hidePopover();
+      }
+
+      window.addEventListener('pointermove', onPointerMove);
+      window.addEventListener('pointerup', onPointerUp);
+    });
+
+    // ==============================================================
+    // 6. ScrollSpy（手动滚动主窗口时，鱼眼焦点实时跟随）
+    // ==============================================================
+    let isScrollChecking = false;
+
+    function syncFocusWithScroll() {
+      const containerRect = chatContainer.getBoundingClientRect();
+      const focusLine = containerRect.top + 160;
+
+      let nearestIdx = 0;
+      let minDistance = Infinity;
+
+      const turnEls = chatContainer.querySelectorAll('.turn-wrapper');
+      turnEls.forEach((el, idx) => {
+        const r = el.getBoundingClientRect();
+        const dist = Math.abs(r.top - focusLine);
+        if (dist < minDistance) {
+          minDistance = dist;
+          nearestIdx = idx;
+        }
+      });
+
+      applyFisheyeWave(nearestIdx);
+    }
+
+    chatContainer.addEventListener('scroll', () => {
+      if (isUserScrubbing || isScrollChecking) return;
+      isScrollChecking = true;
+
+      requestAnimationFrame(() => {
+        syncFocusWithScroll();
+        isScrollChecking = false;
+      });
+    });
+
+    // ==============================================================
+    // 7. 深浅主题切换
+    // ==============================================================
+    const themeBtn = document.getElementById('themeToggleBtn');
+    themeBtn.addEventListener('click', () => {
+      const isDark = document.body.getAttribute('data-theme') === 'dark';
+      document.body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+      document.getElementById('themeIcon').innerText = isDark ? '🌙' : '☀️';
+      document.getElementById('themeText').innerText = isDark ? '切换深色模式' : '切换浅色模式';
+      // 刷新当前高亮
+      applyFisheyeWave(currentFocusIndex);
+    });
+  </script>
+</body>
+</html>

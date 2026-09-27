@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <title>08_思考能力4挡动态调控 - Antigravity Enhance Tools</title>
+  <style>
+    * {
+      margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased;
+    }
+
+    :root, [data-theme="dark"] {
+      --bg: #090814;
+      --card-bg: rgba(20, 16, 36, 0.85);
+      --card-border: rgba(236, 72, 153, 0.22);
+      --mockup-bg: rgba(15, 12, 28, 0.95);
+      --mockup-border: rgba(236, 72, 153, 0.28);
+      --text-main: #fdf2f8;
+      --text-sub: #f472b6;
+      --text-bold: #ffffff;
+      --chip-bg: rgba(255, 255, 255, 0.05);
+      --shadow: 0 20px 45px rgba(0, 0, 0, 0.65);
+      --footer-bg: rgba(20, 16, 36, 0.88);
+      --grid-line: rgba(236, 72, 153, 0.04);
+      --blob-opacity: 0.38;
+      --accent: #ec4899;
+      --accent-glow: rgba(236, 72, 153, 0.45);
+    }
+
+    [data-theme="light"] {
+      --bg: #fff5f8;
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --card-border: rgba(251, 207, 232, 0.95);
+      --mockup-bg: #ffffff;
+      --mockup-border: rgba(244, 114, 182, 0.4);
+      --text-main: #1f121d;
+      --text-sub: #9d174d;
+      --text-bold: #0f050d;
+      --chip-bg: rgba(0, 0, 0, 0.04);
+      --shadow: 0 16px 36px rgba(0, 0, 0, 0.08);
+      --footer-bg: rgba(255, 255, 255, 0.95);
+      --grid-line: rgba(236, 72, 153, 0.035);
+      --blob-opacity: 0.12;
+      --accent: #db2777;
+      --accent-glow: rgba(219, 39, 119, 0.2);
+    }
+
+    body {
+      width: 1920px; height: 1080px; overflow: hidden; background-color: var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--text-main); position: relative;
+    }
+
+    .bg-lights {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 0; pointer-events: none;
+    }
+    .light-blob {
+      position: absolute; border-radius: 50%; filter: blur(140px); opacity: var(--blob-opacity);
+    }
+    .blob-1 { width: 750px; height: 750px; background: radial-gradient(circle, #ec4899 0%, #be185d 70%); top: -140px; right: 20%; }
+    .blob-2 { width: 650px; height: 650px; background: radial-gradient(circle, #8b5cf6 0%, #6d28d9 70%); bottom: -120px; left: 10%; }
+
+    .grid-overlay {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background-image: 
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+      background-size: 48px 48px; z-index: 1; pointer-events: none;
+    }
+
+    .board-container {
+      position: relative; z-index: 2; width: 1920px; height: 1080px;
+      padding: 38px 56px 30px; display: flex; flex-direction: column; justify-content: space-between;
+    }
+
+    /* Header */
+    .top-header {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .brand-left {
+      display: flex; align-items: center; gap: 16px;
+    }
+    .brand-logo-img {
+      width: 52px; height: 52px; object-fit: contain; filter: drop-shadow(0 4px 16px var(--accent-glow));
+    }
+    .brand-texts h2 {
+      font-size: 26px; font-weight: 900; color: var(--text-bold);
+    }
+    .brand-texts p {
+      font-size: 13.5px; color: var(--text-sub); font-weight: 600;
+    }
+    .top-badge {
+      background: rgba(236, 72, 153, 0.16); border: 1.5px solid rgba(236, 72, 153, 0.45);
+      color: #f43f5e; font-size: 14px; font-weight: 800; padding: 6px 18px; border-radius: 999px;
+    }
+
+    /* Main Showcase 2-Columns */
+    .showcase-row {
+      display: grid; grid-template-columns: 0.92fr 1.38fr; gap: 42px; align-items: center; flex: 1; margin: 16px 0;
+    }
+
+    /* Left Info Column */
+    .info-col {
+      display: flex; flex-direction: column; gap: 18px;
+    }
+    .feature-tag-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(236, 72, 153, 0.15); border: 1.5px solid rgba(236, 72, 153, 0.4);
+      color: #ec4899; font-size: 15px; font-weight: 800; padding: 6px 18px; border-radius: 999px; align-self: flex-start;
+    }
+    .feature-title {
+      font-size: 46px; font-weight: 900; line-height: 1.15; color: var(--text-bold); letter-spacing: -0.02em;
+    }
+    .gradient-pink {
+      background: linear-gradient(135deg, #ec4899 0%, #f43f5e 50%, #fb923c 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .feature-desc {
+      font-size: 17.5px; color: var(--text-sub); line-height: 1.6; font-weight: 500;
+    }
+
+    .key-points-list {
+      display: flex; flex-direction: column; gap: 12px; margin-top: 4px;
+    }
+    .point-card {
+      background: var(--card-bg); border: 1.5px solid var(--card-border);
+      border-radius: 14px; padding: 14px 18px; display: flex; align-items: center; gap: 16px; box-shadow: var(--shadow);
+    }
+    .point-icon {
+      width: 44px; height: 44px; border-radius: 12px; background: rgba(236, 72, 153, 0.15);
+      border: 1px solid rgba(236, 72, 153, 0.35); color: #ec4899; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
+    }
+    .point-texts h4 {
+      font-size: 17px; font-weight: 800; color: var(--text-bold); margin-bottom: 3px;
+    }
+    .point-texts p {
+      font-size: 14px; color: var(--text-sub); line-height: 1.4;
+    }
+
+    /* Right Real Software Screenshot Frame */
+    .mockup-col {
+      background: var(--mockup-bg); border: 1.5px solid var(--mockup-border);
+      border-radius: 22px; padding: 20px 22px 16px; box-shadow: var(--shadow); position: relative;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .mockup-header-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-bottom: 12px; border-bottom: 1.5px solid var(--mockup-border);
+    }
+    .mockup-title {
+      font-size: 19px; font-weight: 900; color: var(--text-bold); display: flex; align-items: center; gap: 10px;
+    }
+    .mockup-sync-status {
+      display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: #10b981; font-weight: 800;
+      background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); padding: 4px 12px; border-radius: 999px;
+    }
+
+    .real-screenshot-container {
+      width: 100%; border-radius: 14px; overflow: hidden;
+      border: 1px solid var(--card-border); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+      background: #000;
+    }
+    .real-screenshot-container img {
+      width: 100%; height: auto; display: block;
+    }
+
+    /* Bottom Telemetry Bar */
+    .telemetry-row {
+      background: var(--chip-bg); border: 1px solid var(--mockup-border);
+      border-radius: 12px; padding: 12px 18px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; text-align: center;
+    }
+    .telem-cell h6 {
+      font-size: 12px; color: var(--text-sub); font-weight: 700; margin-bottom: 3px;
+    }
+    .telem-cell p {
+      font-size: 16px; font-weight: 900; color: var(--text-bold);
+    }
+
+    /* Footer */
+    .bottom-bar {
+      background: var(--footer-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1.5px solid var(--card-border); border-radius: 18px; padding: 16px 30px;
+      display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow);
+    }
+    .channels-left {
+      display: flex; align-items: center; gap: 32px; font-size: 15px; color: var(--text-sub); font-weight: 600;
+    }
+    .channels-left strong { color: var(--text-bold); font-weight: 800; }
+  </style>
+</head>
+<body>
+
+  <div class="bg-lights">
+    <div class="light-blob blob-1"></div>
+    <div class="light-blob blob-2"></div>
+  </div>
+
+  <div class="grid-overlay"></div>
+
+  <div class="board-container">
+
+    <header class="top-header">
+      <div class="brand-left">
+        <img src="../../docs/assets/logo_glyph_transparent.png" alt="Logo" class="brand-logo-img">
+        <div class="brand-texts">
+          <h2>Antigravity Enhance Tools</h2>
+          <p>思考能力 4 挡动态调控滑块与实时额度 · 客户端实机实测专项展示</p>
+        </div>
+      </div>
+      <div class="top-badge">
+        🧠 算力消耗自如掌控 · 兼顾速度与深度推理
+      </div>
+    </header>
+
+    <main class="showcase-row">
+      
+      <!-- Left Column -->
+      <div class="info-col">
+        <span class="feature-tag-badge">🧠 深度思考调控滑块</span>
+        <h1 class="feature-title">
+          推理强度自由调节！<br>
+          <span class="gradient-pink">思考能力 4 挡动态调控</span><br>
+          模型菜单与额度联动
+        </h1>
+        <p class="feature-desc">
+          不再忍受固化的推理延迟与配额浪费！原生下拉菜单直接集成 4 挡思考滑动调节条，轻量答复秒回，复杂算法开启高深度思考，配合侧边栏实时额度看板，算力去向一目了然。
+        </p>
+
+        <div class="key-points-list">
+          <div class="point-card">
+            <div class="point-icon">🎚️</div>
+            <div class="point-texts">
+              <h4>关闭 / 低 / 中 / 高 4 挡随心切换</h4>
+              <p>从纯代码格式化（关闭思考）到核心架构深层推演（高思考深度），按需分配 Token 预算。</p>
+            </div>
+          </div>
+          <div class="point-card">
+            <div class="point-icon">✨</div>
+            <div class="point-texts">
+              <h4>紫粉流光动效与原生交互</h4>
+              <p>原生沉浸式 UI 动效，丝滑拖拽阻尼反馈，模型特性标签（思考模型 / 联网搜索）智能显示。</p>
+            </div>
+          </div>
+          <div class="point-card">
+            <div class="point-icon">📊</div>
+            <div class="point-texts">
+              <h4>侧边栏多模型实时配额联动</h4>
+              <p>实时显示 Gemini 2.5 Flash / Pro、Claude 3.7 Sonnet 剩余调用额度与重置周期。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: REAL Software Screenshot -->
+      <div class="mockup-col">
+        <div class="mockup-header-bar">
+          <div class="mockup-title">
+            <span>🧠 客户端内真实界面：思考能力滑块与侧边栏额度</span>
+          </div>
+          <div class="mockup-sync-status">
+            <span>● 软件内真实截图</span>
+          </div>
+        </div>
+
+        <div class="real-screenshot-container">
+          <img src="../../docs/assets/verified_model_slider_live.png" alt="思考能力4挡调节与额度实测截图">
+        </div>
+
+        <div class="telemetry-row">
+          <div class="telem-cell">
+            <h6>思考能力分级</h6>
+            <p style="color: #ec4899;">关闭 / 低 / 中 / 高</p>
+          </div>
+          <div class="telem-cell">
+            <h6>交互反馈</h6>
+            <p>紫粉流光 + 阻尼滑块</p>
+          </div>
+          <div class="telem-cell">
+            <h6>额度透明度</h6>
+            <p>侧边栏 100% 实时可视</p>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+    <footer class="bottom-bar">
+      <div class="channels-left">
+        <span>🌐 官网：<strong>antigravity-enhance-tools.github.io</strong></span>
+        <span>💻 GitHub 搜索项目名：<strong>Antigravity-Enhance-Pack-Tools</strong></span>
+        <span>💬 Discord：<strong>discord.gg/QRsPcNrSB</strong></span>
+      </div>
+      <div style="font-size: 15px; font-weight: 800; color: #ec4899;">
+        ✨ 随需调度推理深度，兼顾极速响应与硬核架构设计
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const theme = params.get('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', theme);
+  </script>
+</body>
+</html>

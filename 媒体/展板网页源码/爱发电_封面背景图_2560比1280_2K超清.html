@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>爱发电 2K 旗舰封面背景图 (2560x1280 - 2:1 严格比例) - Antigravity Enhance Tools</title>
+  <style>
+    * {
+      margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      width: 2560px; height: 1280px; overflow: hidden;
+      background: #060814;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: #f8fafc; position: relative;
+    }
+
+    /* Ambient Background Lights */
+    .bg-lights {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 0; pointer-events: none;
+    }
+    .light-blob {
+      position: absolute; border-radius: 50%; filter: blur(160px);
+    }
+    .blob-1 { width: 1100px; height: 1100px; background: radial-gradient(circle, #6366f1 0%, #4338ca 70%); top: -100px; left: 10%; opacity: 0.5; }
+    .blob-2 { width: 1200px; height: 1200px; background: radial-gradient(circle, #0284c7 0%, #0369a1 70%); bottom: -150px; right: 5%; opacity: 0.45; }
+    .blob-3 { width: 900px; height: 900px; background: radial-gradient(circle, #ec4899 0%, #be185d 70%); top: 5%; right: 26%; opacity: 0.35; }
+    .blob-4 { width: 850px; height: 850px; background: radial-gradient(circle, #10b981 0%, #059669 70%); bottom: -50px; left: 5%; opacity: 0.28; }
+
+    .grid-overlay {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.038) 2px, transparent 2px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.038) 2px, transparent 2px);
+      background-size: 60px 60px; z-index: 1; pointer-events: none;
+    }
+
+    /* 2:1 主画布容器 (2560 x 1280) */
+    .banner-container {
+      position: relative; z-index: 2; width: 2560px; height: 1280px;
+      display: flex; flex-direction: column; justify-content: space-between;
+      padding: 70px 100px 60px 100px;
+    }
+
+    /* 顶部装饰栏 */
+    .top-header-bar {
+      display: flex; align-items: center; justify-content: space-between; width: 100%;
+    }
+    .top-brand-tag {
+      display: flex; align-items: center; gap: 14px;
+      font-size: 20px; font-weight: 800; color: #818cf8; letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    .top-badges-group {
+      display: flex; align-items: center; gap: 16px;
+    }
+    .badge-capsule {
+      background: rgba(255, 255, 255, 0.08); border: 1.5px solid rgba(255, 255, 255, 0.16);
+      padding: 8px 22px; border-radius: 999px; font-size: 19px; font-weight: 700; color: #cbd5e1;
+      display: flex; align-items: center; gap: 8px; backdrop-filter: blur(10px);
+    }
+    .badge-capsule.highlight {
+      background: rgba(99, 102, 241, 0.22); border-color: rgba(99, 102, 241, 0.6);
+      color: #c7d2fe; box-shadow: 0 4px 20px rgba(99, 102, 241, 0.35);
+    }
+
+    /* 中间主体核心区 (高度充沛，左右均衡) */
+    .main-body-zone {
+      display: flex; align-items: center; justify-content: space-between; gap: 70px;
+      flex: 1; margin: 30px 0;
+    }
+
+    /* 左侧品牌与特性 */
+    .brand-section {
+      display: flex; flex-direction: column; gap: 30px; flex: 1.15; max-width: 1360px;
+    }
+
+    .title-row {
+      display: flex; align-items: center; gap: 26px;
+    }
+    .logo-img {
+      width: 100px; height: 100px; object-fit: contain; filter: drop-shadow(0 8px 35px rgba(99, 102, 241, 0.85));
+    }
+    .main-title {
+      font-size: 76px; font-weight: 900; letter-spacing: -0.025em; line-height: 1.15;
+      background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 45%, #38bdf8 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+
+    .sub-title {
+      font-size: 32px; color: #cbd5e1; font-weight: 500; line-height: 1.5;
+    }
+    .highlight-text {
+      color: #38bdf8; font-weight: 800;
+    }
+
+    /* 6 大核心特性矩阵 (2 行 3 列卡片化) */
+    .features-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 6px;
+    }
+    .feature-card {
+      background: rgba(15, 23, 42, 0.85); border: 1.5px solid rgba(255, 255, 255, 0.14);
+      border-radius: 16px; padding: 18px 22px; display: flex; align-items: center; gap: 14px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.45); backdrop-filter: blur(12px);
+    }
+    .card-icon {
+      font-size: 28px;
+    }
+    .card-text {
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .card-text strong {
+      font-size: 21px; color: #f8fafc; font-weight: 800;
+    }
+    .card-text span {
+      font-size: 15px; color: #94a3b8; font-weight: 600;
+    }
+
+    /* 右侧实机 Showcase */
+    .mockup-showcase {
+      display: flex; align-items: center; justify-content: flex-end; position: relative;
+      flex: 1.05;
+    }
+
+    .mockup-card-1 {
+      width: 900px; border-radius: 22px; overflow: hidden;
+      background: rgba(15, 23, 42, 0.96); border: 2.5px solid rgba(99, 102, 241, 0.5);
+      box-shadow: 0 30px 85px rgba(0, 0, 0, 0.9), 0 0 50px rgba(99, 102, 241, 0.4);
+      transform: perspective(1400px) rotateY(-5deg) rotateX(2deg);
+    }
+    .mockup-card-header {
+      background: rgba(30, 41, 59, 0.96); padding: 16px 26px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1.5px solid rgba(255, 255, 255, 0.1);
+    }
+    .window-dots {
+      display: flex; gap: 9px;
+    }
+    .dot { width: 15px; height: 15px; border-radius: 50%; }
+    .dot-r { background: #ef4444; }
+    .dot-y { background: #f59e0b; }
+    .dot-g { background: #10b981; }
+    .mockup-status {
+      font-size: 18px; font-weight: 800; color: #10b981; display: flex; align-items: center; gap: 8px;
+    }
+
+    .mockup-img {
+      width: 100%; height: auto; display: block;
+    }
+
+    /* 悬浮思考胶囊 */
+    .mockup-pill-overlay {
+      position: absolute; bottom: -28px; left: -36px;
+      background: rgba(15, 23, 42, 0.98); border: 2px solid rgba(236, 72, 153, 0.65);
+      border-radius: 20px; padding: 18px 28px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
+      display: flex; align-items: center; gap: 18px;
+      transform: perspective(1400px) rotateY(-4deg) translateZ(50px);
+    }
+    .pill-icon {
+      font-size: 38px;
+    }
+    .pill-texts h5 {
+      font-size: 22px; font-weight: 800; color: #f43f5e; margin-bottom: 4px;
+    }
+    .pill-texts p {
+      font-size: 18px; color: #cbd5e1; font-weight: 600;
+    }
+
+    /* 底部专属栏 */
+    .bottom-footer-bar {
+      display: flex; align-items: center; justify-content: space-between; width: 100%;
+      border-top: 1.5px solid rgba(255, 255, 255, 0.08); padding-top: 24px;
+    }
+    .links-group {
+      display: flex; align-items: center; gap: 32px; font-size: 20px; color: #64748b; font-weight: 600;
+    }
+    .links-group strong {
+      color: #94a3b8; font-weight: 700;
+    }
+    .links-group span.highlight-url {
+      color: #38bdf8; font-weight: 700;
+    }
+    .platform-chips {
+      display: flex; align-items: center; gap: 20px; font-size: 19px; color: #94a3b8; font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Glow Blobs -->
+  <div class="bg-lights">
+    <div class="light-blob blob-1"></div>
+    <div class="light-blob blob-2"></div>
+    <div class="light-blob blob-3"></div>
+    <div class="light-blob blob-4"></div>
+  </div>
+
+  <!-- Tech Grid Background -->
+  <div class="grid-overlay"></div>
+
+  <!-- Banner Content Container (2560x1280 - 2:1 Strict) -->
+  <div class="banner-container">
+
+    <!-- Top Header -->
+    <div class="top-header-bar">
+      <div class="top-brand-tag">
+        <span>◆ GOOGLE ANTIGRAVITY 官方增强扩展插件 ◆</span>
+      </div>
+      <div class="top-badges-group">
+        <div class="badge-capsule highlight">⚡ 原生纯净无污染注入</div>
+        <div class="badge-capsule">👑 作者：Kutaze</div>
+      </div>
+    </div>
+
+    <!-- Middle Core Content -->
+    <div class="main-body-zone">
+      
+      <!-- Left Branding -->
+      <div class="brand-section">
+        <div class="title-row">
+          <img src="../../docs/assets/logo_glyph_transparent.png" class="logo-img" alt="Logo">
+          <h1 class="main-title">Antigravity Enhance Tools</h1>
+        </div>
+
+        <p class="sub-title">
+          全界面深度母语汉化 · <span class="highlight-text">多账号动态秒切与实时配额</span> · 4挡思考滑块 · 插件生态中心
+        </p>
+
+        <!-- 6 Feature Cards -->
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="card-icon">👥</div>
+            <div class="card-text">
+              <strong>多账号免重登</strong>
+              <span>动态秒切 · 告别频繁退出</span>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="card-icon">📊</div>
+            <div class="card-text">
+              <strong>实时配额大盘</strong>
+              <span>Pro/Flash 额度全景透视</span>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="card-icon">🧠</div>
+            <div class="card-text">
+              <strong>4挡思考调控</strong>
+              <span>关/低/中/高 算力随心</span>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="card-icon">🛡️</div>
+            <div class="card-text">
+              <strong>五段式遥测防卡</strong>
+              <span>告别无响应 · 极致稳定</span>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="card-icon">🧩</div>
+            <div class="card-text">
+              <strong>35+ 技能中心</strong>
+              <span>官方生态一键拓展</span>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="card-icon">⚡</div>
+            <div class="card-text">
+              <strong>双主题绿色安装</strong>
+              <span>一键修复 · 零环境依赖</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Mockup Showcase -->
+      <div class="mockup-showcase">
+        <div class="mockup-card-1">
+          <div class="mockup-card-header">
+            <div class="window-dots">
+              <div class="dot dot-r"></div>
+              <div class="dot dot-y"></div>
+              <div class="dot dot-g"></div>
+            </div>
+            <span class="mockup-status">● 真实客户端实测生效</span>
+          </div>
+          <img src="../../docs/assets/verified_account_switcher_live.png" alt="实测截图" class="mockup-img">
+        </div>
+
+        <div class="mockup-pill-overlay">
+          <div class="pill-icon">🧠</div>
+          <div class="pill-texts">
+            <h5>思考能力 4 挡无级调控</h5>
+            <p>实时分配智能算力 · 拒绝无效等待</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom Footer Bar -->
+    <div class="bottom-footer-bar">
+      <div class="links-group">
+        <div>官网：<span class="highlight-url">antigravity-enhance-tools.github.io</span></div>
+        <div>GitHub：<strong>Antigravity-Enhance-Pack-Tools</strong></div>
+        <div>爱发电：<strong>afdian.com/a/Kutaze</strong></div>
+      </div>
+      <div class="platform-chips">
+        <span>💡 Windows / macOS / Linux 全平台支持</span>
+        <span>•</span>
+        <span>开源免费</span>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

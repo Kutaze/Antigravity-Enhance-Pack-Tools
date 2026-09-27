@@ -146,6 +146,19 @@ namespace AntigravityInstaller
         private Button btnRestore;
         private Button btnInstall;
 
+        private Border modalOverlay;
+        private Border modalCard;
+        private Border modalIconBorder;
+        private TextBlock modalIconText;
+        private TextBlock modalTitle;
+        private TextBlock modalSubtitle;
+        private Border modalListBorder;
+        private StackPanel modalListStack;
+        private Button btnModalClose;
+        private Button modalBtnSecondary;
+        private Button modalBtnPrimary;
+        private Action modalConfirmAction;
+
         private string detectedInstallDir;
         private bool isWorking = false;
         private bool isDarkMode = false;
@@ -169,6 +182,14 @@ namespace AntigravityInstaller
             TextOptions.SetTextRenderingMode(this, TextRenderingMode.ClearType);
             RenderOptions.SetClearTypeHint(this, ClearTypeHint.Enabled);
             FontFamily = new FontFamily("Microsoft YaHei UI, Segoe UI, sans-serif");
+
+            KeyDown += (s, e) =>
+            {
+                if (e.Key == Key.Escape && modalOverlay != null && modalOverlay.Visibility == Visibility.Visible)
+                {
+                    CloseModernModal();
+                }
+            };
 
             BuildUI();
             ApplyTheme(isDarkMode);
@@ -242,7 +263,7 @@ namespace AntigravityInstaller
             };
             verBadgeText = new TextBlock
             {
-                Text = "v0.1.6",
+                Text = "v0.1.5",
                 FontSize = 10.5,
                 FontWeight = FontWeights.Medium
             };
@@ -569,7 +590,7 @@ namespace AntigravityInstaller
             cardsGrid.Children.Add(cardAuthor);
 
             // Card 2: Software Model
-            cardModel = CreateFooterCard("🏷️", "软件型号 (Model)", "v0.1.6 Enhance Pro", Color.FromRgb(16, 185, 129), out lblModelTitle, out lblModelVal);
+            cardModel = CreateFooterCard("🏷️", "软件型号 (Model)", "v0.1.5 Enhance Pro", Color.FromRgb(16, 185, 129), out lblModelTitle, out lblModelVal);
             cardModel.Cursor = Cursors.Hand;
             cardModel.ToolTip = "Antigravity 原生深度增强与多账号管理套件 (点击查看关于信息)";
             cardModel.MouseLeftButtonUp += (s, e) => ShowAboutDialog();
@@ -628,6 +649,162 @@ namespace AntigravityInstaller
 
             rootBorder.Child = mainGrid;
             windowContainer.Children.Add(rootBorder);
+
+            // ================= 5. In-Window Modern Modal Overlay =================
+            modalOverlay = new Border
+            {
+                Margin = new Thickness(10),
+                CornerRadius = new CornerRadius(16),
+                Background = new SolidColorBrush(Color.FromArgb(170, 10, 15, 25)),
+                Visibility = Visibility.Collapsed,
+                SnapsToDevicePixels = true,
+                UseLayoutRounding = true
+            };
+            modalOverlay.MouseLeftButtonDown += (s, e) =>
+            {
+                if (e.OriginalSource == modalOverlay && modalBtnSecondary.Visibility != Visibility.Visible)
+                {
+                    CloseModernModal();
+                }
+            };
+
+            modalCard = new Border
+            {
+                Width = 490,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                CornerRadius = new CornerRadius(14),
+                BorderThickness = new Thickness(1),
+                Padding = new Thickness(24, 22, 24, 20),
+                Effect = new DropShadowEffect
+                {
+                    BlurRadius = 32,
+                    ShadowDepth = 8,
+                    Opacity = 0.45,
+                    Color = Colors.Black
+                }
+            };
+
+            var modalContent = new StackPanel();
+
+            var headerGrid = new Grid();
+            headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+            modalIconBorder = new Border
+            {
+                Width = 36,
+                Height = 36,
+                CornerRadius = new CornerRadius(18),
+                Margin = new Thickness(0, 0, 12, 0),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            modalIconText = new TextBlock
+            {
+                Text = "✔",
+                FontSize = 18,
+                FontWeight = FontWeights.Bold,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            modalIconBorder.Child = modalIconText;
+            Grid.SetColumn(modalIconBorder, 0);
+            headerGrid.Children.Add(modalIconBorder);
+
+            modalTitle = new TextBlock
+            {
+                Text = "安装成功",
+                FontSize = 16,
+                FontWeight = FontWeights.Bold,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            Grid.SetColumn(modalTitle, 1);
+            headerGrid.Children.Add(modalTitle);
+
+            btnModalClose = new Button
+            {
+                Content = "✕",
+                Width = 26,
+                Height = 26,
+                FontSize = 12,
+                Cursor = Cursors.Hand,
+                Background = Brushes.Transparent,
+                BorderThickness = new Thickness(0),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            btnModalClose.Click += (s, e) => CloseModernModal();
+            Grid.SetColumn(btnModalClose, 2);
+            headerGrid.Children.Add(btnModalClose);
+
+            modalContent.Children.Add(headerGrid);
+
+            modalSubtitle = new TextBlock
+            {
+                Text = "Antigravity 深度汉化与原生 UI 交互增强补丁部署成功！",
+                FontSize = 13,
+                Margin = new Thickness(0, 14, 0, 12),
+                TextWrapping = TextWrapping.Wrap,
+                LineHeight = 20
+            };
+            modalContent.Children.Add(modalSubtitle);
+
+            modalListBorder = new Border
+            {
+                CornerRadius = new CornerRadius(8),
+                BorderThickness = new Thickness(1),
+                Padding = new Thickness(14, 10, 14, 10),
+                Margin = new Thickness(0, 0, 0, 18)
+            };
+            modalListStack = new StackPanel();
+            modalListBorder.Child = modalListStack;
+            modalContent.Children.Add(modalListBorder);
+
+            var btnRow = new StackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                HorizontalAlignment = HorizontalAlignment.Right
+            };
+
+            modalBtnSecondary = new Button
+            {
+                Content = "取消",
+                Height = 34,
+                Padding = new Thickness(16, 0, 16, 0),
+                Margin = new Thickness(0, 0, 10, 0),
+                FontSize = 12,
+                Cursor = Cursors.Hand,
+                Visibility = Visibility.Collapsed
+            };
+            modalBtnSecondary.Click += (s, e) => CloseModernModal();
+            btnRow.Children.Add(modalBtnSecondary);
+
+            modalBtnPrimary = new Button
+            {
+                Content = "确定",
+                Height = 34,
+                Padding = new Thickness(22, 0, 22, 0),
+                FontSize = 12.5,
+                FontWeight = FontWeights.SemiBold,
+                Cursor = Cursors.Hand
+            };
+            modalBtnPrimary.Click += (s, e) =>
+            {
+                CloseModernModal();
+                if (modalConfirmAction != null)
+                {
+                    var act = modalConfirmAction;
+                    modalConfirmAction = null;
+                    act();
+                }
+            };
+            btnRow.Children.Add(modalBtnPrimary);
+            modalContent.Children.Add(btnRow);
+
+            modalCard.Child = modalContent;
+            modalOverlay.Child = modalCard;
+            windowContainer.Children.Add(modalOverlay);
+
             Content = windowContainer;
         }
 
@@ -924,7 +1101,119 @@ namespace AntigravityInstaller
                 }
             }
 
+            if (modalCard != null)
+            {
+                if (dark)
+                {
+                    modalCard.Background = new SolidColorBrush(Color.FromRgb(24, 24, 27));
+                    modalCard.BorderBrush = new SolidColorBrush(Color.FromRgb(63, 63, 70));
+                    modalTitle.Foreground = new SolidColorBrush(Color.FromRgb(244, 244, 245));
+                    modalSubtitle.Foreground = new SolidColorBrush(Color.FromRgb(161, 161, 170));
+                    modalListBorder.Background = new SolidColorBrush(Color.FromRgb(15, 23, 42));
+                    modalListBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(39, 39, 42));
+                    btnModalClose.Foreground = new SolidColorBrush(Color.FromRgb(161, 161, 170));
+                    UpdateButtonStyle(modalBtnSecondary,
+                        new SolidColorBrush(Color.FromRgb(39, 39, 42)),
+                        new SolidColorBrush(Color.FromRgb(226, 232, 240)),
+                        new CornerRadius(6),
+                        new SolidColorBrush(Color.FromRgb(63, 63, 70)));
+                }
+                else
+                {
+                    modalCard.Background = Brushes.White;
+                    modalCard.BorderBrush = new SolidColorBrush(Color.FromRgb(228, 228, 231));
+                    modalTitle.Foreground = new SolidColorBrush(Color.FromRgb(24, 24, 27));
+                    modalSubtitle.Foreground = new SolidColorBrush(Color.FromRgb(82, 82, 91));
+                    modalListBorder.Background = new SolidColorBrush(Color.FromRgb(248, 250, 252));
+                    modalListBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(228, 228, 231));
+                    btnModalClose.Foreground = new SolidColorBrush(Color.FromRgb(100, 116, 139));
+                    UpdateButtonStyle(modalBtnSecondary,
+                        new SolidColorBrush(Color.FromRgb(244, 244, 245)),
+                        new SolidColorBrush(Color.FromRgb(39, 39, 42)),
+                        new CornerRadius(6),
+                        new SolidColorBrush(Color.FromRgb(228, 228, 231)));
+                }
+                UpdateButtonStyle(modalBtnPrimary,
+                    new SolidColorBrush(Color.FromRgb(37, 99, 235)),
+                    Brushes.White,
+                    new CornerRadius(6),
+                    new SolidColorBrush(Color.FromRgb(29, 78, 216)));
+            }
+
             ValidatePath();
+        }
+
+        private void ShowModernModal(
+            string title,
+            string subtitle,
+            string[] items = null,
+            string primaryBtnText = "确定",
+            bool isError = false,
+            bool isQuestion = false,
+            Action onConfirm = null)
+        {
+            modalConfirmAction = onConfirm;
+            modalTitle.Text = title;
+            modalSubtitle.Text = subtitle;
+            modalBtnPrimary.Content = primaryBtnText;
+
+            if (isError)
+            {
+                modalIconBorder.Background = new SolidColorBrush(Color.FromArgb(35, 239, 68, 68));
+                modalIconText.Text = "✕";
+                modalIconText.Foreground = new SolidColorBrush(Color.FromRgb(239, 68, 68));
+            }
+            else if (isQuestion)
+            {
+                modalIconBorder.Background = new SolidColorBrush(Color.FromArgb(35, 245, 158, 11));
+                modalIconText.Text = "❓";
+                modalIconText.Foreground = new SolidColorBrush(Color.FromRgb(245, 158, 11));
+            }
+            else
+            {
+                modalIconBorder.Background = new SolidColorBrush(Color.FromArgb(35, 16, 185, 129));
+                modalIconText.Text = "✔";
+                modalIconText.Foreground = new SolidColorBrush(Color.FromRgb(16, 185, 129));
+            }
+
+            modalBtnSecondary.Visibility = isQuestion ? Visibility.Visible : Visibility.Collapsed;
+
+            modalListStack.Children.Clear();
+            if (items != null && items.Length > 0)
+            {
+                modalListBorder.Visibility = Visibility.Visible;
+                foreach (var item in items)
+                {
+                    var row = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 3, 0, 3) };
+                    var dot = new TextBlock
+                    {
+                        Text = "•",
+                        FontWeight = FontWeights.Bold,
+                        Foreground = isError ? new SolidColorBrush(Color.FromRgb(239, 68, 68)) : new SolidColorBrush(Color.FromRgb(16, 185, 129)),
+                        Margin = new Thickness(0, 0, 8, 0)
+                    };
+                    var txt = new TextBlock
+                    {
+                        Text = item,
+                        FontSize = 12.5,
+                        Foreground = isDarkMode ? new SolidColorBrush(Color.FromRgb(226, 232, 240)) : new SolidColorBrush(Color.FromRgb(51, 65, 85))
+                    };
+                    row.Children.Add(dot);
+                    row.Children.Add(txt);
+                    modalListStack.Children.Add(row);
+                }
+            }
+            else
+            {
+                modalListBorder.Visibility = Visibility.Collapsed;
+            }
+
+            modalOverlay.Visibility = Visibility.Visible;
+        }
+
+        private void CloseModernModal()
+        {
+            modalOverlay.Visibility = Visibility.Collapsed;
         }
 
         private void UpdateButtonStyle(Button btn, Brush bg, Brush fg, CornerRadius radius, Brush borderBrush = null)
@@ -1226,23 +1515,20 @@ namespace AntigravityInstaller
 
         private void ShowAboutDialog()
         {
-            MessageBox.Show(
-                "Antigravity Enhance Tools (Antigravity 扩展增强工具)\n\n" +
-                "软件型号：v0.1.6 Enhance Pro (全原生 AST 响应式注入)\n" +
-                "作者：Kutaze\n" +
-                "开源项目主页：https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools\n\n" +
-                "核心能力：\n" +
-                "• 全界面母语级原生深度汉化与防卡死守卫\n" +
-                "• 超长上下文鱼眼波浪拖拽刻度导航轴 (左侧停靠、阻尼拖拽定位与无遮挡预览)\n" +
-                "• 多账号快捷切换与配额监控 (100% 本地凭据库存储，绝无云端中转)\n" +
-                "• 真实上下文 Token 动态遥测与 5 段式占比面板\n" +
-                "• 4 挡思考深度滑动调节与原生截图集成\n\n" +
-                "特别鸣谢：\n" +
-                "• 界面 GitHub 矢量图标参考自开源项目 lobehub/lobe-icons\n\n" +
-                "Copyright © 2025-2026 Antigravity Enhance Tools · Kutaze",
-                "关于软件 - Antigravity Enhance Tools",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
+            ShowModernModal(
+                "关于扩展增强工具",
+                "Antigravity Enhance Tools · v0.1.5 Enhance Pro",
+                new string[] {
+                    "软件作者：Kutaze",
+                    "开源地址：github.com/Kutaze/Antigravity-Enhance-Pack-Tools",
+                    "全界面深度母语原生汉化与防卡死守护",
+                    "3倍加长时空刻度导航轴 & 零卡顿丝滑跟随",
+                    "底部轮次检索器 (搜索与上下文毫秒直达)",
+                    "多账号快捷切换与配额监控 (100% 本地凭据安全)",
+                    "4 挡思考深度滑动调节与原生截图集成"
+                },
+                "了解",
+                false);
         }
 
         private Button CreateWindowButton(string text, RoutedEventHandler onClick, bool isClose = false)
@@ -1709,11 +1995,19 @@ namespace AntigravityInstaller
                             }
                         }
 
-                        MessageBox.Show(
-                            "🎉 Antigravity 深度汉化与原生 UI 交互增强补丁安装成功！\n\n已具备：\n• 全界面原生深度汉化\n• 真实上下文实时动态监测\n• 思考能力 4 挡滑块调节\n• 实时额度与消耗看板\n• 防死循环与防卡死主控引擎",
-                            "安装成功 - Antigravity Enhance Tools",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Information);
+                        ShowModernModal(
+                            "安装成功！",
+                            "🎉 Antigravity 深度汉化与原生 UI 交互增强补丁部署成功！",
+                            new string[] {
+                                "全界面原生深度汉化 (9,300+ 词条全景沉浸)",
+                                "3倍加长时空刻度导航轴 & 零卡顿丝滑跟随",
+                                "底部轮次检索器 (搜索与上下文毫秒直达)",
+                                "思考能力 4 挡滑块深度绑定调节",
+                                "实时额度与双模型动态看板",
+                                "防死循环与防卡死守护引擎"
+                            },
+                            "完成并开始使用",
+                            false);
                     });
                 }
                 catch (Exception ex)
@@ -1723,7 +2017,7 @@ namespace AntigravityInstaller
                         progressBar.Value = 0;
                         lblStatus.Text = "❌ 安装失败：" + ex.Message;
                         Log("❌ [错误] " + ex.Message);
-                        MessageBox.Show("安装过程中发生错误：\n" + ex.Message, "安装失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                        ShowModernModal("安装失败", "安装过程中发生错误：\n" + ex.Message, null, "关闭", true);
                     });
                 }
                 finally
@@ -1739,14 +2033,22 @@ namespace AntigravityInstaller
             if (!ValidatePath()) return;
             string installDir = detectedInstallDir;
 
-            var result = MessageBox.Show(
-                "确定要还原 Antigravity 官方原版吗？\n这将恢复官方 app.asar 并还原默认英文界面与原生设置。",
+            ShowModernModal(
                 "确认还原官方原版",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question);
+                "确定要还原 Antigravity 官方原版吗？",
+                new string[] {
+                    "将恢复官方原始纯净 app.asar",
+                    "还原默认官方英文界面与原生设置",
+                    "本地所有工程文件与对话历史完整保留"
+                },
+                "确认还原",
+                false,
+                true,
+                () => ExecuteRestore(installDir));
+        }
 
-            if (result != MessageBoxResult.Yes) return;
-
+        private void ExecuteRestore(string installDir)
+        {
             SetWorking(true, "正在准备还原官方原版...");
             progressBar.Value = 10;
             Log("==========================================");
@@ -1870,13 +2172,15 @@ namespace AntigravityInstaller
                         progressBar.Value = 100;
                         lblStatus.Text = "✔ 官方原版已成功还原！客户端已恢复为默认英文状态。";
                         Log("==========================================");
-                        Log("✔ 官方原生纯净版本已还原完成！");
-
-                        MessageBox.Show(
-                            "Antigravity 官方原版已成功还原！\n客户端已恢复为官方默认英文状态与原生设置。",
-                            "还原成功 - Antigravity Enhance Tools",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Information);
+                        ShowModernModal(
+                            "还原成功",
+                            "Antigravity 官方原版已成功还原！",
+                            new string[] {
+                                "客户端已恢复为官方默认英文状态与原生设置",
+                                "随时可使用本工具再次一键安装汉化与增强补丁"
+                            },
+                            "确定",
+                            false);
                     });
                 }
                 catch (Exception ex)
@@ -1886,7 +2190,7 @@ namespace AntigravityInstaller
                         progressBar.Value = 0;
                         lblStatus.Text = "❌ 还原失败：" + ex.Message;
                         Log("❌ [错误] " + ex.Message);
-                        MessageBox.Show("还原失败：\n" + ex.Message, "还原错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                        ShowModernModal("还原失败", "还原失败：" + ex.Message, null, "关闭", true);
                     });
                 }
                 finally

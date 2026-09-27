@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <title>04_可视化技能中心 - Antigravity Enhance Tools</title>
+  <style>
+    * {
+      margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased;
+    }
+
+    :root, [data-theme="dark"] {
+      --bg: #070a14;
+      --card-bg: rgba(15, 23, 42, 0.82);
+      --card-border: rgba(255, 255, 255, 0.12);
+      --mockup-bg: rgba(10, 15, 29, 0.95);
+      --mockup-border: rgba(255, 255, 255, 0.1);
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --text-bold: #ffffff;
+      --chip-bg: rgba(255, 255, 255, 0.05);
+      --shadow: 0 20px 45px rgba(0, 0, 0, 0.55);
+      --footer-bg: rgba(15, 23, 42, 0.85);
+      --grid-line: rgba(255, 255, 255, 0.025);
+      --blob-opacity: 0.35;
+    }
+
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --card-bg: rgba(255, 255, 255, 0.94);
+      --card-border: rgba(203, 213, 225, 0.85);
+      --mockup-bg: #ffffff;
+      --mockup-border: rgba(226, 232, 240, 0.95);
+      --text-main: #0f172a;
+      --text-sub: #475569;
+      --text-bold: #020617;
+      --chip-bg: rgba(0, 0, 0, 0.04);
+      --shadow: 0 16px 36px rgba(0, 0, 0, 0.08);
+      --footer-bg: rgba(255, 255, 255, 0.95);
+      --grid-line: rgba(0, 0, 0, 0.035);
+      --blob-opacity: 0.12;
+    }
+
+    body {
+      width: 1920px; height: 1080px; overflow: hidden; background-color: var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--text-main); position: relative;
+    }
+
+    .bg-lights {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 0; pointer-events: none;
+    }
+    .light-blob {
+      position: absolute; border-radius: 50%; filter: blur(140px); opacity: var(--blob-opacity);
+    }
+    .blob-1 { width: 750px; height: 750px; background: radial-gradient(circle, #f59e0b 0%, #d97706 70%); top: -150px; left: 10%; }
+    .blob-2 { width: 650px; height: 650px; background: radial-gradient(circle, #10b981 0%, #059669 70%); bottom: -100px; right: 10%; }
+
+    .grid-overlay {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background-image: 
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+      background-size: 48px 48px; z-index: 1; pointer-events: none;
+    }
+
+    .board-container {
+      position: relative; z-index: 2; width: 1920px; height: 1080px;
+      padding: 38px 56px 30px; display: flex; flex-direction: column; justify-content: space-between;
+    }
+
+    /* Header */
+    .top-header {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .brand-left {
+      display: flex; align-items: center; gap: 16px;
+    }
+    .brand-logo-img {
+      width: 52px; height: 52px; object-fit: contain; filter: drop-shadow(0 4px 16px rgba(245, 158, 11, 0.5));
+    }
+    .brand-texts h2 {
+      font-size: 26px; font-weight: 900; color: var(--text-bold);
+    }
+    .brand-texts p {
+      font-size: 13.5px; color: var(--text-sub); font-weight: 600;
+    }
+    .top-badge {
+      background: rgba(245, 158, 11, 0.16); border: 1.5px solid rgba(245, 158, 11, 0.4);
+      color: #d97706; font-size: 14px; font-weight: 800; padding: 6px 18px; border-radius: 999px;
+    }
+
+    /* Main Showcase 2-Columns */
+    .showcase-row {
+      display: grid; grid-template-columns: 0.9fr 1.35fr; gap: 40px; align-items: center; flex: 1; margin: 16px 0;
+    }
+
+    /* Left Info Column */
+    .info-col {
+      display: flex; flex-direction: column; gap: 18px;
+    }
+    .feature-tag-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(245, 158, 11, 0.14); border: 1.5px solid rgba(245, 158, 11, 0.4);
+      color: #d97706; font-size: 15px; font-weight: 800; padding: 6px 18px; border-radius: 999px; align-self: flex-start;
+    }
+    .feature-title {
+      font-size: 46px; font-weight: 900; line-height: 1.15; color: var(--text-bold); letter-spacing: -0.02em;
+    }
+    .gradient-amber {
+      background: linear-gradient(135deg, #f59e0b 0%, #10b981 50%, #06b6d4 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .feature-desc {
+      font-size: 18px; color: var(--text-sub); line-height: 1.6; font-weight: 500;
+    }
+
+    .key-points-list {
+      display: flex; flex-direction: column; gap: 12px; margin-top: 4px;
+    }
+    .point-card {
+      background: var(--card-bg); border: 1.5px solid var(--card-border);
+      border-radius: 14px; padding: 14px 18px; display: flex; align-items: center; gap: 16px; box-shadow: var(--shadow);
+    }
+    .point-icon {
+      width: 44px; height: 44px; border-radius: 12px; background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.35); color: #d97706; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
+    }
+    .point-texts h4 {
+      font-size: 17px; font-weight: 800; color: var(--text-bold); margin-bottom: 3px;
+    }
+    .point-texts p {
+      font-size: 14px; color: var(--text-sub); line-height: 1.4;
+    }
+
+    /* Right Real Software Screenshot Frame */
+    .mockup-col {
+      background: var(--mockup-bg); border: 1.5px solid var(--mockup-border);
+      border-radius: 22px; padding: 22px 24px 18px; box-shadow: var(--shadow); position: relative;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .mockup-header-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-bottom: 12px; border-bottom: 1.5px solid var(--mockup-border);
+    }
+    .mockup-title {
+      font-size: 20px; font-weight: 900; color: var(--text-bold); display: flex; align-items: center; gap: 10px;
+    }
+
+    .real-screenshot-container {
+      width: 100%; border-radius: 14px; overflow: hidden;
+      border: 1px solid var(--card-border); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      background: #000;
+    }
+    .real-screenshot-container img {
+      width: 100%; height: auto; display: block;
+    }
+
+    .telemetry-row {
+      background: var(--chip-bg); border: 1px solid var(--mockup-border);
+      border-radius: 12px; padding: 12px 18px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; text-align: center;
+    }
+    .telem-cell h6 {
+      font-size: 12px; color: var(--text-sub); font-weight: 700; margin-bottom: 3px;
+    }
+    .telem-cell p {
+      font-size: 16px; font-weight: 900; color: var(--text-bold);
+    }
+
+    /* Footer */
+    .bottom-bar {
+      background: var(--footer-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1.5px solid var(--card-border); border-radius: 18px; padding: 16px 30px;
+      display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow);
+    }
+    .channels-left {
+      display: flex; align-items: center; gap: 32px; font-size: 15px; color: var(--text-sub); font-weight: 600;
+    }
+    .channels-left strong { color: var(--text-bold); font-weight: 800; }
+  </style>
+</head>
+<body>
+
+  <div class="bg-lights">
+    <div class="light-blob blob-1"></div>
+    <div class="light-blob blob-2"></div>
+  </div>
+
+  <div class="grid-overlay"></div>
+
+  <div class="board-container">
+
+    <header class="top-header">
+      <div class="brand-left">
+        <img src="../../docs/assets/logo_glyph_transparent.png" alt="Logo" class="brand-logo-img">
+        <div class="brand-texts">
+          <h2>Antigravity Enhance Tools</h2>
+          <p>35+ 可视化技能中心 (Skills Hub) · 客户端实机实测专项展示</p>
+        </div>
+      </div>
+      <div class="top-badge">
+        ✨ 丰富高阶生态 · GitHub 技能一键解析
+      </div>
+    </header>
+
+    <main class="showcase-row">
+      
+      <!-- Left Column -->
+      <div class="info-col">
+        <span class="feature-tag-badge">🧩 生态扩展赋能核心</span>
+        <h1 class="feature-title">
+          释放 Agent 终极潜能<br>
+          <span class="gradient-amber">35+ 可视化技能中心</span><br>
+          GitHub 技能链接一键解析
+        </h1>
+        <p class="feature-desc">
+          告别手动查找提示词文件与繁琐配置目录的旧方式！开箱内置 35+ 个覆盖全栈工程高频场景的顶级 Agent 技能，更支持直接输入 GitHub 链接全自动克隆解析。
+        </p>
+
+        <div class="key-points-list">
+          <div class="point-card">
+            <div class="point-icon">📥</div>
+            <div class="point-texts">
+              <h4>GitHub 技能链接直接粘贴</h4>
+              <p>遇到社区优秀技能仓库，无需解压配置，直接贴 URL 即可秒级完成结构解析并就地激活。</p>
+            </div>
+          </div>
+          <div class="point-card">
+            <div class="point-icon">📦</div>
+            <div class="point-texts">
+              <h4>预置 35+ 高阶工业级技能</h4>
+              <p>覆盖代码审查、TDD 先行、设计系统、深层重构、Bug诊断与性能调优等完整开发工作流。</p>
+            </div>
+          </div>
+          <div class="point-card">
+            <div class="point-icon">🎯</div>
+            <div class="point-texts">
+              <h4>可视化开关与即点即用</h4>
+              <p>清晰模块化卡片流展示，支持按分类检索、一键启用/禁用，提示词调用从此得心应手。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: REAL Software Screenshot -->
+      <div class="mockup-col">
+        <div class="mockup-header-bar">
+          <div class="mockup-title">
+            <span>🧩 客户端内真实界面：技能中心 (Skills Hub) 35 个可用技能</span>
+          </div>
+          <div style="font-size: 13.5px; color: #10b981; font-weight: 800; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); padding: 4px 12px; border-radius: 999px;">
+            <span>● 软件内真实截图</span>
+          </div>
+        </div>
+
+        <div class="real-screenshot-container">
+          <img src="../../docs/assets/verified_skills_hub_live.png" alt="Skills Hub 技能中心实机实测截图">
+        </div>
+
+        <div class="telemetry-row">
+          <div class="telem-cell">
+            <h6>内置开箱即用技能</h6>
+            <p style="color: #f59e0b;">35+ 款高阶技能</p>
+          </div>
+          <div class="telem-cell">
+            <h6>生态安装支持</h6>
+            <p>GitHub Repo 自动解析</p>
+          </div>
+          <div class="telem-cell">
+            <h6>管理方式</h6>
+            <p>纯本地热插拔管理</p>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+    <footer class="bottom-bar">
+      <div class="channels-left">
+        <span>🌐 官网：<strong>antigravity-enhance-tools.github.io</strong></span>
+        <span>💻 GitHub 搜索项目名：<strong>Antigravity-Enhance-Pack-Tools</strong></span>
+        <span>💬 Discord：<strong>discord.gg/QRsPcNrSB</strong></span>
+      </div>
+      <div style="font-size: 15px; font-weight: 800; color: #d97706;">
+        ✨ 专注于软件前端视觉展示与极致人机交互体验
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const theme = params.get('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', theme);
+  </script>
+</body>
+</html>

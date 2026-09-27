@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <title>08_思考能力4挡动态调节_3比4_浅色</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+    :root, [data-theme="light"] {
+      --bg: #f8fafc; --card-bg: rgba(255, 255, 255, 0.95); --card-border: rgba(203, 213, 225, 0.9);
+      --mockup-bg: #ffffff; --mockup-border: rgba(226, 232, 240, 0.95);
+      --text-main: #0f172a; --text-sub: #475569; --text-bold: #020617;
+      --shadow: 0 14px 30px rgba(0, 0, 0, 0.08); --footer-bg: rgba(255, 255, 255, 0.96);
+      --grid-line: rgba(0, 0, 0, 0.035); --blob-opacity: 0.12;
+      --theme: #e11d48; --theme-light: rgba(225, 29, 72, 0.12); --theme-border: rgba(225, 29, 72, 0.3);
+    }
+    body { width: 1200px; height: 1600px; overflow: hidden; background: var(--bg); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; color: var(--text-main); position: relative; }
+    .bg-lights { position: absolute; inset: 0; overflow: hidden; z-index: 0; pointer-events: none; }
+    .light-blob { position: absolute; border-radius: 50%; filter: blur(140px); opacity: var(--blob-opacity); }
+    .blob-1 { width: 700px; height: 700px; background: radial-gradient(circle, #f43f5e 0%, #e11d48 70%); top: -120px; left: -5%; }
+    .blob-2 { width: 600px; height: 600px; background: radial-gradient(circle, #ec4899 0%, #be185d 70%); bottom: -80px; right: -5%; }
+    .grid-overlay { position: absolute; inset: 0; background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px); background-size: 40px 40px; z-index: 1; pointer-events: none; }
+    .poster { position: relative; z-index: 2; width: 1200px; height: 1600px; padding: 40px 50px 36px; display: flex; flex-direction: column; }
+    .header { display: flex; align-items: center; justify-content: space-between; padding-bottom: 18px; border-bottom: 1.5px solid var(--card-border); margin-bottom: 28px; flex-shrink: 0; }
+    .header-left { display: flex; align-items: center; gap: 14px; }
+    .brand { font-size: 26px; font-weight: 900; color: var(--text-bold); letter-spacing: -0.5px; }
+    .version-pill { background: var(--theme-light); border: 1.5px solid var(--theme-border); color: var(--theme); font-size: 14px; font-weight: 800; padding: 5px 14px; border-radius: 999px; }
+    .brand-sub { font-size: 13px; color: var(--text-sub); font-weight: 600; margin-left: 6px; }
+    .page-num { font-size: 20px; font-weight: 900; color: var(--text-sub); }
+    .hero { margin-bottom: 24px; flex-shrink: 0; }
+    .catchy-tag { display: inline-flex; align-items: center; gap: 8px; background: var(--card-bg); border: 1.5px solid var(--card-border); font-size: 15px; font-weight: 800; padding: 7px 20px; border-radius: 999px; color: var(--text-bold); box-shadow: var(--shadow); margin-bottom: 16px; }
+    .hero h1 { font-size: 48px; font-weight: 900; line-height: 1.15; letter-spacing: -0.03em; color: var(--text-bold); margin-bottom: 14px; }
+    .gradient-text { background: linear-gradient(135deg, #f43f5e 0%, #e11d48 50%, #be185d 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero-desc { font-size: 17px; color: var(--text-sub); line-height: 1.65; font-weight: 500; max-width: 920px; }
+    .points-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; flex-shrink: 0; }
+    .point-card { background: var(--card-bg); border: 1.5px solid var(--card-border); border-radius: 16px; padding: 18px 16px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 8px; }
+    .point-card .icon-row { display: flex; align-items: center; gap: 10px; }
+    .point-card .p-icon { width: 40px; height: 40px; border-radius: 12px; background: var(--theme-light); border: 1px solid var(--theme-border); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .point-card h4 { font-size: 17px; font-weight: 800; color: var(--text-bold); }
+    .point-card p { font-size: 13.5px; color: var(--text-sub); line-height: 1.5; }
+    .screenshot-section { flex: 1; display: flex; flex-direction: column; gap: 14px; min-height: 0; margin-bottom: 18px; }
+    .mockup-frame { flex: 1; background: var(--mockup-bg); border: 1.5px solid var(--mockup-border); border-radius: 20px; box-shadow: var(--shadow); display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
+    .mockup-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1.5px solid var(--mockup-border); flex-shrink: 0; }
+    .mockup-bar .title { font-size: 16px; font-weight: 800; color: var(--text-bold); }
+    .mockup-bar .badge { font-size: 13px; font-weight: 700; color: #0284c7; background: rgba(2, 132, 199, 0.1); border: 1px solid rgba(2, 132, 199, 0.3); padding: 3px 10px; border-radius: 999px; }
+    .mockup-body { flex: 1; padding: 20px 24px; display: flex; align-items: stretch; min-height: 0; overflow: hidden; background: #fafafa; }
+    .console-grid { display: grid; grid-template-columns: 1.05fr 1.15fr; gap: 20px; width: 100%; height: 100%; }
+
+    /* Left: 4 Gear Items */
+    .gear-panel { display: flex; flex-direction: column; gap: 10px; height: 100%; justify-content: space-between; }
+    .gear-item {
+      display: flex; align-items: center; gap: 14px; padding: 12px 16px;
+      background: var(--card-bg); border: 1.5px solid var(--card-border);
+      border-radius: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); flex: 1;
+    }
+    .gear-item.active {
+      border-color: var(--theme); background: rgba(225, 29, 72, 0.04);
+      box-shadow: 0 0 0 2.5px rgba(225, 29, 72, 0.15), var(--shadow);
+    }
+    .gear-icon {
+      width: 44px; height: 44px; border-radius: 12px; background: var(--theme-light);
+      border: 1.5px solid var(--theme-border); display: flex; align-items: center;
+      justify-content: center; font-size: 22px; flex-shrink: 0;
+    }
+    .gear-info { flex: 1; min-width: 0; }
+    .gear-title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 3px; }
+    .gear-name { font-size: 16px; font-weight: 900; color: var(--text-bold); }
+    .gear-param { font-size: 11.5px; font-weight: 800; padding: 2px 8px; border-radius: 6px; background: var(--chip-bg); color: var(--text-sub); }
+    .gear-item.active .gear-param { background: rgba(225, 29, 72, 0.15); color: var(--theme); }
+    .gear-sub { font-size: 12.5px; color: var(--text-sub); font-weight: 500; }
+    .gear-radio { width: 22px; height: 22px; border-radius: 50%; border: 2.5px solid var(--card-border); flex-shrink: 0; position: relative; }
+    .gear-radio.checked { border-color: var(--theme); }
+    .gear-radio.checked::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 10px; height: 10px; border-radius: 50%; background: var(--theme); }
+
+    /* Right: Thinking Trace Monitor */
+    .trace-monitor {
+      background: #0f172a; border-radius: 16px; padding: 18px 20px;
+      display: flex; flex-direction: column; gap: 14px; box-shadow: var(--shadow);
+      color: #f8fafc; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    .trace-top {
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;
+    }
+    .trace-badge { display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 700; color: #38bdf8; }
+    .trace-badge::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #38bdf8; box-shadow: 0 0 8px #38bdf8; }
+    .trace-meta { font-size: 11.5px; color: #94a3b8; }
+
+    .pipeline-list { display: flex; flex-direction: column; gap: 8px; }
+    .pipe-step {
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px; padding: 8px 12px; display: flex; align-items: center; justify-content: space-between;
+      font-size: 12px;
+    }
+    .pipe-step.current { border-color: #f43f5e; background: rgba(244, 63, 94, 0.12); }
+    .step-name { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+    .step-tag { font-size: 11px; padding: 2px 7px; border-radius: 4px; font-weight: 700; }
+    .tag-done { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+    .tag-running { background: rgba(244, 63, 94, 0.3); color: #fb7185; }
+    .tag-wait { background: rgba(148, 163, 184, 0.15); color: #94a3b8; }
+
+    .trace-log-box {
+      flex: 1; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px; padding: 12px 14px; font-size: 11.5px; line-height: 1.6;
+      color: #cbd5e1; overflow: hidden; display: flex; flex-direction: column; justify-content: center;
+    }
+    .log-line { display: flex; gap: 8px; }
+    .log-pfx { color: #f43f5e; font-weight: 700; }
+    .log-hl { color: #38bdf8; font-weight: 700; }
+    .log-dim { color: #64748b; }
+
+    .telemetry { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; flex-shrink: 0; }
+    .t-cell { background: var(--card-bg); border: 1.5px solid var(--card-border); border-radius: 14px; padding: 14px 12px; text-align: center; box-shadow: var(--shadow); }
+    .t-cell h6 { font-size: 12px; color: var(--text-sub); font-weight: 700; margin-bottom: 4px; }
+    .t-cell p { font-size: 16px; font-weight: 900; }
+    .footer { background: var(--footer-bg); border: 1.5px solid var(--card-border); border-radius: 18px; padding: 16px 24px; box-shadow: var(--shadow); display: flex; align-items: center; justify-content: center; margin-top: 18px; flex-shrink: 0; }
+    .footer-inner { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; justify-content: center; font-size: 13.5px; color: var(--text-sub); font-weight: 700; }
+    .footer-inner strong { color: var(--text-bold); }
+    .sep { color: var(--card-border); }
+  </style>
+</head>
+<body>
+  <div class="bg-lights"><div class="light-blob blob-1"></div><div class="light-blob blob-2"></div></div>
+  <div class="grid-overlay"></div>
+  <div class="poster">
+    <header class="header">
+      <div class="header-left">
+        <span class="brand">Antigravity</span>
+        <span class="version-pill">v0.1.5</span>
+        <span class="brand-sub">推理强度自由掌控 · 思考能力 4 挡动态调控专项展示</span>
+      </div>
+      <span class="page-num">08 / 10</span>
+    </header>
+    <section class="hero">
+      <div class="catchy-tag">🧠 推理强度自由掌控！</div>
+      <h1>推理强度自由掌控！<br><span class="gradient-text">思考能力 4 挡</span><br>动态调控</h1>
+      <p class="hero-desc">独创思考强度 4 挡无级调节系统，从快速响应到深度推理，根据任务复杂度自由调整 AI 思考深度，精准匹配每一次交互需求。</p>
+    </section>
+    <div class="points-row">
+      <div class="point-card">
+        <div class="icon-row"><div class="p-icon">⚡</div><h4>4 挡思考强度无级调节</h4></div>
+        <p>Quick → Standard → Deep → Expert 四挡自由切换，简单问题秒回，复杂任务深思。</p>
+      </div>
+      <div class="point-card">
+        <div class="icon-row"><div class="p-icon">🎯</div><h4>任务自适应推理匹配</h4></div>
+        <p>根据问题复杂度智能推荐思考挡位，避免简单任务过度消耗、复杂任务思考不足。</p>
+      </div>
+      <div class="point-card">
+        <div class="icon-row"><div class="p-icon">📊</div><h4>实时思考过程可视化</h4></div>
+        <p>思考过程实时展示推理链路与决策节点，让 AI 的思考过程透明可控。</p>
+      </div>
+    </div>
+    <div class="screenshot-section">
+      <div class="mockup-frame">
+        <div class="mockup-bar">
+          <span class="title">🧠 思考能力 4 挡动态调控中枢 · 实时思维链监控</span>
+          <span class="badge" style="color: #e11d48; background: rgba(225, 29, 72, 0.1); border-color: rgba(225, 29, 72, 0.3);">● 调控引擎活跃</span>
+        </div>
+        <div class="mockup-body">
+          <div class="console-grid">
+
+            <!-- Left: 4 Gear Items -->
+            <div class="gear-panel">
+              <div class="gear-item">
+                <div class="gear-icon">⚡</div>
+                <div class="gear-info">
+                  <div class="gear-title-row">
+                    <div class="gear-name">Quick 极速响应</div>
+                    <span class="gear-param">&lt; 0.8s · 1x</span>
+                  </div>
+                  <div class="gear-sub">简单问答 · 代码语法修正 · 零额外消耗</div>
+                </div>
+                <div class="gear-radio"></div>
+              </div>
+
+              <div class="gear-item active">
+                <div class="gear-icon">🔄</div>
+                <div class="gear-info">
+                  <div class="gear-title-row">
+                    <div class="gear-name">Standard 均衡推理</div>
+                    <span class="gear-param">3.5s · 2.5x</span>
+                  </div>
+                  <div class="gear-sub">日常开发 · 模块编写与重构 · 推荐默认</div>
+                </div>
+                <div class="gear-radio checked"></div>
+              </div>
+
+              <div class="gear-item">
+                <div class="gear-icon">🧠</div>
+                <div class="gear-info">
+                  <div class="gear-title-row">
+                    <div class="gear-name">Deep 深度推演</div>
+                    <span class="gear-param">12.0s · 6x</span>
+                  </div>
+                  <div class="gear-sub">复杂任务 · 跨文件全景扫描 · 架构方案评审</div>
+                </div>
+                <div class="gear-radio"></div>
+              </div>
+
+              <div class="gear-item">
+                <div class="gear-icon">🎯</div>
+                <div class="gear-info">
+                  <div class="gear-title-row">
+                    <div class="gear-name">Expert 极限模式</div>
+                    <span class="gear-param">30.0s · 12x</span>
+                  </div>
+                  <div class="gear-sub">疑难死锁 · 逆向逆析 · 多步长链路思维树搜索</div>
+                </div>
+                <div class="gear-radio"></div>
+              </div>
+            </div>
+
+            <!-- Right: Thinking Trace Monitor -->
+            <div class="trace-monitor">
+              <div class="trace-top">
+                <div class="trace-badge">THINKING TRACE LIVE</div>
+                <div class="trace-meta">ENGINE: DEEPREASON v2.4</div>
+              </div>
+              <div class="pipeline-list">
+                <div class="pipe-step">
+                  <span class="step-name"><span>01</span> 需求语义解析与上下文约束提取</span>
+                  <span class="step-tag tag-done">DONE 0.4s</span>
+                </div>
+                <div class="pipe-step current">
+                  <span class="step-name"><span>02</span> 思维链展开：树状分支评估推导</span>
+                  <span class="step-tag tag-running">ACTIVE 1.8s</span>
+                </div>
+                <div class="pipe-step">
+                  <span class="step-name"><span>03</span> AST 语法树安全防御与执行校验</span>
+                  <span class="step-tag tag-wait">QUEUED</span>
+                </div>
+              </div>
+              <div class="trace-log-box">
+                <div class="log-line"><span class="log-pfx">&gt;</span> <span class="log-hl">[Phase 02/TreeSearch]</span> Analyzing 3 candidate paths...</div>
+                <div class="log-line"><span class="log-pfx">&gt;</span> Candidate A: Direct patch insertion &rarr; <span class="log-dim">Pass (score: 0.89)</span></div>
+                <div class="log-line"><span class="log-pfx">&gt;</span> Candidate B: Dynamic hook interceptor &rarr; <span style="color:#4ade80;font-weight:700;">Selected (score: 0.96)</span></div>
+                <div class="log-line"><span class="log-pfx">&gt;</span> <span class="log-dim">Memory safe: true | DOM freeze guard: armed</span></div>
+                <div class="log-line"><span class="log-pfx">&gt;</span> Emitting synthesized tokens to main stream...</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <div class="telemetry">
+        <div class="t-cell"><h6>挡位数量</h6><p style="color: #e11d48;">4 挡动态调控</p></div>
+        <div class="t-cell"><h6>响应模式</h6><p style="color: #f43f5e;">任务智能自适应</p></div>
+        <div class="t-cell"><h6>过程透明</h6><p style="color: #be185d;">思维链实时可视</p></div>
+      </div>
+    </div>
+    <footer class="footer">
+      <div class="footer-inner">
+        <span>🌐 官网：<strong>antigravity-enhance-tools.github.io</strong></span><span class="sep">|</span>
+        <span>💻 GitHub 搜索项目名：<strong>Antigravity-Enhance-Pack-Tools</strong></span><span class="sep">|</span>
+        <span>💬 Discord：<strong>discord.gg/QRsPcNrSB</strong></span><span class="sep">|</span>
+        <span style="color: var(--theme);">✨ 专注于软件前端视觉展示与极致人机交互体验</span>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

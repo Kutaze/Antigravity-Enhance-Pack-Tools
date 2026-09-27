@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <title>06_社交全功能大图_3比4_浅色 - Antigravity Enhance Tools</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+
+    :root, [data-theme="light"] {
+      --bg: #f8fafc;
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --card-border: rgba(203, 213, 225, 0.9);
+      --mockup-bg: #ffffff;
+      --mockup-border: rgba(226, 232, 240, 0.95);
+      --text-main: #0f172a;
+      --text-sub: #475569;
+      --text-bold: #020617;
+      --chip-bg: rgba(0, 0, 0, 0.04);
+      --shadow: 0 14px 30px rgba(0, 0, 0, 0.08);
+      --footer-bg: rgba(255, 255, 255, 0.96);
+      --grid-line: rgba(0, 0, 0, 0.035);
+      --blob-opacity: 0.12;
+    }
+
+    body {
+      width: 1200px; height: 1600px; overflow: hidden; background-color: var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--text-main); position: relative;
+    }
+
+    .bg-lights { position: absolute; inset: 0; overflow: hidden; z-index: 0; pointer-events: none; }
+    .light-blob { position: absolute; border-radius: 50%; filter: blur(140px); opacity: var(--blob-opacity); }
+    .blob-1 { width: 700px; height: 700px; background: radial-gradient(circle, #6366f1 0%, #4338ca 70%); top: -120px; left: 10%; }
+    .blob-2 { width: 650px; height: 650px; background: radial-gradient(circle, #06b6d4 0%, #2563eb 70%); top: 40%; right: -100px; }
+    .blob-3 { width: 600px; height: 600px; background: radial-gradient(circle, #ec4899 0%, #8b5cf6 70%); bottom: -100px; left: 15%; }
+    .grid-overlay { position: absolute; inset: 0; background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px); background-size: 40px 40px; z-index: 1; pointer-events: none; }
+
+    .poster-container {
+      position: relative; z-index: 2; width: 1200px; height: 1600px;
+      padding: 44px 50px 36px; display: flex; flex-direction: column;
+    }
+
+    .poster-header { display: flex; align-items: center; justify-content: space-between; padding-bottom: 20px; border-bottom: 1.5px solid var(--card-border); }
+    .brand-group { display: flex; align-items: center; gap: 16px; }
+    .brand-logo-img { width: 56px; height: 56px; object-fit: contain; filter: drop-shadow(0 4px 18px rgba(99, 102, 241, 0.6)); }
+    .brand-texts h2 { font-size: 28px; font-weight: 900; letter-spacing: -0.02em; color: var(--text-bold); line-height: 1.15; }
+    .brand-texts p { font-size: 14px; color: var(--text-sub); font-weight: 700; }
+    .badge-group { display: flex; align-items: center; gap: 12px; }
+    .version-pill { background: rgba(99, 102, 241, 0.16); border: 1.5px solid rgba(99, 102, 241, 0.45); color: #6366f1; font-size: 14px; font-weight: 800; padding: 6px 14px; border-radius: 999px; }
+    .safety-pill { background: rgba(16, 185, 129, 0.14); border: 1.5px solid rgba(16, 185, 129, 0.4); color: #059669; font-size: 14px; font-weight: 800; padding: 6px 14px; border-radius: 999px; }
+    .page-num { position: absolute; top: 18px; right: 24px; font-size: 13px; font-weight: 800; color: var(--text-sub); opacity: 0.6; }
+
+    .hero-area { text-align: center; margin: 12px 0 20px; }
+    .catchy-tag { display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.22) 0%, rgba(219, 39, 119, 0.18) 100%); border: 1.5px solid rgba(99, 102, 241, 0.45); color: var(--text-bold); font-size: 15px; font-weight: 800; padding: 6px 24px; border-radius: 999px; margin-bottom: 12px; }
+    .hero-main-title { font-size: 54px; font-weight: 900; letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 10px; color: var(--text-bold); }
+    .gradient-text { background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero-sub-text { font-size: 20px; color: var(--text-sub); font-weight: 600; }
+    .hero-sub-text strong { color: var(--text-bold); font-weight: 800; }
+
+    .cards-stack {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 18px;
+      flex: 1;
+      margin-bottom: 22px;
+    }
+    .poster-card {
+      height: 232px;
+      box-sizing: border-box;
+      background: var(--card-bg); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      border: 1.5px solid var(--card-border); border-radius: 20px; padding: 22px 28px;
+      display: grid; grid-template-columns: 1.05fr 1.22fr; gap: 24px; align-items: center;
+      position: relative; overflow: hidden; box-shadow: var(--shadow);
+    }
+    .poster-card::before { content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 6px; }
+    .border-cyan::before { background: linear-gradient(180deg, #06b6d4, #3b82f6); }
+    .border-purple::before { background: linear-gradient(180deg, #8b5cf6, #ec4899); }
+    .border-emerald::before { background: linear-gradient(180deg, #10b981, #059669); }
+    .border-amber::before { background: linear-gradient(180deg, #f59e0b, #ef4444); }
+
+    .card-info { display: flex; flex-direction: column; justify-content: center; }
+    .card-info h3 { font-size: 21px; font-weight: 900; color: var(--text-bold); display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .card-info p { font-size: 14.5px; color: var(--text-sub); line-height: 1.5; margin-bottom: 12px; font-weight: 500; }
+    .badge-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .micro-pill { font-size: 12.5px; font-weight: 800; padding: 4px 11px; border-radius: 6px; }
+    .pill-cyan { background: rgba(6, 182, 212, 0.15); color: #0284c7; border: 1px solid rgba(6, 182, 212, 0.35); }
+    .pill-purple { background: rgba(139, 92, 246, 0.15); color: #8b5cf6; border: 1px solid rgba(139, 92, 246, 0.35); }
+    .pill-emerald { background: rgba(16, 185, 129, 0.15); color: #059669; border: 1px solid rgba(16, 185, 129, 0.35); }
+    .pill-amber { background: rgba(245, 158, 11, 0.15); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.35); }
+
+    .card-preview-box {
+      background: var(--mockup-bg); border: 1.5px solid var(--mockup-border);
+      border-radius: 16px; overflow: hidden; box-shadow: var(--shadow);
+      height: 100%; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center;
+    }
+    .real-thumb-img {
+      width: 100%; height: 100%; max-height: 190px;
+      object-fit: cover; object-position: center 25%;
+      display: block; border-radius: 14px;
+    }
+
+    .p2-model-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 12px; border-radius: 9px; font-size: 13.5px; font-weight: 700; margin-bottom: 6px;
+      background: var(--chip-bg); color: var(--text-sub); border: 1px solid var(--mockup-border);
+    }
+    .p2-model-item:last-child { margin-bottom: 0; }
+    .p2-model-item.active { background: rgba(139, 92, 246, 0.15); border-color: rgba(139, 92, 246, 0.45); color: var(--text-bold); }
+
+    .p3-item { display: flex; align-items: center; justify-content: space-between; font-size: 13.5px; padding: 7px 12px; border-bottom: 1px solid var(--mockup-border); }
+    .p3-item:last-child { border-bottom: none; }
+    .p3-k { color: var(--text-sub); font-weight: 600; }
+    .p3-v { color: var(--text-bold); font-weight: 800; }
+
+    .poster-footer {
+      background: var(--footer-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1.5px solid var(--card-border); border-radius: 20px; padding: 20px 28px;
+      display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow);
+      margin-top: auto; flex-shrink: 0;
+    }
+    .footer-left { display: flex; align-items: center; gap: 14px; }
+    .author-circle-img { width: 48px; height: 48px; border-radius: 50%; border: 2.5px solid #6366f1; object-fit: cover; }
+    .footer-meta h4 { font-size: 16px; font-weight: 900; color: var(--text-bold); margin-bottom: 3px; }
+    .footer-meta p { font-size: 13px; color: var(--text-sub); font-weight: 600; }
+    .footer-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+    .search-guide-box {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.18) 0%, rgba(6, 182, 212, 0.14) 100%);
+      border: 1.5px solid rgba(99, 102, 241, 0.4); padding: 7px 16px; border-radius: 10px;
+      font-size: 13.5px; font-weight: 800; color: var(--text-bold);
+    }
+    .site-guide-link { font-size: 13px; color: #6366f1; font-weight: 700; }
+  </style>
+</head>
+<body>
+
+  <div class="bg-lights">
+    <div class="light-blob blob-1"></div>
+    <div class="light-blob blob-2"></div>
+    <div class="light-blob blob-3"></div>
+  </div>
+  <div class="grid-overlay"></div>
+
+  <div class="poster-container">
+    <div class="page-num">06 / 10</div>
+
+    <header class="poster-header">
+      <div class="brand-group">
+        <img src="../../../docs/assets/logo_glyph_transparent.png" alt="Logo" class="brand-logo-img">
+        <div class="brand-texts">
+          <h2>Antigravity Enhance Tools</h2>
+          <p>官方桌面端原生体验增强套件 · 实机功能展示</p>
+        </div>
+      </div>
+      <div class="badge-group">
+        <span class="version-pill">v0.1.5 PRO</span>
+        <span class="safety-pill">🛡️ 纯本地免安装</span>
+      </div>
+    </header>
+
+    <section class="hero-area">
+      <div class="catchy-tag">🚀 彻底解决额度盲盒与生硬交互 · 交互顺手度提升 10 倍</div>
+      <h1 class="hero-main-title">
+        让 Antigravity 顺手 10 倍！<br>
+        <span class="gradient-text">多账号实时配额 · 界面UI美化</span>
+      </h1>
+      <p class="hero-sub-text">
+        <strong>100% 全场景原生汉化</strong> · <strong>悬浮模型秒切</strong> · <strong>35+ 技能中心</strong>
+      </p>
+    </section>
+
+    <main class="cards-stack">
+
+      <div class="poster-card border-cyan">
+        <div class="card-info">
+          <h3>👥 多账号动态切换 · 实时额度</h3>
+          <p>集成多账号管理池，毫秒级快速切换，实时展示剩余配额与重置倒计时，彻底告别额度焦虑。</p>
+          <div class="badge-row">
+            <span class="micro-pill pill-cyan">底栏一键切换</span>
+            <span class="micro-pill pill-cyan">实时额度同步</span>
+            <span class="micro-pill pill-cyan">实机实测</span>
+          </div>
+        </div>
+        <div class="card-preview-box">
+          <img src="../../../docs/assets/verified_account_switcher_live.png" alt="多账号实测" class="real-thumb-img">
+        </div>
+      </div>
+
+      <div class="poster-card border-purple">
+        <div class="card-info">
+          <h3>🎨 界面 UI 深度美化 · 悬浮模型秒切</h3>
+          <p>毛玻璃质感、科学留白与护眼字阶排版，快捷模型切换呼之即出，双手不离当前思路，交互丝滑极致。</p>
+          <div class="badge-row">
+            <span class="micro-pill pill-purple">悬浮面板秒切</span>
+            <span class="micro-pill pill-purple">毛玻璃视觉重构</span>
+            <span class="micro-pill pill-purple">顺手度拉满</span>
+          </div>
+        </div>
+        <div class="card-preview-box" style="padding: 12px 16px;">
+          <div class="p2-model-item active">
+            <span>Claude 3.5 Sonnet (主力推理)</span>
+            <span style="color: #8b5cf6;">✓</span>
+          </div>
+          <div class="p2-model-item">
+            <span>Gemini 1.5 Pro (超长上下文)</span>
+            <span style="font-size: 11.5px; opacity: 0.6;">Ctrl+2</span>
+          </div>
+          <div class="p2-model-item">
+            <span>DeepSeek R1 (深度思考)</span>
+            <span style="font-size: 11.5px; opacity: 0.6;">Ctrl+3</span>
+          </div>
+          <div class="p2-model-item">
+            <span>GPT-4o (全能通用大模型)</span>
+            <span style="font-size: 11.5px; opacity: 0.6;">Ctrl+4</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="poster-card border-emerald">
+        <div class="card-info">
+          <h3>🌏 100% 全场景原生深度汉化</h3>
+          <p>深度语义校对与词条润色，菜单、偏好设置、报错弹窗全面母语化，搭载工业级防卡死与防崩溃守卫。</p>
+          <div class="badge-row">
+            <span class="micro-pill pill-emerald">3000+ 词条覆盖</span>
+            <span class="micro-pill pill-emerald">零死循环防抖</span>
+            <span class="micro-pill pill-emerald">快捷键完美保留</span>
+          </div>
+        </div>
+        <div class="card-preview-box" style="padding: 10px 14px;">
+          <div class="p3-item"><span class="p3-k">界面母语化</span><span class="p3-v">简体中文 (原生校对)</span></div>
+          <div class="p3-item"><span class="p3-k">防卡死守卫</span><span class="p3-v" style="color: #059669;">活跃保护中 (零白屏)</span></div>
+          <div class="p3-item"><span class="p3-k">隐私机制</span><span class="p3-v">100% 本地运行零上传</span></div>
+          <div class="p3-item"><span class="p3-k">底层挂载</span><span class="p3-v" style="color: #0284c7;">原生注入无感融合</span></div>
+        </div>
+      </div>
+
+      <div class="poster-card border-amber">
+        <div class="card-info">
+          <h3>🧩 35+ 可视化技能中心 & 绿色安装器</h3>
+          <p>预置覆盖代码审查、TDD、设计系统的 35+ 高阶技能，支持 GitHub 链接一键解析，单文件双主题一键无损安装与还原。</p>
+          <div class="badge-row">
+            <span class="micro-pill pill-amber">GitHub 技能一键装</span>
+            <span class="micro-pill pill-amber">35个技能开箱用</span>
+            <span class="micro-pill pill-amber">实机实测</span>
+          </div>
+        </div>
+        <div class="card-preview-box">
+          <img src="../../../docs/assets/verified_skills_hub_live.png" alt="技能中心实测" class="real-thumb-img">
+        </div>
+      </div>
+
+    </main>
+
+    <footer class="poster-footer">
+      <div class="footer-left">
+        <img src="../../../docs/assets/author_avatar.png" alt="Kutaze" class="author-circle-img">
+        <div class="footer-meta">
+          <h4>Crafted by Kutaze</h4>
+          <p>专注于软件前端视觉展示与极致人机交互体验</p>
+        </div>
+      </div>
+      <div class="footer-right">
+        <div class="search-guide-box">👉 GitHub 搜索开源项目名：Antigravity-Enhance-Pack-Tools</div>
+        <div class="site-guide-link">🌐 官方发布网站：antigravity-enhance-tools.github.io</div>
+      </div>
+    </footer>
+
+  </div>
+</body>
+</html>

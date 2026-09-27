@@ -1,0 +1,147 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>高能探索者 / 共创官 - 爱发电方案配图</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+    body {
+      width: 1000px; height: 1000px; overflow: hidden;
+      background: #070913;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: #f8fafc; position: relative;
+    }
+    .bg-lights { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 0; pointer-events: none; }
+    .light-blob { position: absolute; border-radius: 50%; filter: blur(130px); }
+    .grid-overlay {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.04) 2px, transparent 2px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.04) 2px, transparent 2px);
+      background-size: 50px 50px; z-index: 1; pointer-events: none;
+    }
+    .card-container {
+      position: relative; z-index: 2; width: 1000px; height: 1000px;
+      padding: 60px; display: flex; flex-direction: column; justify-content: space-between; align-items: center;
+      text-align: center;
+    }
+    .top-bar { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+    .tier-badge { font-size: 19px; font-weight: 900; letter-spacing: 0.12em; text-transform: uppercase; padding: 8px 26px; border-radius: 999px; }
+    .logo-brand { display: flex; align-items: center; gap: 12px; font-size: 20px; font-weight: 800; color: #94a3b8; }
+    .logo-brand img { width: 38px; height: 38px; object-fit: contain; filter: drop-shadow(0 2px 10px rgba(99, 102, 241, 0.6)); }
+
+    .center-visual { display: flex; flex-direction: column; align-items: center; gap: 18px; margin-top: 10px; }
+    .icon-wrapper {
+      width: 200px; height: 200px; border-radius: 46px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 100px; position: relative;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75);
+    }
+    .icon-wrapper::after { content: ''; position: absolute; inset: -4px; border-radius: 50px; z-index: -1; opacity: 0.8; filter: blur(14px); }
+
+    .price-tag { display: inline-flex; align-items: baseline; gap: 6px; font-size: 56px; font-weight: 900; letter-spacing: -0.02em; }
+    .price-currency { font-size: 32px; font-weight: 700; }
+    .price-period { font-size: 24px; color: #94a3b8; font-weight: 600; }
+
+    .scheme-title { font-size: 46px; font-weight: 900; letter-spacing: -0.01em; margin-top: -6px; }
+    .scheme-subtitle { font-size: 22px; color: #94a3b8; font-weight: 500; max-width: 740px; line-height: 1.45; }
+
+    .benefits-box {
+      width: 100%; display: flex; flex-direction: column; gap: 14px;
+      background: rgba(15, 23, 42, 0.8); border: 1.5px solid rgba(255, 255, 255, 0.14);
+      border-radius: 24px; padding: 24px 34px; backdrop-filter: blur(16px);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+    }
+    .benefits-title { font-size: 18px; font-weight: 800; letter-spacing: 0.1em; color: #64748b; text-transform: uppercase; text-align: left; }
+    .benefits-list { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; text-align: left; }
+    .benefit-item { display: flex; align-items: center; gap: 10px; font-size: 19px; font-weight: 700; color: #e2e8f0; }
+
+    .bottom-bar { font-size: 19px; color: #64748b; font-weight: 600; letter-spacing: 0.05em; }
+    .bottom-bar strong { color: #94a3b8; }
+
+    /* Theme overrides */
+    body.tier-coffee .blob-1 { width: 500px; height: 500px; background: #f59e0b; top: 100px; left: 100px; opacity: 0.4; }
+    body.tier-coffee .blob-2 { width: 600px; height: 600px; background: #8b5cf6; bottom: 80px; right: 80px; opacity: 0.4; }
+    body.tier-coffee .tier-badge { background: rgba(245, 158, 11, 0.2); border: 2px solid rgba(245, 158, 11, 0.6); color: #fde68a; }
+    body.tier-coffee .icon-wrapper { background: linear-gradient(145deg, #1e1b4b, #312e81); border: 3px solid rgba(245, 158, 11, 0.5); }
+    body.tier-coffee .icon-wrapper::after { background: #f59e0b; }
+    body.tier-coffee .price-tag { color: #fbbf24; }
+    body.tier-coffee .scheme-title { background: linear-gradient(135deg, #ffffff 0%, #fef3c7 60%, #f59e0b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    body.tier-coffee .benefit-item span.check { color: #fbbf24; }
+
+    body.tier-energy .blob-1 { width: 550px; height: 550px; background: #06b6d4; top: 100px; left: 80px; opacity: 0.45; }
+    body.tier-energy .blob-2 { width: 650px; height: 650px; background: #6366f1; bottom: 60px; right: 60px; opacity: 0.45; }
+    body.tier-energy .tier-badge { background: rgba(99, 102, 241, 0.25); border: 2px solid rgba(99, 102, 241, 0.7); color: #a5b4fc; }
+    body.tier-energy .icon-wrapper { background: linear-gradient(145deg, #0f172a, #1e1b4b); border: 3px solid rgba(99, 102, 241, 0.6); }
+    body.tier-energy .icon-wrapper::after { background: #6366f1; }
+    body.tier-energy .price-tag { color: #38bdf8; }
+    body.tier-energy .scheme-title { background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 50%, #38bdf8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    body.tier-energy .benefit-item span.check { color: #38bdf8; }
+
+    body.tier-rocket .blob-1 { width: 550px; height: 550px; background: #ec4899; top: 80px; right: 100px; opacity: 0.45; }
+    body.tier-rocket .blob-2 { width: 650px; height: 650px; background: #8b5cf6; bottom: 80px; left: 80px; opacity: 0.45; }
+    body.tier-rocket .tier-badge { background: rgba(236, 72, 153, 0.25); border: 2px solid rgba(236, 72, 153, 0.7); color: #fbcfe8; }
+    body.tier-rocket .icon-wrapper { background: linear-gradient(145deg, #1e102a, #2e1065); border: 3px solid rgba(236, 72, 153, 0.6); }
+    body.tier-rocket .icon-wrapper::after { background: #ec4899; }
+    body.tier-rocket .price-tag { color: #f43f5e; }
+    body.tier-rocket .scheme-title { background: linear-gradient(135deg, #ffffff 0%, #ffe4e6 50%, #f43f5e 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    body.tier-rocket .benefit-item span.check { color: #f43f5e; }
+
+    body.tier-crown .blob-1 { width: 600px; height: 600px; background: #eab308; top: 80px; left: 100px; opacity: 0.45; }
+    body.tier-crown .blob-2 { width: 650px; height: 650px; background: #ca8a04; bottom: 60px; right: 80px; opacity: 0.4; }
+    body.tier-crown .tier-badge { background: rgba(234, 179, 8, 0.25); border: 2px solid rgba(234, 179, 8, 0.75); color: #fef08a; }
+    body.tier-crown .icon-wrapper { background: linear-gradient(145deg, #271d05, #422006); border: 3px solid rgba(234, 179, 8, 0.7); }
+    body.tier-crown .icon-wrapper::after { background: #eab308; }
+    body.tier-crown .price-tag { color: #facc15; }
+    body.tier-crown .scheme-title { background: linear-gradient(135deg, #ffffff 0%, #fef9c3 50%, #eab308 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    body.tier-crown .benefit-item span.check { color: #facc15; }
+
+    body.tier-heart .blob-1 { width: 550px; height: 550px; background: #f43f5e; top: 100px; left: 100px; opacity: 0.45; }
+    body.tier-heart .blob-2 { width: 600px; height: 600px; background: #fb7185; bottom: 80px; right: 80px; opacity: 0.4; }
+    body.tier-heart .tier-badge { background: rgba(244, 63, 94, 0.25); border: 2px solid rgba(244, 63, 94, 0.7); color: #fecdd3; }
+    body.tier-heart .icon-wrapper { background: linear-gradient(145deg, #300e16, #4c0519); border: 3px solid rgba(244, 63, 94, 0.6); }
+    body.tier-heart .icon-wrapper::after { background: #f43f5e; }
+    body.tier-heart .price-tag { color: #fb7185; }
+    body.tier-heart .scheme-title { background: linear-gradient(135deg, #ffffff 0%, #ffe4e6 50%, #fb7185 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    body.tier-heart .benefit-item span.check { color: #fb7185; }
+  </style>
+</head>
+<body class="tier-rocket">
+  <div class="bg-lights">
+    <div class="light-blob blob-1"></div>
+    <div class="light-blob blob-2"></div>
+  </div>
+  <div class="grid-overlay"></div>
+  <div class="card-container">
+    <div class="top-bar">
+      <div class="tier-badge">TIER 03 · 深度共创</div>
+      <div class="logo-brand">
+        <img src="../../docs/assets/logo_glyph_transparent.png" alt="Logo">
+        <span>Antigravity Tools</span>
+      </div>
+    </div>
+    <div class="center-visual">
+      <div class="icon-wrapper">🚀</div>
+      <div class="price-tag">
+        <span class="price-currency">¥</span>
+        <span>29.9</span>
+        <span class="price-period">/ 月</span>
+      </div>
+      <div class="scheme-title">高能探索者 / 共创官</div>
+      <div class="scheme-subtitle">深度参与产品演进，与作者共同雕琢人机协同极致体验！</div>
+    </div>
+    <div class="benefits-box">
+      <div class="benefits-title">专属支持回报 · BENEFITS</div>
+      <div class="benefits-list">
+        <div class="benefit-item"><span class="check">✔</span> 【Feature Request】建议最高优先排期</div>
+        <div class="benefit-item"><span class="check">✔</span> 专属 1 对 1 技术交流与答疑通道</div>
+        <div class="benefit-item"><span class="check">✔</span> 官网赞助者专区优先排位展示</div>
+        <div class="benefit-item"><span class="check">✔</span> 包含前述所有赞助者全部特权</div>
+      </div>
+    </div>
+    <div class="bottom-bar">
+      支持作者：<strong>Kutaze</strong> · 纯净开源 · 体验至上
+    </div>
+  </div>
+</body>
+</html>

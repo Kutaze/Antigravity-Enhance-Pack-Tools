@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <title>10_项目与作者简介_3比4_浅色 - Antigravity Enhance Tools</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+
+    :root, [data-theme="light"] {
+      --bg: #f8fafc;
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --card-border: rgba(203, 213, 225, 0.9);
+      --mockup-bg: #ffffff;
+      --mockup-border: rgba(226, 232, 240, 0.95);
+      --text-main: #0f172a;
+      --text-sub: #475569;
+      --text-bold: #020617;
+      --chip-bg: rgba(0, 0, 0, 0.04);
+      --shadow: 0 14px 30px rgba(0, 0, 0, 0.08);
+      --footer-bg: rgba(255, 255, 255, 0.96);
+      --grid-line: rgba(0, 0, 0, 0.035);
+      --blob-opacity: 0.12;
+      --theme: #3b82f6;
+      --theme-light: rgba(59, 130, 246, 0.12);
+      --theme-border: rgba(59, 130, 246, 0.3);
+    }
+
+    body {
+      width: 1200px; height: 1600px; overflow: hidden; background: var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--text-main); position: relative;
+    }
+
+    .bg-lights { position: absolute; inset: 0; overflow: hidden; z-index: 0; pointer-events: none; }
+    .light-blob { position: absolute; border-radius: 50%; filter: blur(140px); opacity: var(--blob-opacity); }
+    .blob-1 { width: 700px; height: 700px; background: radial-gradient(circle, #3b82f6 0%, #1d4ed8 70%); top: -120px; left: -5%; }
+    .blob-2 { width: 650px; height: 650px; background: radial-gradient(circle, #8b5cf6 0%, #6d28d9 70%); bottom: -80px; right: -5%; }
+    .blob-3 { width: 500px; height: 500px; background: radial-gradient(circle, #ec4899 0%, #db2777 70%); top: 40%; left: 35%; opacity: 0.08; }
+
+    .grid-overlay {
+      position: absolute; inset: 0;
+      background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+      background-size: 40px 40px; z-index: 1; pointer-events: none;
+    }
+
+    .poster {
+      position: relative; z-index: 2; width: 1200px; height: 1600px;
+      padding: 40px 50px 36px; display: flex; flex-direction: column;
+    }
+
+    .header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-bottom: 18px; border-bottom: 1.5px solid var(--card-border); margin-bottom: 24px; flex-shrink: 0;
+    }
+    .header-left { display: flex; align-items: center; gap: 14px; }
+    .brand { font-size: 26px; font-weight: 900; color: var(--text-bold); letter-spacing: -0.5px; }
+    .version-pill {
+      background: var(--theme-light); border: 1.5px solid var(--theme-border);
+      color: var(--theme); font-size: 14px; font-weight: 800; padding: 5px 14px; border-radius: 999px;
+    }
+    .brand-sub { font-size: 13px; color: var(--text-sub); font-weight: 600; margin-left: 6px; }
+    .page-num { font-size: 20px; font-weight: 900; color: var(--text-sub); }
+
+    .hero { margin-bottom: 22px; flex-shrink: 0; text-align: left; }
+    .catchy-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--card-bg); border: 1.5px solid var(--card-border);
+      font-size: 15px; font-weight: 800; padding: 7px 20px; border-radius: 999px;
+      color: var(--text-bold); box-shadow: var(--shadow); margin-bottom: 14px;
+    }
+    .hero h1 {
+      font-size: 46px; font-weight: 900; line-height: 1.18; letter-spacing: -0.03em;
+      color: var(--text-bold); margin-bottom: 12px;
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero-desc {
+      font-size: 16.5px; color: var(--text-sub); line-height: 1.6; font-weight: 500; max-width: 980px;
+    }
+
+    /* Main Showcase Content */
+    .showcase-content {
+      flex: 1; display: flex; flex-direction: column; gap: 16px; min-height: 0;
+    }
+
+    /* Author & Project Split Row */
+    .top-cards-row {
+      display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 16px; flex-shrink: 0;
+    }
+
+    .author-card {
+      background: var(--card-bg); border: 1.5px solid var(--card-border);
+      border-radius: 18px; padding: 22px 24px; box-shadow: var(--shadow);
+      display: flex; gap: 20px; align-items: flex-start;
+    }
+    .author-avatar-wrap {
+      position: relative; flex-shrink: 0;
+    }
+    .author-avatar {
+      width: 84px; height: 84px; border-radius: 20px; object-fit: cover;
+      border: 2.5px solid #3b82f6; box-shadow: 0 8px 20px rgba(59, 130, 246, 0.25);
+    }
+    .author-badge-live {
+      position: absolute; bottom: -4px; right: -4px;
+      background: #10b981; width: 16px; height: 16px; border-radius: 50%;
+      border: 2.5px solid #ffffff;
+    }
+    .author-info {
+      flex: 1; display: flex; flex-direction: column; gap: 6px;
+    }
+    .author-name-row {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .author-name {
+      font-size: 24px; font-weight: 900; color: var(--text-bold);
+    }
+    .author-role-pills {
+      display: flex; gap: 6px; flex-wrap: wrap; margin-top: 2px;
+    }
+    .role-pill {
+      font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px;
+      background: rgba(59, 130, 246, 0.1); color: #2563eb; border: 1px solid rgba(59, 130, 246, 0.25);
+    }
+    .author-bio {
+      font-size: 13.5px; color: var(--text-sub); line-height: 1.55; margin-top: 4px;
+    }
+
+    .project-card {
+      background: var(--card-bg); border: 1.5px solid var(--card-border);
+      border-radius: 18px; padding: 22px 22px; box-shadow: var(--shadow);
+      display: flex; flex-direction: column; justify-content: space-between; gap: 12px;
+    }
+    .proj-title-row {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .proj-title {
+      font-size: 18px; font-weight: 900; color: var(--text-bold);
+    }
+    .proj-badge {
+      font-size: 12px; font-weight: 800; color: #10b981;
+      background: rgba(16, 185, 129, 0.12); padding: 3px 10px; border-radius: 999px;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .proj-channels-list {
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .channel-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 7px 12px; background: rgba(0, 0, 0, 0.025); border: 1px solid var(--card-border);
+      border-radius: 10px; font-size: 12.5px; font-weight: 700;
+    }
+    .channel-item span.lbl { color: var(--text-sub); display: flex; align-items: center; gap: 6px; }
+    .channel-item span.val { color: var(--text-bold); font-family: monospace; font-size: 12px; }
+
+    /* Features Grid (6 Highlights) */
+    .features-grid-section {
+      background: var(--card-bg); border: 1.5px solid var(--card-border);
+      border-radius: 20px; padding: 20px 24px; box-shadow: var(--shadow);
+      flex: 1; display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .features-grid-header {
+      font-size: 17px; font-weight: 900; color: var(--text-bold); margin-bottom: 12px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .features-grid-header span.tag {
+      font-size: 12px; font-weight: 700; color: #8b5cf6;
+      background: rgba(139, 92, 246, 0.1); padding: 3px 10px; border-radius: 999px;
+      border: 1px solid rgba(139, 92, 246, 0.25);
+    }
+    .features-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+    }
+    .feat-box {
+      background: #ffffff; border: 1.5px solid var(--card-border);
+      border-radius: 14px; padding: 14px 14px; display: flex; flex-direction: column; gap: 6px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    }
+    .feat-box .f-icon-title {
+      display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 800; color: var(--text-bold);
+    }
+    .feat-box p {
+      font-size: 12.5px; color: var(--text-sub); line-height: 1.45;
+    }
+
+    /* Telemetry */
+    .telemetry {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; flex-shrink: 0; margin-top: 14px;
+    }
+    .t-cell {
+      background: var(--card-bg); border: 1.5px solid var(--card-border);
+      border-radius: 14px; padding: 12px 10px; text-align: center; box-shadow: var(--shadow);
+    }
+    .t-cell h6 { font-size: 11.5px; color: var(--text-sub); font-weight: 700; margin-bottom: 3px; }
+    .t-cell p { font-size: 15px; font-weight: 900; }
+
+    /* Footer */
+    .footer {
+      background: var(--footer-bg); border: 1.5px solid var(--card-border);
+      border-radius: 18px; padding: 16px 24px; box-shadow: var(--shadow);
+      display: flex; align-items: center; justify-content: center;
+      margin-top: 16px; flex-shrink: 0;
+    }
+    .footer-inner {
+      display: flex; align-items: center; gap: 16px; flex-wrap: wrap; justify-content: center;
+      font-size: 13.5px; color: var(--text-sub); font-weight: 700;
+    }
+    .footer-inner strong { color: var(--text-bold); }
+    .sep { color: var(--card-border); }
+  </style>
+</head>
+<body>
+  <div class="bg-lights">
+    <div class="light-blob blob-1"></div>
+    <div class="light-blob blob-2"></div>
+    <div class="light-blob blob-3"></div>
+  </div>
+  <div class="grid-overlay"></div>
+
+  <div class="poster">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <span class="brand">Antigravity</span>
+        <span class="version-pill">v0.1.5</span>
+        <span class="brand-sub">项目全景开源致谢 · 开发者简介与生态矩阵专项展示</span>
+      </div>
+      <span class="page-num">10 / 10</span>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="catchy-tag">🚀 专注于极致人机交互 · 拥抱开源生产力</div>
+      <h1>做最好用的开发辅助！<br><span class="gradient-text">项目全景与开发者简介</span><br>开源协作 · 欢迎 Star</h1>
+      <p class="hero-desc">Antigravity Enhance Tools 由独立开发者 Kutaze 倾力打造，全场景母语化、时空刻度导航、多账号无缝秒切与 35+ 技能中心，完全开源、零数据上传，致力于为开发者带来顺手 10 倍的纯粹心流体验。</p>
+    </section>
+
+    <!-- Showcase Content -->
+    <div class="showcase-content">
+      <!-- Top Cards Row: Author + Project -->
+      <div class="top-cards-row">
+        <!-- Author Profile Card -->
+        <div class="author-card">
+          <div class="author-avatar-wrap">
+            <img src="../../../docs/assets/author_avatar.png" alt="Kutaze" class="author-avatar">
+            <div class="author-badge-live" title="持续维护活跃中"></div>
+          </div>
+          <div class="author-info">
+            <div class="author-name-row">
+              <span class="author-name">Kutaze</span>
+              <span style="font-size: 12px; font-weight: 700; color: #6366f1;">Creator & Maintainer</span>
+            </div>
+            <div class="author-role-pills">
+              <span class="role-pill">独立全栈开发者</span>
+              <span class="role-pill">UI/UX 交互极客</span>
+              <span class="role-pill">开源作者</span>
+            </div>
+            <p class="author-bio">
+              专注于软件前端视觉艺术呈现、极致人机交互体验与桌面端深度逆向扩展。坚持“100% 纯本地运行、零数据外泄、零死循环防抖”的工业级交付准则。
+            </p>
+          </div>
+        </div>
+
+        <!-- Project Channels Card -->
+        <div class="project-card">
+          <div class="proj-title-row">
+            <span class="proj-title">📦 项目访问矩阵</span>
+            <span class="proj-badge">● 官方通道</span>
+          </div>
+          <div class="proj-channels-list">
+            <div class="channel-item">
+              <span class="lbl">🌐 官方网站</span>
+              <span class="val" style="color: #2563eb;">antigravity-enhance-tools.github.io</span>
+            </div>
+            <div class="channel-item">
+              <span class="lbl">💻 GitHub 源码</span>
+              <span class="val" style="color: #8b5cf6;">Kutaze/Antigravity-Enhance-Pack-Tools</span>
+            </div>
+            <div class="channel-item">
+              <span class="lbl">💬 Discord 社区</span>
+              <span class="val" style="color: #6366f1;">discord.gg/QRsPcNrSB</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Core Features Grid -->
+      <div class="features-grid-section">
+        <div class="features-grid-header">
+          <span>✨ 核心能力矩阵 · 全面释放 AI 生产力潜能</span>
+          <span class="tag">六维一体原生增强</span>
+        </div>
+        <div class="features-grid">
+          <div class="feat-box">
+            <div class="f-icon-title">🌏 全场景原生汉化</div>
+            <p>9300+ 词条覆盖，设置、弹窗与面板母语化，原生 AST 注入零侵入。</p>
+          </div>
+          <div class="feat-box">
+            <div class="f-icon-title">⏱️ 时空刻度导航轴</div>
+            <p>3倍加长视野，本地日志穿透秒级索引，平滑定位与历史快照卡片。</p>
+          </div>
+          <div class="feat-box">
+            <div class="f-icon-title">👥 多账号与实时额度</div>
+            <p>底栏秒切免重启，实时调用配额同步，本地 DPAPI 加密凭据隔离。</p>
+          </div>
+          <div class="feat-box">
+            <div class="f-icon-title">🧠 思考能力动态调控</div>
+            <p>Gemini 4 挡无级调控，Claude 内置思考自适应，GPT 固定推理锁定。</p>
+          </div>
+          <div class="feat-box">
+            <div class="f-icon-title">📊 五段式上下文遥测</div>
+            <p>Token 消耗动态占比，会话健康度监控，工业级防死循环自愈守卫。</p>
+          </div>
+          <div class="feat-box">
+            <div class="f-icon-title">🧩 35+ 技能与安装器</div>
+            <p>代码审查与架构重构技能开箱即用，双主题单文件 GUI 秒级备份还原。</p>
+          </div>
+        </div>
+
+        <!-- Telemetry Row -->
+        <div class="telemetry">
+          <div class="t-cell">
+            <h6>软件型号</h6>
+            <p style="color: #2563eb;">v0.1.5 Enhance Pro</p>
+          </div>
+          <div class="t-cell">
+            <h6>隐私安全机制</h6>
+            <p style="color: #059669;">100% 纯本地运行</p>
+          </div>
+          <div class="t-cell">
+            <h6>开源协作协议</h6>
+            <p style="color: #8b5cf6;">MIT License</p>
+          </div>
+          <div class="t-cell">
+            <h6>赞助与支持</h6>
+            <p style="color: #db2777;">爱发电 / 微信</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-inner">
+        <span>🌐 官网：<strong>antigravity-enhance-tools.github.io</strong></span>
+        <span class="sep">|</span>
+        <span>💻 GitHub 搜索项目名：<strong>Antigravity-Enhance-Pack-Tools</strong></span>
+        <span class="sep">|</span>
+        <span>💬 Discord：<strong>discord.gg/QRsPcNrSB</strong></span>
+        <span class="sep">|</span>
+        <span style="color: var(--theme);">✨ 专注于软件前端视觉展示与极致人机交互体验</span>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

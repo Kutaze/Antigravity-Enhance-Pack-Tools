@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <title>01_全景总览_3比4_浅色 - Antigravity Enhance Tools</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+
+    :root, [data-theme="light"] {
+      --bg: #f8fafc;
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --card-border: rgba(203, 213, 225, 0.9);
+      --mockup-bg: #ffffff;
+      --mockup-border: rgba(226, 232, 240, 0.95);
+      --text-main: #0f172a;
+      --text-sub: #475569;
+      --text-bold: #020617;
+      --chip-bg: rgba(0, 0, 0, 0.04);
+      --shadow: 0 14px 30px rgba(0, 0, 0, 0.08);
+      --footer-bg: rgba(255, 255, 255, 0.96);
+      --grid-line: rgba(0, 0, 0, 0.035);
+      --blob-opacity: 0.12;
+    }
+
+    body {
+      width: 1200px; height: 1600px; overflow: hidden; background-color: var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--text-main); position: relative;
+    }
+
+    .bg-lights { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 0; pointer-events: none; }
+    .light-blob { position: absolute; border-radius: 50%; filter: blur(140px); opacity: var(--blob-opacity); }
+    .blob-1 { width: 700px; height: 700px; background: radial-gradient(circle, #6366f1 0%, #4338ca 70%); top: -120px; left: 10%; }
+    .blob-2 { width: 650px; height: 650px; background: radial-gradient(circle, #06b6d4 0%, #2563eb 70%); top: 40%; right: -100px; }
+    .blob-3 { width: 600px; height: 600px; background: radial-gradient(circle, #ec4899 0%, #8b5cf6 70%); bottom: -100px; left: 15%; }
+
+    .grid-overlay {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background-image:
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+      background-size: 40px 40px; z-index: 1; pointer-events: none;
+    }
+
+    .poster-container {
+      position: relative; z-index: 2; width: 1200px; height: 1600px;
+      padding: 44px 50px 36px; display: flex; flex-direction: column;
+    }
+
+    /* Header */
+    .poster-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-bottom: 20px; border-bottom: 1.5px solid var(--card-border);
+    }
+    .brand-group { display: flex; align-items: center; gap: 16px; }
+    .brand-logo-img { width: 56px; height: 56px; object-fit: contain; filter: drop-shadow(0 4px 18px rgba(99, 102, 241, 0.6)); }
+    .brand-texts h2 { font-size: 28px; font-weight: 900; letter-spacing: -0.02em; color: var(--text-bold); line-height: 1.15; }
+    .brand-texts p { font-size: 14px; color: var(--text-sub); font-weight: 700; }
+    .badge-group { display: flex; align-items: center; gap: 12px; }
+    .version-pill {
+      background: rgba(99, 102, 241, 0.16); border: 1.5px solid rgba(99, 102, 241, 0.45);
+      color: #6366f1; font-size: 14px; font-weight: 800; padding: 6px 14px; border-radius: 999px;
+    }
+    .safety-pill {
+      background: rgba(16, 185, 129, 0.14); border: 1.5px solid rgba(16, 185, 129, 0.4);
+      color: #059669; font-size: 14px; font-weight: 800; padding: 6px 14px; border-radius: 999px;
+    }
+
+    /* Hero */
+    .hero-area { text-align: center; margin: 16px 0 24px; }
+    .catchy-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.22) 0%, rgba(219, 39, 119, 0.18) 100%);
+      border: 1.5px solid rgba(99, 102, 241, 0.45);
+      color: var(--text-bold); font-size: 15px; font-weight: 800; padding: 6px 24px; border-radius: 999px; margin-bottom: 14px;
+    }
+    .hero-main-title {
+      font-size: 52px; font-weight: 900; letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 12px; color: var(--text-bold);
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero-sub-text { font-size: 20px; color: var(--text-sub); font-weight: 600; }
+    .hero-sub-text strong { color: var(--text-bold); font-weight: 800; }
+
+    /* 4 Vertical Cards */
+    .cards-stack {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 18px;
+      flex: 1;
+      margin-bottom: 22px;
+    }
+    .poster-card {
+      height: 232px;
+      box-sizing: border-box;
+      background: var(--card-bg); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      border: 1.5px solid var(--card-border); border-radius: 20px; padding: 22px 28px;
+      display: grid; grid-template-columns: 1.08fr 1.18fr; gap: 24px; align-items: center;
+      position: relative; overflow: hidden; box-shadow: var(--shadow);
+    }
+    .poster-card::before { content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 6px; }
+    .border-cyan::before { background: linear-gradient(180deg, #06b6d4, #3b82f6); }
+    .border-purple::before { background: linear-gradient(180deg, #8b5cf6, #ec4899); }
+    .border-emerald::before { background: linear-gradient(180deg, #10b981, #059669); }
+    .border-amber::before { background: linear-gradient(180deg, #f59e0b, #ef4444); }
+
+    .card-info { display: flex; flex-direction: column; justify-content: center; }
+    .card-info h3 {
+      font-size: 21px; font-weight: 900; color: var(--text-bold);
+      display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
+    }
+    .card-info p { font-size: 14.5px; color: var(--text-sub); line-height: 1.5; margin-bottom: 12px; font-weight: 500; }
+    .badge-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .micro-pill { font-size: 12.5px; font-weight: 800; padding: 4px 11px; border-radius: 6px; }
+    .pill-cyan { background: rgba(6, 182, 212, 0.15); color: #0284c7; border: 1px solid rgba(6, 182, 212, 0.35); }
+    .pill-purple { background: rgba(139, 92, 246, 0.15); color: #7c3aed; border: 1px solid rgba(139, 92, 246, 0.35); }
+    .pill-emerald { background: rgba(16, 185, 129, 0.15); color: #059669; border: 1px solid rgba(16, 185, 129, 0.35); }
+    .pill-amber { background: rgba(245, 158, 11, 0.15); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.35); }
+
+    /* Preview boxes */
+    .card-preview-box {
+      background: var(--mockup-bg); border: 1.5px solid var(--mockup-border);
+      border-radius: 16px; overflow: hidden; box-shadow: var(--shadow);
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 12px 16px; height: 100%; box-sizing: border-box;
+    }
+    .real-thumb-img { width: 100%; height: auto; display: block; border-radius: 12px; }
+
+    /* Account mockup items */
+    .acc-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 12px; border-radius: 9px; margin-bottom: 6px;
+      background: var(--chip-bg); border: 1px solid var(--mockup-border);
+    }
+    .acc-item:last-child { margin-bottom: 0; }
+    .acc-item.active { background: rgba(99, 102, 241, 0.12); border-color: rgba(99, 102, 241, 0.4); }
+    .acc-name { display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 800; color: var(--text-bold); }
+    .acc-avatar-sm {
+      width: 24px; height: 24px; border-radius: 50%; background: #6366f1; color: #fff;
+      display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800;
+    }
+    .quota-badge { font-size: 12px; font-weight: 800; padding: 3px 9px; border-radius: 6px; }
+    .quota-green { background: rgba(16, 185, 129, 0.2); color: #059669; }
+
+    /* Model switcher mockup */
+    .model-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 12px; border-radius: 9px; font-size: 13.5px; font-weight: 700; margin-bottom: 6px;
+      background: var(--chip-bg); color: var(--text-sub); border: 1px solid var(--mockup-border);
+    }
+    .model-item:last-child { margin-bottom: 0; }
+    .model-item.active { background: rgba(139, 92, 246, 0.15); border-color: rgba(139, 92, 246, 0.45); color: var(--text-bold); }
+
+    /* Localization rows */
+    .loc-item {
+      display: flex; align-items: center; justify-content: space-between; font-size: 13.5px; padding: 7px 12px;
+      border-bottom: 1px solid var(--mockup-border);
+    }
+    .loc-item:last-child { border-bottom: none; }
+    .loc-k { color: var(--text-sub); font-weight: 600; }
+    .loc-v { color: var(--text-bold); font-weight: 800; }
+
+    /* Skills capsules */
+    .skills-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+    .skill-cap {
+      background: var(--chip-bg); border: 1px solid var(--mockup-border); padding: 7px 11px; border-radius: 9px;
+      font-size: 12.5px; font-weight: 700; color: var(--text-bold); display: flex; align-items: center; gap: 6px;
+    }
+    .gui-mini {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.14) 0%, rgba(6, 182, 212, 0.10) 100%);
+      border: 1px solid rgba(16, 185, 129, 0.35); padding: 7px 12px; border-radius: 9px;
+      display: flex; align-items: center; justify-content: space-between; font-size: 12.5px; color: #059669; font-weight: 800;
+    }
+
+    /* Footer */
+    .poster-footer {
+      background: var(--footer-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1.5px solid var(--card-border); border-radius: 20px; padding: 20px 28px;
+      display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow);
+      margin-top: auto; flex-shrink: 0;
+    }
+    .footer-left { display: flex; align-items: center; gap: 14px; }
+    .author-circle-img { width: 48px; height: 48px; border-radius: 50%; border: 2.5px solid #6366f1; object-fit: cover; }
+    .footer-meta h4 { font-size: 16px; font-weight: 900; color: var(--text-bold); margin-bottom: 3px; }
+    .footer-meta p { font-size: 13px; color: var(--text-sub); font-weight: 600; }
+    .footer-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+    .search-guide-box {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.18) 0%, rgba(6, 182, 212, 0.14) 100%);
+      border: 1.5px solid rgba(99, 102, 241, 0.4); padding: 7px 16px; border-radius: 10px;
+      font-size: 13.5px; font-weight: 800; color: var(--text-bold);
+    }
+    .site-guide-link { font-size: 13px; color: #6366f1; font-weight: 700; }
+    .page-num {
+      position: absolute; top: 18px; right: 24px; font-size: 13px; font-weight: 800;
+      color: var(--text-sub); opacity: 0.6;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-lights">
+    <div class="light-blob blob-1"></div>
+    <div class="light-blob blob-2"></div>
+    <div class="light-blob blob-3"></div>
+  </div>
+  <div class="grid-overlay"></div>
+
+  <div class="poster-container">
+    <div class="page-num">01 / 10</div>
+
+    <header class="poster-header">
+      <div class="brand-group">
+        <img src="../../../docs/assets/logo_glyph_transparent.png" alt="Logo" class="brand-logo-img">
+        <div class="brand-texts">
+          <h2>Antigravity Enhance Tools</h2>
+          <p>官方桌面端原生体验增强套件 · 全景总览</p>
+        </div>
+      </div>
+      <div class="badge-group">
+        <span class="version-pill">v0.1.5 PRO</span>
+        <span class="safety-pill">🛡️ 纯本地免安装</span>
+      </div>
+    </header>
+
+    <section class="hero-area">
+      <div class="catchy-tag">✨ 2026 全面重构 · 多账号原生切换与额度实时大盘</div>
+      <h1 class="hero-main-title">
+        释放 Google Antigravity 的<br>
+        <span class="gradient-text">终极全能生产力体验</span>
+      </h1>
+      <p class="hero-sub-text">
+        <strong>多账号实时配额</strong> · <strong>界面 UI 极致美化</strong> · <strong>便捷模型秒切</strong> · <strong>100% 原生母语汉化</strong>
+      </p>
+    </section>
+
+    <main class="cards-stack">
+
+      <!-- Card 1: 多账号 -->
+      <div class="poster-card border-cyan">
+        <div class="card-info">
+          <h3>👥 多账号动态切换 · 实时额度</h3>
+          <p>集成多账号管理池，毫秒级快速切换，实时展示剩余配额与重置倒计时，彻底告别额度焦虑。</p>
+          <div class="badge-row">
+            <span class="micro-pill pill-cyan">底栏一键切换</span>
+            <span class="micro-pill pill-cyan">实时额度同步</span>
+            <span class="micro-pill pill-cyan">实机实测</span>
+          </div>
+        </div>
+        <div class="card-preview-box" style="padding: 12px 14px;">
+          <div class="acc-item active">
+            <div class="acc-name"><span class="acc-avatar-sm">L</span><span>主力开发 (Lynan)</span></div>
+            <span class="quota-badge quota-green">剩余 85%</span>
+          </div>
+          <div class="acc-item">
+            <div class="acc-name"><span class="acc-avatar-sm" style="background:#3b82f6;">T</span><span>团队商业 (Team)</span></div>
+            <span class="quota-badge" style="background:rgba(59,130,246,0.2);color:#2563eb;">剩余 62%</span>
+          </div>
+          <div class="acc-item">
+            <div class="acc-name"><span class="acc-avatar-sm" style="background:#8b5cf6;">B</span><span>备用池 (Dev-Pool)</span></div>
+            <span class="quota-badge" style="background:rgba(168,85,247,0.2);color:#7c3aed;">剩余 98%</span>
+          </div>
+          <div class="acc-item">
+            <div class="acc-name"><span class="acc-avatar-sm" style="background:#059669;">E</span><span>体验账号 (Guest-Vip)</span></div>
+            <span class="quota-badge quota-green">剩余 100%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: UI 美化 & 模型切换 -->
+      <div class="poster-card border-purple">
+        <div class="card-info">
+          <h3>🎨 界面 UI 深度美化 · 悬浮模型秒切</h3>
+          <p>毛玻璃质感、科学留白与护眼字阶排版，快捷模型切换呼之即出，双手不离思路，交互丝滑极致。</p>
+          <div class="badge-row">
+            <span class="micro-pill pill-purple">悬浮面板秒切</span>
+            <span class="micro-pill pill-purple">毛玻璃视觉重构</span>
+            <span class="micro-pill pill-purple">顺手度拉满</span>
+          </div>
+        </div>
+        <div class="card-preview-box" style="padding: 12px 14px;">
+          <div class="model-item active">
+            <span>Claude 3.5 Sonnet (主力推理)</span>
+            <span style="color: #7c3aed;">✓</span>
+          </div>
+          <div class="model-item">
+            <span>Gemini 1.5 Pro (超长上下文)</span>
+            <span style="font-size: 11.5px; opacity: 0.6;">Ctrl+2</span>
+          </div>
+          <div class="model-item">
+            <span>DeepSeek R1 (深度思考)</span>
+            <span style="font-size: 11.5px; opacity: 0.6;">Ctrl+3</span>
+          </div>
+          <div class="model-item">
+            <span>GPT-4o (全能通用模型)</span>
+            <span style="font-size: 11.5px; opacity: 0.6;">Ctrl+4</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3: 全场景汉化 -->
+      <div class="poster-card border-emerald">
+        <div class="card-info">
+          <h3>🌏 100% 全场景原生深度汉化</h3>
+          <p>深度语义校对与词条润色，菜单、偏好设置、报错弹窗全面母语化，搭载工业级防卡死与防崩溃守卫。</p>
+          <div class="badge-row">
+            <span class="micro-pill pill-emerald">3000+ 词条覆盖</span>
+            <span class="micro-pill pill-emerald">零死循环防抖</span>
+            <span class="micro-pill pill-emerald">快捷键保留</span>
+          </div>
+        </div>
+        <div class="card-preview-box" style="padding: 10px 14px;">
+          <div class="loc-item"><span class="loc-k">界面母语化</span><span class="loc-v">简体中文 (原生校对)</span></div>
+          <div class="loc-item"><span class="loc-k">防卡死守卫</span><span class="loc-v" style="color: #059669;">活跃保护中 (零白屏)</span></div>
+          <div class="loc-item"><span class="loc-k">隐私机制</span><span class="loc-v">100% 本地运行零上传</span></div>
+          <div class="loc-item"><span class="loc-k">底层支持</span><span class="loc-v" style="color: #0284c7;">热补丁秒级载入</span></div>
+        </div>
+      </div>
+
+      <!-- Card 4: 技能中心 & 安装器 -->
+      <div class="poster-card border-amber">
+        <div class="card-info">
+          <h3>🧩 35+ 可视化技能中心 & 绿色安装器</h3>
+          <p>预置覆盖代码审查、TDD、设计系统的 35+ 高阶技能，单文件双主题一键无损安装与还原。</p>
+          <div class="badge-row">
+            <span class="micro-pill pill-amber">GitHub 技能一键装</span>
+            <span class="micro-pill pill-amber">35个技能开箱用</span>
+            <span class="micro-pill pill-amber">实机实测</span>
+          </div>
+        </div>
+        <div class="card-preview-box" style="padding: 12px 14px;">
+          <div class="skills-grid">
+            <div class="skill-cap">🔍 三轴代码审查</div>
+            <div class="skill-cap">🧪 TDD测试先行</div>
+            <div class="skill-cap">🎨 设计系统规范</div>
+            <div class="skill-cap">⚡ 深度架构重构</div>
+          </div>
+          <div class="gui-mini">
+            <span>🛠️ 深浅双主题 GUI</span>
+            <span>一键注入/还原</span>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <footer class="poster-footer">
+      <div class="footer-left">
+        <img src="../../../docs/assets/author_avatar.png" alt="Kutaze" class="author-circle-img">
+        <div class="footer-meta">
+          <h4>Crafted by Kutaze</h4>
+          <p>专注于软件前端视觉展示与极致人机交互体验</p>
+        </div>
+      </div>
+      <div class="footer-right">
+        <div class="search-guide-box">👉 GitHub 搜索开源项目名：Antigravity-Enhance-Pack-Tools</div>
+        <div class="site-guide-link">🌐 官方发布网站：antigravity-enhance-tools.github.io</div>
+      </div>
+    </footer>
+
+  </div>
+
+</body>
+</html>
+

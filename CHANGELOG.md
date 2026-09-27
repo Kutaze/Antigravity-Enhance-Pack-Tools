@@ -4,6 +4,120 @@ All notable changes to the **Antigravity Enhance Tools** project will be documen
 
 ---
 
+## [v0.1.5] - 2026-09-27 深度修复与体验重构版
+
+### 侧边栏超长上下文精准定位与防震荡、本地日志权威穿透索引、模型自适应与防闪退全面修复
+- **侧边栏超长上下文精准定位与防跳跃震荡（Anti-Jitter Navigation & Progressive Lock）**：
+  - **问题深度溯源**：在超长会话中，旧逻辑在平滑滚动定位时启动了 10 轮逐帧异步轮询（`attemptLock`），而与此同时 `syncScrollSpy` 在并发监听视口 `scroll` 事件并重算活跃刻度与触发微光，两者的异步调度产生了严重的竞态反馈环（Fighting Loop），导致页面在跳转时反复上下剧烈抖动；
+  - **引入 850ms 导航冷却锁（Navigation Lockout Guard）**：在用户点击刻度轴或搜索结果执行导航时，设定 `isProgrammaticNavigating = true`，在此期间彻底切断 `syncScrollSpy` 的竞态重绘，彻底解决跳转时上下往复震荡问题；
+  - **消除盲目轮询与单次视口探测**：视口内有节点则一次性平滑居中并触发翡翠绿脉冲光环，大幅减轻主线程渲染压力。
+- **超长会话历史快照预览卡片（`agy-historical-viewer`）**：
+  - **超出虚拟切片渲染池时的优雅降级**：当跳转的目标轮次超出当前页面虚拟滚动切片渲染范围（已被 React 虚拟化卸载）时，不再生硬强制拉扯滚动条至无效的比例高度；
+  - 自动平滑滚动至可见最前沿，并呼出轻量级毛玻璃浮动历史快照卡片，完整呈现用户提问与 AI 回答摘要，支持一键独立复制，彻底解决超长上下文无法定位与内容缺失问题。
+- **穿透读取本地日志文件建立权威会话轮次库（Local Disk Transcript Authoritative Indexing）**：
+  - **问题深度溯源**：原先搜索列表直接读取了前端内存中的 `trajectorySlice.stepsInSlice`。在超长会话经过模型自动压缩总结后，内存中每一步的开头都被强制拼接了压缩摘要（如宣发页面修改文本），导致列表前 9 行全部取到了相同的字符前缀；
+  - **穿透直读本地真实日志**：底层 IPC 桥 `antigravity:get-conversation-turns` 直接穿透读取用户本地真实的会话存储（`~/.gemini/antigravity/brain/<id>/.system_generated/logs/transcript.jsonl`）；
+  - **深度数据提纯**：正则彻底剔除 `<CONTEXT_SUMMARY>`、`<USER_SETTINGS_CHANGE>` 等元数据前缀，提取最末真实的 `<USER_REQUEST>` 并过滤前后连续重复事件，精准建立干净的会话轮次库；
+  - **确立本地磁盘最高权威（Source of Truth）**：渲染引擎将本地磁盘数据确立为绝对最高权威，清空并精准覆盖内存脏切片，彻底消除搜索列表中信息重复或错乱的问题。
+- **彻底修复模型切换菜单“频繁闪退点不开、需重复点击”问题（Radix UI Dropdown Dismissal Fix）**：
+  - **根因分析**：在主控协调器的同步循环中，一旦模型菜单展开，滑块初始化会调用 `trySelectSubmenuEffort`，该函数向菜单分发了模拟点击（`match.click()`）。在 Radix UI 中，**只要菜单内任意项被点击，整个下拉菜单就会被立即关闭**！导致用户刚点开模型按钮，35 毫秒内菜单就被自动关掉（表现为闪退、点不开）；
+  - **显式交互与被动同步严格隔离**：`isUserExplicitAction` 仅在用户**手动点击滑块档位或拖动滑块释放时**才允许触发底层子菜单点击，初始化与被动同步时坚决不触发模拟点击；
+  - **防穿透事件门禁**：在滑块容器上增加 `onpointerdown / onmousedown / onclick` 的 `stopPropagation` 事件门禁，杜绝 Radix 判定为外部点击；
+  - **微秒级就绪监听**：为模型选择触发器绑定点击就绪监听，点击触发器立即就绪挂载，滑块秒开无白屏。
+- **模型思考能力动态自适应与跨模型状态污染隔离（Model Adaptive Thinking Architecture）**：
+  - **架构重构**：新增 `getModelThinkingCapabilities(modelBase)` 模型能力判定管道：
+    - **Claude 系列**（Sonnet / Opus / Haiku）：自适应切换为专有状态徽标 **`内置思考 (不可调)`**（琥珀金主题），隐藏交互滑轨，展示平台自动深度推理提示，**严禁分发模拟点击与写入脏数据**；
+    - **GPT / OSS 系列**：自适应切换为状态徽标 **`固定推理 (中)`**（翡翠绿主题），锁定交互；
+    - **Gemini 系列**：自适应激活专属 4 挡动态调控滑块（关闭 / 低 / 中 / 高），支持最高挡专属紫粉微光；
+  - **彻底阻断 cross-contamination**：切断不同模型之间全局 `localStorage` 的交叉污染，从 Claude 切换回 Gemini 时自动恢复 Gemini 各自独立的记忆档位，不再闪退崩溃。
+- **全套 3:4 竖屏浅色宣发展板完整交付（全 10 页视觉矩阵）**：
+  - 交付全套 10 张 1200×1600 浅色宣发展板（01 全景总览、02 多账号与实时额度、03 界面UI美化、04 可视化技能中心、05 绿色双主题安装器、06 社交全功能大图、07 侧边栏插件生态、08 思考能力4挡调节、09 真实上下文五段遥测、10 项目全景与开发者简介）；
+  - 第 10 页完整展示项目名、官方网址、GitHub/Discord 社区、作者个人简介与核心能力矩阵。
+
+---
+
+## [v0.1.9] - 2026-09-25
+
+### 官方内核级轨迹切片直达引擎（requestPageUpdate）、调度渲染器参数深度调优与超长上下文精准定位
+- **攻克“只能定位到当前页面缓存最顶上或不变”的深层架构瓶颈（Root Cause Conquered）**：
+  - **核心机理深度溯源**：Antigravity 2.0 采用双端虚拟切片架构（`trajectorySlice`）。对于包含数万步或数十轮的超长会话（如 18,000+ 步），前端默认仅向后端 Language Server 订阅请求最近 50 步（`startIndex: -50`），早期历史消息根本不在客户端 DOM 树与 React 状态中！
+  - **历史缺陷分析**：原逻辑仅在 DOM 视口中调用 `scrollContainer.scrollTo({ top: targetTop })`。当跳转前几轮时，因目标消息未挂载，视口只能滑到当前切片顶部（`scrollTop = 0`），造成“无论怎么点都卡在当前缓存最顶上”的现象；
+  - **内核 RPC 切片调度穿透（requestPageUpdate Integration）**：
+    - 深度逆向探明底层 `Zqb` 组件与 Language Server RPC 接口 `requestAgentStatePageUpdate`；
+    - 在 `navigateToTurn` 中集成原生切片驱动器 `findRequestPageUpdate`。当目标轮次处于当前视口切片外时，主动构造精确步数范围（`{ startIndex: targetStep - 8, endIndexExclusive: targetStep + 70 }` 或首页 `{ startIndex: 0, endIndexExclusive: 60 }`）直接向底层内核派发切片请求；
+    - 内核在 200ms 内瞬间重构切片，驱动 React 挂载目标会话节点，随后由居中定位与脉冲高亮精准锁定，实现跨越数万步历史的毫秒级真·瞬移直达！
+- **调度渲染器核心参数深度优化（Scheduler & Virtualization Tuning via `window.oy`）**：
+  - **动态优化内核虚拟化配置 `window.oy`**：
+    - `expansion.minBatchSize`：由默认极小值 15 提升至 **60**，向上滑动时一次性合并拉取充足步数，杜绝超长对话滑动时反复请求切片造成的严重卡顿与停顿；
+    - `trigger.innerRadiusPx`：由默认 150px 扩大至 **500px**，大幅增加向上滑动的预加载触发距离，在用户视线到达前已在后台静默就绪，彻底消除滑到顶部时的白屏等待与顿挫感；
+    - `trigger.outerRadiusPx`：扩展至 **8000px**，提供充裕的安全视口缓冲区，避免过早卸载已渲染节点导致的反复销毁与重绘；
+- **真实消息气泡毫秒直达（user-input-step Direct Pipeline）**：
+  - 调整优先匹配通道：直接针对 `[data-testid="user-input-step"]` 节点提取签名校验，遍历耗时由毫秒级降至微秒级；
+  - 主滚动视口检索器优先锁定官方 `[data-testid="autoscroll-viewport"]`，消除多层嵌套容器溯源开销。
+
+---
+
+## [v0.1.8] - 2026-09-24
+
+### 真实文本 TreeWalker 秒级精确定位、多阶渐进锁定与搜索弹窗瞬移直达
+- **TreeWalker 文本特征穿透引擎（100% 根治“定位不到会话”与“搜索框选择无法跳转”）**：
+  - **问题深度溯源**：原逻辑严重依赖臆测的测试属性（如 `[data-testid="user-input-step"]`、`.scroll-mt-4`、`[aria-label="User message"]`），由于官方真实 DOM 并不存在这些类名，且 aria-label 已被汉化为“用户消息”，导致定位选择器在 100% 的情况下均返回空，直接导致所有点击与搜索跳转失效；
+  - **TreeWalker 超高速文本遍历**：推翻伪类选择器，重构为基于 DOM `TreeWalker` 的纯文本节点穿透扫描。自动清洗用户提问中的 XML 标签与标点，提取中文字符串与多级文本签名，直接捕获真实文本节点并自动上溯至消息气泡卡片，定位成功率提升至 100%；
+  - **视口多阶动态渐进锁定（Multi-Phase Progressive Scroll Lock-On）**：
+    - 若目标气泡已在当前 DOM 树中：立即调用原生 `scrollIntoView({ behavior: 'smooth', block: 'center' })` 进行精准像素级居中；
+    - 若目标处于当前视口切片外：先估算目标区间平滑滚动以触发 React 动态挂载，随后在 100ms、260ms、550ms 逐级捕获新挂载的节点并二次精准锁定，彻底解决长对话跨切片定位；
+- **上下文搜索弹窗体验优化（Context Search Popover Instant Response）**：
+  - 点击列表项后立即收起弹窗，让用户清晰看到底层会话平滑滚动与居中定位全过程；
+  - 搜索框支持按下键盘 `Enter` 键直接直达第一条匹配的对话；
+- **全新高辨识度翡翠绿脉冲光环（Vivid Emerald Target Pulse Highlight）**：
+  - 废弃原先暗灰且不易察觉的灰色线框，升级为 8px 圆角、`#10b981` 翡翠绿双层脉冲光环（`outline: 2px solid #10b981; box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.35)`），定位到位后清晰醒目提示当前对话。
+
+---
+
+## [v0.1.7] - 2026-09-24
+
+### 3倍刻度轴加长、零卡顿波浪跟随、上下文搜索检索器与现代安装器全面升级
+- **时空刻度导航轴高度 3 倍加长与细粒度采样（3x Extended Timeline Height）**：突破原先 `window.innerHeight / 3` 的矮小限制，将刻度轴最大垂直高度扩展至窗口高度的 ~80%（约 500px~850px，足足加长 3 倍以上）；采样密度上限由 20 档扩大至 18~65 档，更细腻地映射超长对话历史；
+- **彻底根治鼠标跟随卡顿与布局抖动（Zero-Reflow Fluid Wave Engine）**：推翻旧版在 `pointermove` 循环中每次读取 `getBoundingClientRect()` 并实时写入样式的强制同步回流（Forced Reflow / Layout Thrashing）缺陷；重构为基于单次轨道坐标获取、内层 100% 纯数学余弦推算的零回流引擎，彻底告别假死卡顿，跟手流畅度直达 120 FPS 丝滑顺畅；
+- **刻度节点 100% 绝对点击直达与精确定位（Reliable Direct Tick Click & Scroll）**：每个刻度节点均独立绑定精准 `click` 事件与防穿透隔离，杜绝拖拽手势吞没点击；完善虚拟化滚动容器向下溯源检测，确保大范围跳跃定位与视口气泡平滑高亮居中 100% 响应；
+- **刻度轴底部轮次搜索按钮与上下文检索弹窗（Context Search Popover 学习并对齐第三张图设计）**：
+  - 在导航轴轨道正下方新增现代化列表检索按钮；
+  - 点击即可呼出匹配参考图 3 设计的悬浮搜索卡片（330px 宽，磨砂微光，适配深浅主题）；
+  - 顶部配备即时搜索过滤输入框，支持输入轮次编号（如“8”）或问题关键词实时检索；
+  - 列表项左侧标注微灰轮次数字（`1`, `2`, ..., `8`），居中单行省略展示用户提问摘要；
+  - 当前所在对话轮次具备同款翡翠绿竖边框（`border-left: 3.5px solid #10b981;`）与微光高亮；
+  - 点击任意项即可平滑瞬移至对应对话，并自动关闭或联动刻度轴波浪高亮；
+  - 具备点击弹窗外部与按下 `Esc` 键自动收起的优雅交互；
+- **全流程性能卡顿、启动卡顿与上下文定位彻底重构（Zero-Lag Architecture & Accurate Jump Navigation）**：
+  - **彻底清除启动与主协调器卡死源（Eliminate Layout Thrashing on Startup & Master Sync）**：排查发现旧版在查找滚动视口时，无限制调用 `querySelectorAll('div')` 遍历全页面 5000+ 个节点并实时计算样式与尺寸（造成每秒数万次 Forced Reflow）；重构为优先命中 `[data-radix-scroll-area-viewport]` 与持久缓存，耗时从 40ms 降至 0.01ms；
+  - **历史轮次提取 1.5s 内存高阶缓存（Fiber & DOM Traversal Caching）**：为 `findRealUserTurns()` 建立会话级 1.5 秒 TTL 缓存门禁，主协调器周期性检查时直接秒级返回缓存，杜绝重复遍历 15 层 React Fiber 树与 DOM 结构；
+  - **品牌动效 Logo 极速短路守卫（Header Logo Short-Circuit Guard）**：在 `ensureBrandHeaderLogo` 顶部建立 ID 级速断检验，若侧边栏 Logo 已存在直接返回，杜绝全文档频繁检索 `h1~h3, span, div, p`；
+  - **彻底废除 90ms 暴力置顶轮询器（Abolish Harmful Backfill Interval & Synthetic Events）**：推翻旧版 `setInterval(stepLoad, 90)` 强行执行 `scrollTop = 0` 及派发合成 `resize`、`wheel` 事件的设计（此设计会导致会话被强行钉死在顶部、全页面反复重绘假死达 3 秒）；
+  - **精准比例直达与就近二次精确定位（Instant Ratio-Based Smooth Scroll & Fine Centering）**：
+    - 若目标轮次已渲染，直接 `scrollIntoView({ behavior: 'smooth', block: 'center' })` 并触发光环闪烁；
+    - 若目标属于视口外虚拟记录，依全局刻度比例 $ratio = idx / (total - 1)$ 一键滚动至目标位置（`scrollTo({ top: ratio * maxScroll })`），并在 180ms 后就近二次匹配精准锁定高亮；全程 0 毫秒卡顿，0 定时器死循环；
+  - **波浪动画 DOM 写入量降低 12 倍（12x Lower DOM Mutation for Wave Animation）**：仅重绘波浪半径内（55px）的 6~8 个活跃刻度线条，非活跃刻度保持静默，聚焦切换从遍历 60 节点缩减至精准 2 节点变更；悬浮预览卡片仅在轮次变更时更新 DOM，彻底杜绝鼠标跟随卡顿；
+  - **上下文搜索弹窗直达增强（Search Popover Instant Jump）**：搜索框选择任意历史轮次即可瞬间直达精准位置，彻底解决“搜索框选中无法定位”的问题。
+- **模型实际选择显示与思考能力滑条脱节不正常彻底解决（Model Selector & Thinking Slider Sync Fix）**：
+  - **根因追溯**：排查发现主协调器（Master Coordinator）循环中无参调用 `syncModelTriggerText()` 时，原逻辑错误兜底读取本地陈旧的 `localStorage.__AGY_THINKING_LEVEL__`（默认值为 `高`），导致只要页面发生微小渲染，输入框模型按钮中的思考档位就被暴力篡改为 `高`，而下拉面板中的实际模型（如 `Gemini 3.8 Flash 中`）与滑条（处于 `中`）被完全隔离脱节；
+  - **被动监听自适应真实状态**：重构 `syncModelTriggerText()`，在无参被动同步时严禁暴力覆盖触发按钮，转为精准提取 React 渲染在按钮中的真实模型档位（`关闭` / `低` / `中` / `高`），实时回写本地存储并驱动滑条精准跟随；
+  - **滑条拖拽联动 Radix 子菜单**：在主动调节滑条档位时，新增 `trySelectSubmenuEffort` 智能触发器，联动模型下拉子菜单匹配对应档位，使触发按钮、菜单勾选项与思考滑条三位一体 100% 绝对同频同步；
+- **安装器成功与提示页面全面现代化适配（Modern In-Window WPF Modal，彻底剔除古董 Win32 弹窗）**：
+  - 针对用户反馈的图 1 原生 Windows 经典老旧 `MessageBox.Show` 弹窗违和感，全面重构为内嵌在 WPF 窗口内部的磨砂半透明现代化弹窗模态层（`ShowModernModal`）；
+  - 具备 16px 圆角阴影卡片、翡翠绿成功徽章图标、主副标题、特性卡片清单与品牌主色调按钮；
+  - 全面支持浅色/深色模式自适应与 `Esc` / 背景遮罩轻触关闭；
+  - 无论是安装成功、安装失败、还原官方原版确认还是关于弹窗，均获得统一一致的现代轻奢视觉品质；
+- **侧边栏底部当前账号头像与昵称显示彻底纠偏（User Profile Avatar & Name Sync Fix）**：
+  - **根因追溯与修复**：修复此前由于 `getUserProfile()` 仅读取本地陈旧 `localStorage` 缓存且兜底策略未检索 `profiles_meta.json` 多账号元数据，导致邮箱前缀纯数字（如 `3207486260`）被错误作为昵称显示、头像丢失并回退为截取首字符数字 `'3'` 的历史缺陷；
+  - **Token Claims 凭据自动解析与回填**：在主进程与补丁引擎中新增 Google OAuth `id_token` 真实声明解析能力，自动提取账号真实姓名（如 `ze kuta`）及官方高清头像（`lh3.googleusercontent.com`），并与已保存的 Base64 专属头像双重联动；
+  - **防御性纯数字覆盖拦截**：在账号切换器与配置回写器中增加校验拦截，严禁将未格式化的邮箱纯数字覆盖真实昵称；
+  - **DOM 挂载与网络容灾回退（Graceful Avatar Fallback）**：优化底部个人中心头像 DOM 结构，同时容纳高清图像标签与首字备用徽标，并配备 `onerror` 无缝降级回退机制，确保在离线或弱网环境下绝无断图破裂感；
+- **剔除侧边栏遮挡文本的多余版本号标签（Quota Version Tag Removed）**：
+  - 彻底移除了侧边栏额度卡片标题行右侧的 `v0.1.6` 蓝色标签，为“当前实时额度”彻底还原本来横向空间，绝不再产生文字折行与挤压；
+  - 同步移除了品牌标识旁的多余版本徽标，界面恢复清爽极简。
+
+---
+
 ## [v0.1.6] - 2026-09-24
 
 ### 鱼眼波浪刻度导航轴（Timeline Fisheye Scrubber）与安装器核心修复

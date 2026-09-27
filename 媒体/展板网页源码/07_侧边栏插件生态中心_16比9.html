@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <title>07_侧边栏插件生态中心 - Antigravity Enhance Tools</title>
+  <style>
+    * {
+      margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased;
+    }
+
+    :root, [data-theme="dark"] {
+      --bg: #090915;
+      --card-bg: rgba(18, 18, 38, 0.85);
+      --card-border: rgba(139, 92, 246, 0.22);
+      --mockup-bg: rgba(13, 13, 28, 0.95);
+      --mockup-border: rgba(139, 92, 246, 0.25);
+      --text-main: #f8fafc;
+      --text-sub: #a5b4fc;
+      --text-bold: #ffffff;
+      --chip-bg: rgba(255, 255, 255, 0.05);
+      --shadow: 0 20px 45px rgba(0, 0, 0, 0.6);
+      --footer-bg: rgba(18, 18, 38, 0.88);
+      --grid-line: rgba(139, 92, 246, 0.04);
+      --blob-opacity: 0.38;
+      --accent: #8b5cf6;
+      --accent-glow: rgba(139, 92, 246, 0.4);
+    }
+
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --card-border: rgba(203, 213, 225, 0.9);
+      --mockup-bg: #ffffff;
+      --mockup-border: rgba(226, 232, 240, 0.95);
+      --text-main: #0f172a;
+      --text-sub: #475569;
+      --text-bold: #020617;
+      --chip-bg: rgba(0, 0, 0, 0.04);
+      --shadow: 0 16px 36px rgba(0, 0, 0, 0.08);
+      --footer-bg: rgba(255, 255, 255, 0.95);
+      --grid-line: rgba(0, 0, 0, 0.035);
+      --blob-opacity: 0.12;
+      --accent: #7c3aed;
+      --accent-glow: rgba(124, 58, 237, 0.2);
+    }
+
+    body {
+      width: 1920px; height: 1080px; overflow: hidden; background-color: var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--text-main); position: relative;
+    }
+
+    .bg-lights {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 0; pointer-events: none;
+    }
+    .light-blob {
+      position: absolute; border-radius: 50%; filter: blur(140px); opacity: var(--blob-opacity);
+    }
+    .blob-1 { width: 750px; height: 750px; background: radial-gradient(circle, #8b5cf6 0%, #6d28d9 70%); top: -120px; right: 15%; }
+    .blob-2 { width: 650px; height: 650px; background: radial-gradient(circle, #ec4899 0%, #be185d 70%); bottom: -100px; left: 5%; }
+
+    .grid-overlay {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background-image: 
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+      background-size: 48px 48px; z-index: 1; pointer-events: none;
+    }
+
+    .board-container {
+      position: relative; z-index: 2; width: 1920px; height: 1080px;
+      padding: 38px 56px 30px; display: flex; flex-direction: column; justify-content: space-between;
+    }
+
+    /* Header */
+    .top-header {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .brand-left {
+      display: flex; align-items: center; gap: 16px;
+    }
+    .brand-logo-img {
+      width: 52px; height: 52px; object-fit: contain; filter: drop-shadow(0 4px 16px var(--accent-glow));
+    }
+    .brand-texts h2 {
+      font-size: 26px; font-weight: 900; color: var(--text-bold);
+    }
+    .brand-texts p {
+      font-size: 13.5px; color: var(--text-sub); font-weight: 600;
+    }
+    .top-badge {
+      background: rgba(139, 92, 246, 0.16); border: 1.5px solid rgba(139, 92, 246, 0.45);
+      color: #a855f7; font-size: 14px; font-weight: 800; padding: 6px 18px; border-radius: 999px;
+    }
+
+    /* Main Showcase 2-Columns */
+    .showcase-row {
+      display: grid; grid-template-columns: 0.95fr 1.35fr; gap: 42px; align-items: center; flex: 1; margin: 16px 0;
+    }
+
+    /* Left Info Column */
+    .info-col {
+      display: flex; flex-direction: column; gap: 18px;
+    }
+    .feature-tag-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(139, 92, 246, 0.15); border: 1.5px solid rgba(139, 92, 246, 0.4);
+      color: #8b5cf6; font-size: 15px; font-weight: 800; padding: 6px 18px; border-radius: 999px; align-self: flex-start;
+    }
+    .feature-title {
+      font-size: 46px; font-weight: 900; line-height: 1.15; color: var(--text-bold); letter-spacing: -0.02em;
+    }
+    .gradient-purple {
+      background: linear-gradient(135deg, #a855f7 0%, #ec4899 50%, #f43f5e 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .feature-desc {
+      font-size: 17.5px; color: var(--text-sub); line-height: 1.6; font-weight: 500;
+    }
+
+    .key-points-list {
+      display: flex; flex-direction: column; gap: 12px; margin-top: 4px;
+    }
+    .point-card {
+      background: var(--card-bg); border: 1.5px solid var(--card-border);
+      border-radius: 14px; padding: 14px 18px; display: flex; align-items: center; gap: 16px; box-shadow: var(--shadow);
+    }
+    .point-icon {
+      width: 44px; height: 44px; border-radius: 12px; background: rgba(139, 92, 246, 0.15);
+      border: 1px solid rgba(139, 92, 246, 0.35); color: #8b5cf6; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
+    }
+    .point-texts h4 {
+      font-size: 17px; font-weight: 800; color: var(--text-bold); margin-bottom: 3px;
+    }
+    .point-texts p {
+      font-size: 14px; color: var(--text-sub); line-height: 1.4;
+    }
+
+    /* Right Real Software Screenshot Frame */
+    .mockup-col {
+      background: var(--mockup-bg); border: 1.5px solid var(--mockup-border);
+      border-radius: 22px; padding: 20px 22px 16px; box-shadow: var(--shadow); position: relative;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .mockup-header-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-bottom: 12px; border-bottom: 1.5px solid var(--mockup-border);
+    }
+    .mockup-title {
+      font-size: 19px; font-weight: 900; color: var(--text-bold); display: flex; align-items: center; gap: 10px;
+    }
+    .mockup-sync-status {
+      display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: #10b981; font-weight: 800;
+      background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); padding: 4px 12px; border-radius: 999px;
+    }
+
+    .real-screenshot-container {
+      width: 100%; border-radius: 14px; overflow: hidden;
+      border: 1px solid var(--card-border); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+      background: #000;
+    }
+    .real-screenshot-container img {
+      width: 100%; height: auto; display: block;
+    }
+
+    /* Bottom Telemetry Bar */
+    .telemetry-row {
+      background: var(--chip-bg); border: 1px solid var(--mockup-border);
+      border-radius: 12px; padding: 12px 18px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; text-align: center;
+    }
+    .telem-cell h6 {
+      font-size: 12px; color: var(--text-sub); font-weight: 700; margin-bottom: 3px;
+    }
+    .telem-cell p {
+      font-size: 16px; font-weight: 900; color: var(--text-bold);
+    }
+
+    /* Footer */
+    .bottom-bar {
+      background: var(--footer-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1.5px solid var(--card-border); border-radius: 18px; padding: 16px 30px;
+      display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow);
+    }
+    .channels-left {
+      display: flex; align-items: center; gap: 32px; font-size: 15px; color: var(--text-sub); font-weight: 600;
+    }
+    .channels-left strong { color: var(--text-bold); font-weight: 800; }
+  </style>
+</head>
+<body>
+
+  <div class="bg-lights">
+    <div class="light-blob blob-1"></div>
+    <div class="light-blob blob-2"></div>
+  </div>
+
+  <div class="grid-overlay"></div>
+
+  <div class="board-container">
+
+    <header class="top-header">
+      <div class="brand-left">
+        <img src="../../docs/assets/logo_glyph_transparent.png" alt="Logo" class="brand-logo-img">
+        <div class="brand-texts">
+          <h2>Antigravity Enhance Tools</h2>
+          <p>侧边栏插件生态中心 · 客户端实机实测专项展示</p>
+        </div>
+      </div>
+      <div class="top-badge">
+        🧩 聚合丰富插件 · 一键赋能全能工作流
+      </div>
+    </header>
+
+    <main class="showcase-row">
+      
+      <!-- Left Column -->
+      <div class="info-col">
+        <span class="feature-tag-badge">🧩 扩展插件生态中心</span>
+        <h1 class="feature-title">
+          模块化自由扩充！<br>
+          <span class="gradient-purple">侧边栏扩展插件生态</span><br>
+          一键开关即时生效
+        </h1>
+        <p class="feature-desc">
+          打破单一客户端能力边界！内置 9 大开箱即用官方与社区增强插件，涵盖代码开发、提示词工程、截图联调、环境监控全维度，彻底告别繁琐的手动配置。
+        </p>
+
+        <div class="key-points-list">
+          <div class="point-card">
+            <div class="point-icon">⚡</div>
+            <div class="point-texts">
+              <h4>9 大实用插件即装即用</h4>
+              <p>集成多账号管理、技能面板增强、原生截图唤起、网络代理穿透等核心模块，按需自由开关。</p>
+            </div>
+          </div>
+          <div class="point-card">
+            <div class="point-icon">🔄</div>
+            <div class="point-texts">
+              <h4>Codex 本地生态无缝集成</h4>
+              <p>完美兼容 Codex 插件规范与配置项，本地环境秒级同步，跨生态无痛迁移。</p>
+            </div>
+          </div>
+          <div class="point-card">
+            <div class="point-icon">🌐</div>
+            <div class="point-texts">
+              <h4>支持 GitHub 链接一键安装</h4>
+              <p>开放扩展架构，直接粘贴社区仓库 URL 即可自动化拉取编译并载入新插件。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: REAL Software Screenshot -->
+      <div class="mockup-col">
+        <div class="mockup-header-bar">
+          <div class="mockup-title">
+            <span>🧩 客户端内真实界面：扩展插件生态中心</span>
+          </div>
+          <div class="mockup-sync-status">
+            <span>● 软件内真实截图</span>
+          </div>
+        </div>
+
+        <div class="real-screenshot-container">
+          <img src="../../docs/assets/verified_plugin_center_live.png" alt="侧边栏插件生态中心实测截图">
+        </div>
+
+        <div class="telemetry-row">
+          <div class="telem-cell">
+            <h6>内置实用扩展</h6>
+            <p style="color: #a855f7;">9 款即装即用</p>
+          </div>
+          <div class="telem-cell">
+            <h6>生态兼容规范</h6>
+            <p>Codex / 社区插件标准</p>
+          </div>
+          <div class="telem-cell">
+            <h6>快捷截图与操作</h6>
+            <p>Win+Shift+S 原生唤起</p>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+    <footer class="bottom-bar">
+      <div class="channels-left">
+        <span>🌐 官网：<strong>antigravity-enhance-tools.github.io</strong></span>
+        <span>💻 GitHub 搜索项目名：<strong>Antigravity-Enhance-Pack-Tools</strong></span>
+        <span>💬 Discord：<strong>discord.gg/QRsPcNrSB</strong></span>
+      </div>
+      <div style="font-size: 15px; font-weight: 800; color: #a855f7;">
+        ✨ 模块化可插拔架构，赋能顶级 AI 编程交互体验
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const theme = params.get('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', theme);
+  </script>
+</body>
+</html>

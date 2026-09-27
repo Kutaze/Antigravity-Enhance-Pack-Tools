@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <title>05_绿色双主题安装器_3比4_浅色</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+    :root, [data-theme="light"] {
+      --bg: #f8fafc; --card-bg: rgba(255, 255, 255, 0.95); --card-border: rgba(203, 213, 225, 0.9);
+      --mockup-bg: #ffffff; --mockup-border: rgba(226, 232, 240, 0.95);
+      --text-main: #0f172a; --text-sub: #475569; --text-bold: #020617;
+      --shadow: 0 14px 30px rgba(0, 0, 0, 0.08); --footer-bg: rgba(255, 255, 255, 0.96);
+      --grid-line: rgba(0, 0, 0, 0.035); --blob-opacity: 0.12;
+      --theme: #059669; --theme-light: rgba(5, 150, 105, 0.12); --theme-border: rgba(5, 150, 105, 0.3);
+    }
+    body { width: 1200px; height: 1600px; overflow: hidden; background: var(--bg); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; color: var(--text-main); position: relative; }
+    .bg-lights { position: absolute; inset: 0; overflow: hidden; z-index: 0; pointer-events: none; }
+    .light-blob { position: absolute; border-radius: 50%; filter: blur(140px); opacity: var(--blob-opacity); }
+    .blob-1 { width: 700px; height: 700px; background: radial-gradient(circle, #10b981 0%, #059669 70%); top: -120px; left: -5%; }
+    .blob-2 { width: 600px; height: 600px; background: radial-gradient(circle, #0284c7 0%, #0369a1 70%); bottom: -80px; right: -5%; }
+    .grid-overlay { position: absolute; inset: 0; background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px); background-size: 40px 40px; z-index: 1; pointer-events: none; }
+    .poster { position: relative; z-index: 2; width: 1200px; height: 1600px; padding: 40px 50px 36px; display: flex; flex-direction: column; }
+    .header { display: flex; align-items: center; justify-content: space-between; padding-bottom: 18px; border-bottom: 1.5px solid var(--card-border); margin-bottom: 28px; flex-shrink: 0; }
+    .header-left { display: flex; align-items: center; gap: 14px; }
+    .brand { font-size: 26px; font-weight: 900; color: var(--text-bold); letter-spacing: -0.5px; }
+    .version-pill { background: var(--theme-light); border: 1.5px solid var(--theme-border); color: var(--theme); font-size: 14px; font-weight: 800; padding: 5px 14px; border-radius: 999px; }
+    .brand-sub { font-size: 13px; color: var(--text-sub); font-weight: 600; margin-left: 6px; }
+    .page-num { font-size: 20px; font-weight: 900; color: var(--text-sub); }
+    .hero { margin-bottom: 24px; flex-shrink: 0; }
+    .catchy-tag { display: inline-flex; align-items: center; gap: 8px; background: var(--card-bg); border: 1.5px solid var(--card-border); font-size: 15px; font-weight: 800; padding: 7px 20px; border-radius: 999px; color: var(--text-bold); box-shadow: var(--shadow); margin-bottom: 16px; }
+    .hero h1 { font-size: 48px; font-weight: 900; line-height: 1.15; letter-spacing: -0.03em; color: var(--text-bold); margin-bottom: 14px; }
+    .gradient-text { background: linear-gradient(135deg, #10b981 0%, #059669 50%, #0284c7 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero-desc { font-size: 17px; color: var(--text-sub); line-height: 1.65; font-weight: 500; max-width: 920px; }
+    .points-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; flex-shrink: 0; }
+    .point-card { background: var(--card-bg); border: 1.5px solid var(--card-border); border-radius: 16px; padding: 18px 16px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 8px; }
+    .point-card .icon-row { display: flex; align-items: center; gap: 10px; }
+    .point-card .p-icon { width: 40px; height: 40px; border-radius: 12px; background: var(--theme-light); border: 1px solid var(--theme-border); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .point-card h4 { font-size: 17px; font-weight: 800; color: var(--text-bold); }
+    .point-card p { font-size: 13.5px; color: var(--text-sub); line-height: 1.5; }
+    .screenshot-section { flex: 1; display: flex; flex-direction: column; gap: 14px; min-height: 0; margin-bottom: 18px; }
+    .mockup-frame { flex: 1; background: var(--mockup-bg); border: 1.5px solid var(--mockup-border); border-radius: 20px; box-shadow: var(--shadow); display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
+    .mockup-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1.5px solid var(--mockup-border); flex-shrink: 0; }
+    .mockup-bar .title { font-size: 16px; font-weight: 800; color: var(--text-bold); }
+    .mockup-bar .badge { font-size: 13px; font-weight: 700; color: #16a34a; background: rgba(22, 163, 74, 0.1); border: 1px solid rgba(22, 163, 74, 0.3); padding: 3px 10px; border-radius: 999px; }
+    .mockup-body { flex: 1; padding: 20px 24px; display: flex; align-items: center; justify-content: center; min-height: 0; overflow: hidden; background: #f8fafc; }
+    .installer-showcase { display: flex; align-items: center; justify-content: center; gap: 24px; width: 100%; height: 100%; }
+    .side-wing { display: flex; flex-direction: column; gap: 16px; width: 230px; flex-shrink: 0; }
+    .wing-card {
+      background: var(--card-bg); border: 1.5px solid var(--card-border);
+      border-radius: 16px; padding: 16px 18px; box-shadow: var(--shadow);
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .wing-icon { font-size: 26px; }
+    .wing-title { font-size: 16px; font-weight: 800; color: var(--text-bold); }
+    .wing-desc { font-size: 13px; color: var(--text-sub); line-height: 1.45; }
+    .center-app-box { flex: 1; height: 100%; max-width: 580px; display: flex; align-items: center; justify-content: center; }
+    .center-app-box img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 14px; box-shadow: 0 14px 34px rgba(0,0,0,0.12); border: 1px solid var(--mockup-border); }
+
+    .telemetry { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; flex-shrink: 0; }
+    .t-cell { background: var(--card-bg); border: 1.5px solid var(--card-border); border-radius: 14px; padding: 14px 12px; text-align: center; box-shadow: var(--shadow); }
+    .t-cell h6 { font-size: 12px; color: var(--text-sub); font-weight: 700; margin-bottom: 4px; }
+    .t-cell p { font-size: 16px; font-weight: 900; }
+    .footer { background: var(--footer-bg); border: 1.5px solid var(--card-border); border-radius: 18px; padding: 16px 24px; box-shadow: var(--shadow); display: flex; align-items: center; justify-content: center; margin-top: 18px; flex-shrink: 0; }
+    .footer-inner { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; justify-content: center; font-size: 13.5px; color: var(--text-sub); font-weight: 700; }
+    .footer-inner strong { color: var(--text-bold); }
+    .sep { color: var(--card-border); }
+  </style>
+</head>
+<body>
+  <div class="bg-lights"><div class="light-blob blob-1"></div><div class="light-blob blob-2"></div></div>
+  <div class="grid-overlay"></div>
+  <div class="poster">
+    <header class="header">
+      <div class="header-left">
+        <span class="brand">Antigravity</span>
+        <span class="version-pill">v0.1.5</span>
+        <span class="brand-sub">零门槛即装即用 · 双主题独立 GUI 安装向导专项展示</span>
+      </div>
+      <span class="page-num">05 / 10</span>
+    </header>
+    <section class="hero">
+      <div class="catchy-tag">🛠️ 零门槛即装即用！</div>
+      <h1>零门槛即装即用！<br><span class="gradient-text">双主题独立 GUI</span><br>安装向导</h1>
+      <p class="hero-desc">单个 HTML 文件即为完整安装器，无需任何前置环境。内置深浅双主题界面，一键完成注入/备份/还原，安全无侵入。</p>
+    </section>
+    <div class="points-row">
+      <div class="point-card">
+        <div class="icon-row"><div class="p-icon">🎨</div><h4>深浅双主题可视化界面</h4></div>
+        <p>根据系统偏好自动适配深色/浅色主题，安装全程图形界面引导，零命令行操作。</p>
+      </div>
+      <div class="point-card">
+        <div class="icon-row"><div class="p-icon">⚡</div><h4>秒级自动备份与还原</h4></div>
+        <p>注入前自动创建原始文件快照，支持一键无损还原至官方原版，安全无忧。</p>
+      </div>
+      <div class="point-card">
+        <div class="icon-row"><div class="p-icon">🛡️</div><h4>100% 本地运行零上传</h4></div>
+        <p>安装器与增强套件均为纯本地文件操作，不连接任何外部服务器，隐私安全有保障。</p>
+      </div>
+    </div>
+    <div class="screenshot-section">
+      <div class="mockup-frame">
+        <div class="mockup-bar">
+          <span class="title">🛠️ 双主题 GUI 安装器：一键注入与安全还原</span>
+          <span class="badge">● 安装器真实界面</span>
+        </div>
+        <div class="mockup-body">
+          <div class="installer-showcase">
+            <div class="side-wing">
+              <div class="wing-card">
+                <div class="wing-icon">⚡</div>
+                <div class="wing-title">单文件绿色运行</div>
+                <div class="wing-desc">免安装 Node / Python 环境，双击即开，零依赖极速启动。</div>
+              </div>
+              <div class="wing-card">
+                <div class="wing-icon">🛡️</div>
+                <div class="wing-title">纯本地无感注入</div>
+                <div class="wing-desc">纯本地文件操作，不上传任何私密 Token 与上下文。</div>
+              </div>
+            </div>
+
+            <div class="center-app-box">
+              <img src="../../../docs/assets/gui_installer_light_preview.png" alt="双主题GUI安装器界面">
+            </div>
+
+            <div class="side-wing">
+              <div class="wing-card">
+                <div class="wing-icon">🔄</div>
+                <div class="wing-title">秒级自动快照备份</div>
+                <div class="wing-desc">注入前自动对原生文件快照，支持一键无损秒回退官方。</div>
+              </div>
+              <div class="wing-card">
+                <div class="wing-icon">🎨</div>
+                <div class="wing-title">原生深浅双主题</div>
+                <div class="wing-desc">一键自由切换明暗模式，与 Antigravity 官方质感完美统一。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="telemetry">
+        <div class="t-cell"><h6>安装方式</h6><p style="color: #059669;">单文件零依赖</p></div>
+        <div class="t-cell"><h6>备份机制</h6><p style="color: #0284c7;">秒级自动快照</p></div>
+        <div class="t-cell"><h6>还原能力</h6><p style="color: #10b981;">一键无损回退</p></div>
+      </div>
+    </div>
+    <footer class="footer">
+      <div class="footer-inner">
+        <span>🌐 官网：<strong>antigravity-enhance-tools.github.io</strong></span><span class="sep">|</span>
+        <span>💻 GitHub 搜索项目名：<strong>Antigravity-Enhance-Pack-Tools</strong></span><span class="sep">|</span>
+        <span>💬 Discord：<strong>discord.gg/QRsPcNrSB</strong></span><span class="sep">|</span>
+        <span style="color: var(--theme);">✨ 专注于软件前端视觉展示与极致人机交互体验</span>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

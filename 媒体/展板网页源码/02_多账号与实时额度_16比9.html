@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <title>02_多账号与实时额度看板 - Antigravity Enhance Tools</title>
+  <style>
+    * {
+      margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased;
+    }
+
+    :root, [data-theme="dark"] {
+      --bg: #070a14;
+      --card-bg: rgba(15, 23, 42, 0.82);
+      --card-border: rgba(255, 255, 255, 0.12);
+      --mockup-bg: rgba(10, 15, 29, 0.95);
+      --mockup-border: rgba(255, 255, 255, 0.1);
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --text-bold: #ffffff;
+      --chip-bg: rgba(255, 255, 255, 0.05);
+      --shadow: 0 20px 45px rgba(0, 0, 0, 0.55);
+      --footer-bg: rgba(15, 23, 42, 0.85);
+      --grid-line: rgba(255, 255, 255, 0.025);
+      --blob-opacity: 0.35;
+    }
+
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --card-bg: rgba(255, 255, 255, 0.94);
+      --card-border: rgba(203, 213, 225, 0.85);
+      --mockup-bg: #ffffff;
+      --mockup-border: rgba(226, 232, 240, 0.95);
+      --text-main: #0f172a;
+      --text-sub: #475569;
+      --text-bold: #020617;
+      --chip-bg: rgba(0, 0, 0, 0.04);
+      --shadow: 0 16px 36px rgba(0, 0, 0, 0.08);
+      --footer-bg: rgba(255, 255, 255, 0.95);
+      --grid-line: rgba(0, 0, 0, 0.035);
+      --blob-opacity: 0.12;
+    }
+
+    body {
+      width: 1920px; height: 1080px; overflow: hidden; background-color: var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--text-main); position: relative;
+    }
+
+    .bg-lights {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 0; pointer-events: none;
+    }
+    .light-blob {
+      position: absolute; border-radius: 50%; filter: blur(140px); opacity: var(--blob-opacity);
+    }
+    .blob-1 { width: 750px; height: 750px; background: radial-gradient(circle, #0284c7 0%, #0369a1 70%); top: -150px; left: 10%; }
+    .blob-2 { width: 650px; height: 650px; background: radial-gradient(circle, #6366f1 0%, #4338ca 70%); bottom: -100px; right: 10%; }
+
+    .grid-overlay {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background-image: 
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+      background-size: 48px 48px; z-index: 1; pointer-events: none;
+    }
+
+    .board-container {
+      position: relative; z-index: 2; width: 1920px; height: 1080px;
+      padding: 38px 56px 30px; display: flex; flex-direction: column; justify-content: space-between;
+    }
+
+    /* Header */
+    .top-header {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .brand-left {
+      display: flex; align-items: center; gap: 16px;
+    }
+    .brand-logo-img {
+      width: 52px; height: 52px; object-fit: contain; filter: drop-shadow(0 4px 16px rgba(2, 132, 199, 0.5));
+    }
+    .brand-texts h2 {
+      font-size: 26px; font-weight: 900; color: var(--text-bold);
+    }
+    .brand-texts p {
+      font-size: 13.5px; color: var(--text-sub); font-weight: 600;
+    }
+    .top-badge {
+      background: rgba(2, 132, 199, 0.16); border: 1.5px solid rgba(2, 132, 199, 0.4);
+      color: #0284c7; font-size: 14px; font-weight: 800; padding: 6px 18px; border-radius: 999px;
+    }
+
+    /* Main Showcase 2-Columns */
+    .showcase-row {
+      display: grid; grid-template-columns: 0.9fr 1.35fr; gap: 40px; align-items: center; flex: 1; margin: 16px 0;
+    }
+
+    /* Left Info Column */
+    .info-col {
+      display: flex; flex-direction: column; gap: 18px;
+    }
+    .feature-tag-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(2, 132, 199, 0.14); border: 1.5px solid rgba(2, 132, 199, 0.4);
+      color: #0284c7; font-size: 15px; font-weight: 800; padding: 6px 18px; border-radius: 999px; align-self: flex-start;
+    }
+    .feature-title {
+      font-size: 46px; font-weight: 900; line-height: 1.15; color: var(--text-bold); letter-spacing: -0.02em;
+    }
+    .gradient-cyan {
+      background: linear-gradient(135deg, #0284c7 0%, #38bdf8 50%, #818cf8 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .feature-desc {
+      font-size: 18px; color: var(--text-sub); line-height: 1.6; font-weight: 500;
+    }
+
+    .key-points-list {
+      display: flex; flex-direction: column; gap: 12px; margin-top: 4px;
+    }
+    .point-card {
+      background: var(--card-bg); border: 1.5px solid var(--card-border);
+      border-radius: 14px; padding: 14px 18px; display: flex; align-items: center; gap: 16px; box-shadow: var(--shadow);
+    }
+    .point-icon {
+      width: 44px; height: 44px; border-radius: 12px; background: rgba(2, 132, 199, 0.15);
+      border: 1px solid rgba(2, 132, 199, 0.35); color: #0284c7; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
+    }
+    .point-texts h4 {
+      font-size: 17px; font-weight: 800; color: var(--text-bold); margin-bottom: 3px;
+    }
+    .point-texts p {
+      font-size: 14px; color: var(--text-sub); line-height: 1.4;
+    }
+
+    /* Right Real Software Screenshot Frame */
+    .mockup-col {
+      background: var(--mockup-bg); border: 1.5px solid var(--mockup-border);
+      border-radius: 22px; padding: 22px 24px 18px; box-shadow: var(--shadow); position: relative;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .mockup-header-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-bottom: 12px; border-bottom: 1.5px solid var(--mockup-border);
+    }
+    .mockup-title {
+      font-size: 20px; font-weight: 900; color: var(--text-bold); display: flex; align-items: center; gap: 10px;
+    }
+    .mockup-sync-status {
+      display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: #10b981; font-weight: 800;
+      background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); padding: 4px 12px; border-radius: 999px;
+    }
+
+    .real-screenshot-container {
+      width: 100%; border-radius: 14px; overflow: hidden;
+      border: 1px solid var(--card-border); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      background: #000;
+    }
+    .real-screenshot-container img {
+      width: 100%; height: auto; display: block;
+    }
+
+    /* Bottom Telemetry Bar */
+    .telemetry-row {
+      background: var(--chip-bg); border: 1px solid var(--mockup-border);
+      border-radius: 12px; padding: 12px 18px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; text-align: center;
+    }
+    .telem-cell h6 {
+      font-size: 12px; color: var(--text-sub); font-weight: 700; margin-bottom: 3px;
+    }
+    .telem-cell p {
+      font-size: 16px; font-weight: 900; color: var(--text-bold);
+    }
+
+    /* Footer */
+    .bottom-bar {
+      background: var(--footer-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1.5px solid var(--card-border); border-radius: 18px; padding: 16px 30px;
+      display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow);
+    }
+    .channels-left {
+      display: flex; align-items: center; gap: 32px; font-size: 15px; color: var(--text-sub); font-weight: 600;
+    }
+    .channels-left strong { color: var(--text-bold); font-weight: 800; }
+  </style>
+</head>
+<body>
+
+  <div class="bg-lights">
+    <div class="light-blob blob-1"></div>
+    <div class="light-blob blob-2"></div>
+  </div>
+
+  <div class="grid-overlay"></div>
+
+  <div class="board-container">
+
+    <header class="top-header">
+      <div class="brand-left">
+        <img src="../../docs/assets/logo_glyph_transparent.png" alt="Logo" class="brand-logo-img">
+        <div class="brand-texts">
+          <h2>Antigravity Enhance Tools</h2>
+          <p>多账号功能切换与实时配额监控系统 · 客户端实机实测专项展示</p>
+        </div>
+      </div>
+      <div class="top-badge">
+        ✨ 彻底消除额度焦虑 · 毫秒级热切换
+      </div>
+    </header>
+
+    <main class="showcase-row">
+      
+      <!-- Left Column -->
+      <div class="info-col">
+        <span class="feature-tag-badge">👥 账号池动态调度核心</span>
+        <h1 class="feature-title">
+          告别额度盲盒！<br>
+          <span class="gradient-cyan">支持多账号功能切换</span><br>
+          实时显示账户额度
+        </h1>
+        <p class="feature-desc">
+          原生 Antigravity 在账号耗尽时必须退出重登，极易打断开发心流。本套件将多账号统一集成至底栏面板，随时感知真实余量，点击即可完成无缝秒切。
+        </p>
+
+        <div class="key-points-list">
+          <div class="point-card">
+            <div class="point-icon">⚡</div>
+            <div class="point-texts">
+              <h4>毫秒级免重启热切换</h4>
+              <p>底栏头像点击即开，多工作/私人账号随心轮换，不重启客户端、不丢失当前会话上下文。</p>
+            </div>
+          </div>
+          <div class="point-card">
+            <div class="point-icon">📊</div>
+            <div class="point-texts">
+              <h4>实时配额与倒计时同步</h4>
+              <p>毫秒级同步官方剩余调用百分比与重置倒计时，每一次复杂任务调用心中有数。</p>
+            </div>
+          </div>
+          <div class="point-card">
+            <div class="point-icon">🛡️</div>
+            <div class="point-texts">
+              <h4>本地凭据隔离存储</h4>
+              <p>所有 Token 与配置 100% 留存在用户本地加密目录，绝对不经过任何第三方云端代理。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: REAL Software Screenshot -->
+      <div class="mockup-col">
+        <div class="mockup-header-bar">
+          <div class="mockup-title">
+            <span>👥 客户端内真实界面：多账号额度管理与快捷切换</span>
+          </div>
+          <div class="mockup-sync-status">
+            <span>● 软件内真实截图</span>
+          </div>
+        </div>
+
+        <div class="real-screenshot-container">
+          <img src="../../docs/assets/verified_account_switcher_live.png" alt="多账号管理与配额实测截图">
+        </div>
+
+        <div class="telemetry-row">
+          <div class="telem-cell">
+            <h6>官方端点并发同步</h6>
+            <p style="color: #10b981;">秒级自动对齐</p>
+          </div>
+          <div class="telem-cell">
+            <h6>多凭证安全存储</h6>
+            <p>本地 DPAPI 加密</p>
+          </div>
+          <div class="telem-cell">
+            <h6>切换操作成本</h6>
+            <p>1 键热生效免重登</p>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+    <footer class="bottom-bar">
+      <div class="channels-left">
+        <span>🌐 官网：<strong>antigravity-enhance-tools.github.io</strong></span>
+        <span>💻 GitHub 搜索项目名：<strong>Antigravity-Enhance-Pack-Tools</strong></span>
+        <span>💬 Discord：<strong>discord.gg/QRsPcNrSB</strong></span>
+      </div>
+      <div style="font-size: 15px; font-weight: 800; color: #0284c7;">
+        ✨ 专注于软件前端视觉展示与极致人机交互体验
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const theme = params.get('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', theme);
+  </script>
+</body>
+</html>

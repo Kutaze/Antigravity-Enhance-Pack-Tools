@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>爱发电精选封面横幅 (1440x360) - Antigravity Enhance Tools</title>
+  <style>
+    * {
+      margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      width: 1440px; height: 360px; overflow: hidden;
+      background: #070914;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: #f8fafc; position: relative;
+    }
+
+    /* Ambient Background Lights */
+    .bg-lights {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 0; pointer-events: none;
+    }
+    .light-blob {
+      position: absolute; border-radius: 50%; filter: blur(100px);
+    }
+    .blob-1 { width: 500px; height: 500px; background: radial-gradient(circle, #6366f1 0%, #4338ca 70%); top: -140px; left: 15%; opacity: 0.42; }
+    .blob-2 { width: 550px; height: 550px; background: radial-gradient(circle, #0284c7 0%, #0369a1 70%); bottom: -160px; right: 5%; opacity: 0.38; }
+    .blob-3 { width: 400px; height: 400px; background: radial-gradient(circle, #ec4899 0%, #be185d 70%); top: -100px; right: 30%; opacity: 0.3; }
+
+    .grid-overlay {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 36px 36px; z-index: 1; pointer-events: none;
+    }
+
+    .banner-container {
+      position: relative; z-index: 2; width: 1440px; height: 360px;
+      padding: 30px 48px; display: flex; align-items: center; justify-content: space-between; gap: 36px;
+    }
+
+    /* Left Branding Section */
+    .brand-section {
+      display: flex; flex-direction: column; gap: 14px; flex: 1.1; max-width: 820px;
+    }
+
+    .tag-row {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .brand-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(99, 102, 241, 0.18); border: 1.2px solid rgba(99, 102, 241, 0.5);
+      color: #a5b4fc; font-size: 13px; font-weight: 800; padding: 4px 14px; border-radius: 999px;
+    }
+    .author-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #e2e8f0; font-size: 12.5px; font-weight: 700; padding: 4px 12px; border-radius: 999px;
+    }
+
+    .title-row {
+      display: flex; align-items: center; gap: 16px;
+    }
+    .logo-img {
+      width: 56px; height: 56px; object-fit: contain; filter: drop-shadow(0 4px 20px rgba(99, 102, 241, 0.7));
+    }
+    .main-title {
+      font-size: 40px; font-weight: 900; letter-spacing: -0.02em; line-height: 1.15;
+      background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 40%, #38bdf8 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+
+    .sub-title {
+      font-size: 16.5px; color: #cbd5e1; font-weight: 500; line-height: 1.5;
+    }
+    .highlight-text {
+      color: #38bdf8; font-weight: 800;
+    }
+
+    .features-pill-row {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-top: 2px;
+    }
+    .feature-chip {
+      background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px; padding: 6px 12px; font-size: 13px; font-weight: 700; color: #94a3b8;
+      display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+    }
+    .feature-chip strong { color: #f8fafc; font-weight: 800; }
+
+    /* Right Real Software Mockup Section */
+    .mockup-showcase {
+      display: flex; align-items: center; justify-content: flex-end; position: relative;
+      flex: 0.9;
+    }
+
+    /* Floating Window 1 (Main account live screenshot) */
+    .mockup-card-1 {
+      width: 500px; border-radius: 14px; overflow: hidden;
+      background: rgba(15, 23, 42, 0.95); border: 1.5px solid rgba(99, 102, 241, 0.4);
+      box-shadow: 0 16px 45px rgba(0, 0, 0, 0.8), 0 0 30px rgba(99, 102, 241, 0.3);
+      transform: perspective(1000px) rotateY(-6deg) rotateX(3deg);
+    }
+    .mockup-card-header {
+      background: rgba(30, 41, 59, 0.95); padding: 8px 14px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .window-dots {
+      display: flex; gap: 6px;
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-r { background: #ef4444; }
+    .dot-y { background: #f59e0b; }
+    .dot-g { background: #10b981; }
+    .mockup-status {
+      font-size: 12px; font-weight: 800; color: #10b981; display: flex; align-items: center; gap: 4px;
+    }
+
+    .mockup-img {
+      width: 100%; height: auto; display: block;
+    }
+
+    /* Floating Small Pill 2 (Thinking Slider Preview) */
+    .mockup-pill-overlay {
+      position: absolute; bottom: -10px; left: -25px;
+      background: rgba(15, 23, 42, 0.96); border: 1.5px solid rgba(236, 72, 153, 0.5);
+      border-radius: 12px; padding: 10px 16px; box-shadow: 0 12px 35px rgba(0, 0, 0, 0.75);
+      display: flex; align-items: center; gap: 12px;
+      transform: perspective(1000px) rotateY(-4deg) translateZ(30px);
+    }
+    .pill-icon {
+      font-size: 22px;
+    }
+    .pill-texts h5 {
+      font-size: 13px; font-weight: 800; color: #f43f5e; margin-bottom: 2px;
+    }
+    .pill-texts p {
+      font-size: 11.5px; color: #cbd5e1; font-weight: 600;
+    }
+
+    /* Footer domain info */
+    .domain-tag {
+      position: absolute; bottom: 10px; right: 28px; font-size: 11.5px; color: #64748b; font-weight: 600;
+    }
+    .domain-tag strong { color: #94a3b8; }
+  </style>
+</head>
+<body>
+
+  <div class="bg-lights">
+    <div class="light-blob blob-1"></div>
+    <div class="light-blob blob-2"></div>
+    <div class="light-blob blob-3"></div>
+  </div>
+
+  <div class="grid-overlay"></div>
+
+  <div class="banner-container">
+
+    <!-- Left Branding Info -->
+    <div class="brand-section">
+      <div class="tag-row">
+        <span class="brand-badge">🚀 GOOGLE ANTIGRAVITY 官方增强扩展套件</span>
+        <span class="author-badge">👑 作者：Kutaze</span>
+      </div>
+
+      <div class="title-row">
+        <img src="../../docs/assets/logo_glyph_transparent.png" alt="Logo" class="logo-img">
+        <h1 class="main-title">Antigravity Enhance Tools</h1>
+      </div>
+
+      <p class="sub-title">
+        全界面深度母语汉化 · <span class="highlight-text">多账号动态秒切与实时配额</span> · 4挡思考滑块 · 插件生态中心
+      </p>
+
+      <div class="features-pill-row">
+        <div class="feature-chip">👥 <strong>多账号免重登</strong></div>
+        <div class="feature-chip">📊 <strong>实时配额大盘</strong></div>
+        <div class="feature-chip">🧠 <strong>4挡思考调控</strong></div>
+        <div class="feature-chip">🛡️ <strong>五段式遥测防卡死</strong></div>
+        <div class="feature-chip">🧩 <strong>35+ 技能中心</strong></div>
+        <div class="feature-chip">⚡ <strong>双主题绿色安装器</strong></div>
+      </div>
+    </div>
+
+    <!-- Right Real Software Mockup Showcase -->
+    <div class="mockup-showcase">
+      <div class="mockup-card-1">
+        <div class="mockup-card-header">
+          <div class="window-dots">
+            <div class="dot dot-r"></div>
+            <div class="dot dot-y"></div>
+            <div class="dot dot-g"></div>
+          </div>
+          <span class="mockup-status">● 真实客户端实测</span>
+        </div>
+        <img src="../../docs/assets/verified_account_switcher_live.png" alt="实测截图" class="mockup-img">
+      </div>
+
+      <div class="mockup-pill-overlay">
+        <div class="pill-icon">🧠</div>
+        <div class="pill-texts">
+          <h5>思考能力 4 挡动态调控</h5>
+          <p>关闭 / 低 / 中 / 高 随需调度算力</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="domain-tag">
+    官网：<strong>antigravity-enhance-tools.github.io</strong> | GitHub：<strong>Antigravity-Enhance-Pack-Tools</strong>
+  </div>
+
+</body>
+</html>

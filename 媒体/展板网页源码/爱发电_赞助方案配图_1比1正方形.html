@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>爱发电赞助方案 1:1 正方形配图渲染模板</title>
+  <style>
+    * {
+      margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      width: 1000px; height: 1000px; overflow: hidden;
+      background: #070913;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: #f8fafc; position: relative;
+    }
+
+    /* Ambient Background Lights */
+    .bg-lights {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 0; pointer-events: none;
+    }
+    .light-blob {
+      position: absolute; border-radius: 50%; filter: blur(120px);
+    }
+
+    .grid-overlay {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.04) 2px, transparent 2px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.04) 2px, transparent 2px);
+      background-size: 50px 50px; z-index: 1; pointer-events: none;
+    }
+
+    .card-container {
+      position: relative; z-index: 2; width: 1000px; height: 1000px;
+      padding: 60px; display: flex; flex-direction: column; justify-content: space-between; align-items: center;
+      text-align: center;
+    }
+
+    /* Top Tier Bar */
+    .top-bar {
+      display: flex; align-items: center; justify-content: space-between; width: 100%;
+    }
+    .tier-badge {
+      font-size: 18px; font-weight: 900; letter-spacing: 0.15em; text-transform: uppercase;
+      padding: 8px 24px; border-radius: 999px; backdrop-filter: blur(10px);
+    }
+    .logo-brand {
+      display: flex; align-items: center; gap: 12px; font-size: 20px; font-weight: 800; color: #94a3b8;
+    }
+    .logo-brand img {
+      width: 36px; height: 36px; object-fit: contain; filter: drop-shadow(0 2px 10px rgba(99, 102, 241, 0.6));
+    }
+
+    /* Center Visual Area */
+    .center-visual {
+      display: flex; flex-direction: column; align-items: center; gap: 20px; margin-top: 10px;
+    }
+    .icon-wrapper {
+      width: 220px; height: 220px; border-radius: 50px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 110px; position: relative;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+    }
+    .icon-wrapper::after {
+      content: ''; position: absolute; inset: -4px; border-radius: 54px;
+      z-index: -1; opacity: 0.8; filter: blur(12px);
+    }
+
+    .price-tag {
+      display: inline-flex; align-items: baseline; gap: 6px;
+      font-size: 56px; font-weight: 900; letter-spacing: -0.02em;
+    }
+    .price-currency {
+      font-size: 32px; font-weight: 700;
+    }
+    .price-period {
+      font-size: 24px; color: #94a3b8; font-weight: 600;
+    }
+
+    .scheme-title {
+      font-size: 46px; font-weight: 900; letter-spacing: -0.01em; margin-top: -6px;
+    }
+    .scheme-subtitle {
+      font-size: 22px; color: #94a3b8; font-weight: 500; max-width: 720px; line-height: 1.4;
+    }
+
+    /* Benefits Pills Grid */
+    .benefits-box {
+      width: 100%; display: flex; flex-direction: column; gap: 14px;
+      background: rgba(15, 23, 42, 0.75); border: 1.5px solid rgba(255, 255, 255, 0.12);
+      border-radius: 24px; padding: 24px 32px; backdrop-filter: blur(16px);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+    }
+    .benefits-title {
+      font-size: 18px; font-weight: 800; letter-spacing: 0.1em; color: #64748b; text-transform: uppercase;
+      text-align: left;
+    }
+    .benefits-list {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; text-align: left;
+    }
+    .benefit-item {
+      display: flex; align-items: center; gap: 10px; font-size: 19px; font-weight: 700; color: #e2e8f0;
+    }
+    .benefit-item span.check {
+      font-size: 18px;
+    }
+
+    /* Bottom Signature */
+    .bottom-bar {
+      font-size: 18px; color: #64748b; font-weight: 600; letter-spacing: 0.05em;
+    }
+    .bottom-bar strong { color: #94a3b8; }
+
+    /* =========================================================================
+       THEME SPECIFIC OVERRIDES (Through URL Hash or Class)
+       ========================================================================= */
+
+    /* 1. 咖啡档 (¥5) - 温暖拿铁紫橙调 */
+    body.tier-coffee .blob-1 { width: 500px; height: 500px; background: #f59e0b; top: 100px; left: 100px; opacity: 0.35; }
+    body.tier-coffee .blob-2 { width: 600px; height: 600px; background: #8b5cf6; bottom: 80px; right: 80px; opacity: 0.4; }
+    body.tier-coffee .tier-badge { background: rgba(245, 158, 11, 0.2); border: 2px solid rgba(245, 158, 11, 0.6); color: #fde68a; }
+    body.tier-coffee .icon-wrapper { background: linear-gradient(145deg, #1e1b4b, #312e81); border: 3px solid rgba(245, 158, 11, 0.5); }
+    body.tier-coffee .icon-wrapper::after { background: #f59e0b; }
+    body.tier-coffee .price-tag { color: #fbbf24; }
+    body.tier-coffee .scheme-title { background: linear-gradient(135deg, #ffffff 0%, #fef3c7 60%, #f59e0b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    body.tier-coffee .benefit-item span.check { color: #fbbf24; }
+
+    /* 2. 能量包 (¥15) - 赛博电光蓝紫调 */
+    body.tier-energy .blob-1 { width: 550px; height: 550px; background: #06b6d4; top: 100px; left: 80px; opacity: 0.4; }
+    body.tier-energy .blob-2 { width: 650px; height: 650px; background: #6366f1; bottom: 60px; right: 60px; opacity: 0.45; }
+    body.tier-energy .tier-badge { background: rgba(99, 102, 241, 0.25); border: 2px solid rgba(99, 102, 241, 0.7); color: #a5b4fc; }
+    body.tier-energy .icon-wrapper { background: linear-gradient(145deg, #0f172a, #1e1b4b); border: 3px solid rgba(99, 102, 241, 0.6); }
+    body.tier-energy .icon-wrapper::after { background: #6366f1; }
+    body.tier-energy .price-tag { color: #38bdf8; }
+    body.tier-energy .scheme-title { background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 50%, #38bdf8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    body.tier-energy .benefit-item span.check { color: #38bdf8; }
+
+    /* 3. 探索官 (¥30) - 炽烈星舰粉紫调 */
+    body.tier-rocket .blob-1 { width: 550px; height: 550px; background: #ec4899; top: 80px; right: 100px; opacity: 0.4; }
+    body.tier-rocket .blob-2 { width: 650px; height: 650px; background: #8b5cf6; bottom: 80px; left: 80px; opacity: 0.45; }
+    body.tier-rocket .tier-badge { background: rgba(236, 72, 153, 0.25); border: 2px solid rgba(236, 72, 153, 0.7); color: #fbcfe8; }
+    body.tier-rocket .icon-wrapper { background: linear-gradient(145deg, #1e102a, #2e1065); border: 3px solid rgba(236, 72, 153, 0.6); }
+    body.tier-rocket .icon-wrapper::after { background: #ec4899; }
+    body.tier-rocket .price-tag { color: #f43f5e; }
+    body.tier-rocket .scheme-title { background: linear-gradient(135deg, #ffffff 0%, #ffe4e6 50%, #f43f5e 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    body.tier-rocket .benefit-item span.check { color: #f43f5e; }
+
+    /* 4. 守护者 (¥99) - 尊贵黑金流光调 */
+    body.tier-crown .blob-1 { width: 600px; height: 600px; background: #eab308; top: 80px; left: 100px; opacity: 0.45; }
+    body.tier-crown .blob-2 { width: 650px; height: 650px; background: #ca8a04; bottom: 60px; right: 80px; opacity: 0.4; }
+    body.tier-crown .tier-badge { background: rgba(234, 179, 8, 0.25); border: 2px solid rgba(234, 179, 8, 0.75); color: #fef08a; }
+    body.tier-crown .icon-wrapper { background: linear-gradient(145deg, #271d05, #422006); border: 3px solid rgba(234, 179, 8, 0.7); }
+    body.tier-crown .icon-wrapper::after { background: #eab308; }
+    body.tier-crown .price-tag { color: #facc15; }
+    body.tier-crown .scheme-title { background: linear-gradient(135deg, #ffffff 0%, #fef9c3 50%, #eab308 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    body.tier-crown .benefit-item span.check { color: #facc15; }
+
+    /* 5. 随心发电 (自选) - 温暖爱心赤红调 */
+    body.tier-heart .blob-1 { width: 550px; height: 550px; background: #f43f5e; top: 100px; left: 100px; opacity: 0.4; }
+    body.tier-heart .blob-2 { width: 600px; height: 600px; background: #fb7185; bottom: 80px; right: 80px; opacity: 0.4; }
+    body.tier-heart .tier-badge { background: rgba(244, 63, 94, 0.25); border: 2px solid rgba(244, 63, 94, 0.7); color: #fecdd3; }
+    body.tier-heart .icon-wrapper { background: linear-gradient(145deg, #300e16, #4c0519); border: 3px solid rgba(244, 63, 94, 0.6); }
+    body.tier-heart .icon-wrapper::after { background: #f43f5e; }
+    body.tier-heart .price-tag { color: #fb7185; }
+    body.tier-heart .scheme-title { background: linear-gradient(135deg, #ffffff 0%, #ffe4e6 50%, #fb7185 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    body.tier-heart .benefit-item span.check { color: #fb7185; }
+  </style>
+</head>
+<body id="appBody" class="tier-coffee">
+
+  <div class="bg-lights">
+    <div class="light-blob blob-1"></div>
+    <div class="light-blob blob-2"></div>
+  </div>
+
+  <div class="grid-overlay"></div>
+
+  <div class="card-container">
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <div class="tier-badge" id="tierBadge">TIER 01 · 精神鼓励</div>
+      <div class="logo-brand">
+        <img src="../../docs/assets/logo_glyph_transparent.png" alt="Logo">
+        <span>Antigravity Tools</span>
+      </div>
+    </div>
+
+    <!-- Center Visual Area -->
+    <div class="center-visual">
+      <div class="icon-wrapper" id="iconWrapper">☕</div>
+
+      <div class="price-tag">
+        <span class="price-currency">¥</span>
+        <span id="priceNum">5</span>
+        <span class="price-period" id="pricePeriod">/ 月</span>
+      </div>
+
+      <div class="scheme-title" id="schemeTitle">请作者喝杯咖啡</div>
+      <div class="scheme-subtitle" id="schemeSubtitle">用一杯浓缩咖啡的温度，为深夜写代码调试的作者注入活力！</div>
+    </div>
+
+    <!-- Benefits Box -->
+    <div class="benefits-box">
+      <div class="benefits-title">专属支持回报 · BENEFITS</div>
+      <div class="benefits-list" id="benefitsList">
+        <div class="benefit-item"><span class="check">✔</span> 官网与项目鸣谢名单收录</div>
+        <div class="benefit-item"><span class="check">✔</span> 爱发电作者专属私信感谢</div>
+        <div class="benefit-item"><span class="check">✔</span> 社区专属赞助者荣誉标识</div>
+        <div class="benefit-item"><span class="check">✔</span> 支持开源项目长期维护迭代</div>
+      </div>
+    </div>
+
+    <!-- Bottom Footer -->
+    <div class="bottom-bar">
+      支持作者：<strong>Kutaze</strong> · 纯净开源 · 体验至上
+    </div>
+
+  </div>
+
+  <script>
+    // 支持通过 URL 参数如 ?tier=coffee / energy / rocket / crown / heart 动态改变配置
+    const urlParams = new URLSearchParams(window.location.search);
+    const tier = urlParams.get('tier') || 'coffee';
+
+    const configs = {
+      coffee: {
+        bodyClass: 'tier-coffee',
+        badge: 'TIER 01 · 精神鼓励',
+        icon: '☕',
+        price: '5',
+        period: '/ 月',
+        title: '请作者喝杯咖啡',
+        subtitle: '用一杯浓缩咖啡的温度，为深夜写代码调试的作者注入活力！',
+        benefits: [
+          '官网与项目鸣谢名单收录',
+          '爱发电作者专属私信感谢',
+          '社区专属赞助者荣誉标识',
+          '支持开源项目长期维护迭代'
+        ]
+      },
+      energy: {
+        bodyClass: 'tier-energy',
+        badge: 'TIER 02 · 核心动力 (推荐)',
+        icon: '⚡',
+        price: '15',
+        period: '/ 月',
+        title: '极客能量包 / 续命红牛',
+        subtitle: '为作者补充强劲能量，驱动工具持续适配与高频体验迭代！',
+        benefits: [
+          'Discord 专属彩色 Sponsor 身份组',
+          '新版本功能路线图 (Roadmap) 抢先知',
+          'Alpha / Beta 预览版内测体验权',
+          '包含前述所有基础档位权益'
+        ]
+      },
+      rocket: {
+        bodyClass: 'tier-rocket',
+        badge: 'TIER 03 · 深度共创',
+        icon: '🚀',
+        price: '30',
+        period: '/ 月',
+        title: '高能探索者 / 共创官',
+        subtitle: '深度参与产品演进，与作者共同雕琢人机协同极致体验！',
+        benefits: [
+          '【Feature Request】需求建议最高优先排期',
+          '专属 1 对 1 技术交流与答疑通道',
+          '官网赞助者专区优先排位展示',
+          '包含前述所有赞助者全部特权'
+        ]
+      },
+      crown: {
+        bodyClass: 'tier-crown',
+        badge: 'TIER 04 · 荣誉合伙人',
+        icon: '👑',
+        price: '99',
+        period: '/ 月',
+        title: '荣誉守护者 / 顶级赞助',
+        subtitle: '感谢您对独立开源软件开发的顶级认可与坚实支撑！',
+        benefits: [
+          'GitHub 首页 README 专属大徽章致谢',
+          '官网支持挂载个人 / 企业 Logo 与链接',
+          '远程 1 对 1 深度专属技术支持服务',
+          '成为项目长久荣誉共创合伙人'
+        ]
+      },
+      heart: {
+        bodyClass: 'tier-heart',
+        badge: 'FREE TIER · 随心赞助',
+        icon: '💖',
+        price: '任意',
+        period: '自由金额',
+        title: '随心投喂 / 自由发电',
+        subtitle: '金额不限，心意无价！感谢你让开源生态变得更加温暖。',
+        benefits: [
+          '零门槛自由支持独立开发者',
+          '爱发电专属作者私信感谢',
+          '资金全额用于服务器带宽与设备',
+          '每一份认可都会被铭记在心底'
+        ]
+      }
+    };
+
+    const cfg = configs[tier] || configs.coffee;
+    document.getElementById('appBody').className = cfg.bodyClass;
+    document.getElementById('tierBadge').textContent = cfg.badge;
+    document.getElementById('iconWrapper').textContent = cfg.icon;
+    document.getElementById('priceNum').textContent = cfg.price;
+    document.getElementById('pricePeriod').textContent = cfg.period;
+    document.getElementById('schemeTitle').textContent = cfg.title;
+    document.getElementById('schemeSubtitle').textContent = cfg.subtitle;
+
+    const benefitsContainer = document.getElementById('benefitsList');
+    benefitsContainer.innerHTML = cfg.benefits.map(b => `<div class="benefit-item"><span class="check">✔</span> ${b}</div>`).join('');
+  </script>
+</body>
+</html>

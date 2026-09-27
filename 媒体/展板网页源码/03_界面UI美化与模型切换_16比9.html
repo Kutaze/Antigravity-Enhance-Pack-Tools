@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <title>03_界面UI美化与模型切换 - Antigravity Enhance Tools</title>
+  <style>
+    * {
+      margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased;
+    }
+
+    :root, [data-theme="dark"] {
+      --bg: #070a14;
+      --card-bg: rgba(15, 23, 42, 0.82);
+      --card-border: rgba(255, 255, 255, 0.12);
+      --mockup-bg: rgba(10, 15, 29, 0.95);
+      --mockup-border: rgba(255, 255, 255, 0.1);
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --text-bold: #ffffff;
+      --chip-bg: rgba(255, 255, 255, 0.05);
+      --shadow: 0 20px 45px rgba(0, 0, 0, 0.55);
+      --footer-bg: rgba(15, 23, 42, 0.85);
+      --grid-line: rgba(255, 255, 255, 0.025);
+      --blob-opacity: 0.35;
+    }
+
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --card-bg: rgba(255, 255, 255, 0.94);
+      --card-border: rgba(203, 213, 225, 0.85);
+      --mockup-bg: #ffffff;
+      --mockup-border: rgba(226, 232, 240, 0.95);
+      --text-main: #0f172a;
+      --text-sub: #475569;
+      --text-bold: #020617;
+      --chip-bg: rgba(0, 0, 0, 0.04);
+      --shadow: 0 16px 36px rgba(0, 0, 0, 0.08);
+      --footer-bg: rgba(255, 255, 255, 0.95);
+      --grid-line: rgba(0, 0, 0, 0.035);
+      --blob-opacity: 0.12;
+    }
+
+    body {
+      width: 1920px; height: 1080px; overflow: hidden; background-color: var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--text-main); position: relative;
+    }
+
+    .bg-lights {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 0; pointer-events: none;
+    }
+    .light-blob {
+      position: absolute; border-radius: 50%; filter: blur(140px); opacity: var(--blob-opacity);
+    }
+    .blob-1 { width: 750px; height: 750px; background: radial-gradient(circle, #8b5cf6 0%, #6366f1 70%); top: -150px; left: 10%; }
+    .blob-2 { width: 650px; height: 650px; background: radial-gradient(circle, #ec4899 0%, #d946ef 70%); bottom: -100px; right: 10%; }
+
+    .grid-overlay {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background-image: 
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+      background-size: 48px 48px; z-index: 1; pointer-events: none;
+    }
+
+    .board-container {
+      position: relative; z-index: 2; width: 1920px; height: 1080px;
+      padding: 40px 60px 32px; display: flex; flex-direction: column; justify-content: space-between;
+    }
+
+    /* Header */
+    .top-header {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .brand-left {
+      display: flex; align-items: center; gap: 16px;
+    }
+    .brand-logo-img {
+      width: 52px; height: 52px; object-fit: contain; filter: drop-shadow(0 4px 16px rgba(139, 92, 246, 0.5));
+    }
+    .brand-texts h2 {
+      font-size: 26px; font-weight: 900; color: var(--text-bold);
+    }
+    .brand-texts p {
+      font-size: 13.5px; color: var(--text-sub); font-weight: 600;
+    }
+    .top-badge {
+      background: rgba(139, 92, 246, 0.16); border: 1.5px solid rgba(139, 92, 246, 0.4);
+      color: #8b5cf6; font-size: 14px; font-weight: 800; padding: 6px 18px; border-radius: 999px;
+    }
+
+    /* Main Showcase 2-Columns */
+    .showcase-row {
+      display: grid; grid-template-columns: 1.05fr 1.2fr; gap: 48px; align-items: center; flex: 1; margin: 20px 0;
+    }
+
+    /* Left Info Column */
+    .info-col {
+      display: flex; flex-direction: column; gap: 20px;
+    }
+    .feature-tag-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(139, 92, 246, 0.14); border: 1.5px solid rgba(139, 92, 246, 0.4);
+      color: #8b5cf6; font-size: 15px; font-weight: 800; padding: 6px 18px; border-radius: 999px; align-self: flex-start;
+    }
+    .feature-title {
+      font-size: 48px; font-weight: 900; line-height: 1.15; color: var(--text-bold); letter-spacing: -0.02em;
+    }
+    .gradient-purple {
+      background: linear-gradient(135deg, #a855f7 0%, #ec4899 50%, #f43f5e 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .feature-desc {
+      font-size: 19px; color: var(--text-sub); line-height: 1.6; font-weight: 500;
+    }
+
+    .key-points-list {
+      display: flex; flex-direction: column; gap: 14px; margin-top: 8px;
+    }
+    .point-card {
+      background: var(--card-bg); border: 1.5px solid var(--card-border);
+      border-radius: 14px; padding: 14px 20px; display: flex; align-items: center; gap: 16px; box-shadow: var(--shadow);
+    }
+    .point-icon {
+      width: 44px; height: 44px; border-radius: 12px; background: rgba(139, 92, 246, 0.15);
+      border: 1px solid rgba(139, 92, 246, 0.35); color: #8b5cf6; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
+    }
+    .point-texts h4 {
+      font-size: 17px; font-weight: 800; color: var(--text-bold); margin-bottom: 3px;
+    }
+    .point-texts p {
+      font-size: 14px; color: var(--text-sub); line-height: 1.4;
+    }
+
+    /* Right Enlarged UI Mockup */
+    .mockup-col {
+      background: var(--mockup-bg); border: 1.5px solid var(--mockup-border);
+      border-radius: 24px; padding: 32px 36px; box-shadow: var(--shadow); position: relative;
+    }
+    .mockup-header-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-bottom: 20px; border-bottom: 1.5px solid var(--mockup-border); margin-bottom: 24px;
+    }
+    .mockup-title {
+      font-size: 22px; font-weight: 900; color: var(--text-bold); display: flex; align-items: center; gap: 10px;
+    }
+
+    /* Floating model switcher mockup list */
+    .model-box-list {
+      display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px;
+    }
+    .model-card-item {
+      background: var(--card-bg); border: 1.5px solid var(--card-border);
+      border-radius: 16px; padding: 16px 22px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .model-card-item.selected {
+      border-color: #8b5cf6; background: rgba(139, 92, 246, 0.12); box-shadow: 0 0 25px rgba(139, 92, 246, 0.25);
+    }
+    .model-item-left {
+      display: flex; align-items: center; gap: 16px;
+    }
+    .model-avatar-badge {
+      width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px;
+    }
+    .model-meta h5 {
+      font-size: 18px; font-weight: 900; color: var(--text-bold); margin-bottom: 3px;
+    }
+    .model-meta p {
+      font-size: 13.5px; color: var(--text-sub);
+    }
+    .model-status-right {
+      display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 800;
+    }
+
+    .telemetry-row {
+      background: var(--chip-bg); border: 1px solid var(--mockup-border);
+      border-radius: 14px; padding: 16px 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; text-align: center;
+    }
+    .telem-cell h6 {
+      font-size: 12.5px; color: var(--text-sub); font-weight: 700; margin-bottom: 4px;
+    }
+    .telem-cell p {
+      font-size: 17px; font-weight: 900; color: var(--text-bold);
+    }
+
+    /* Footer */
+    .bottom-bar {
+      background: var(--footer-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1.5px solid var(--card-border); border-radius: 18px; padding: 18px 32px;
+      display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow);
+    }
+    .channels-left {
+      display: flex; align-items: center; gap: 32px; font-size: 15px; color: var(--text-sub); font-weight: 600;
+    }
+    .channels-left strong { color: var(--text-bold); font-weight: 800; }
+  </style>
+</head>
+<body>
+
+  <div class="bg-lights">
+    <div class="light-blob blob-1"></div>
+    <div class="light-blob blob-2"></div>
+  </div>
+
+  <div class="grid-overlay"></div>
+
+  <div class="board-container">
+
+    <header class="top-header">
+      <div class="brand-left">
+        <img src="../../docs/assets/logo_glyph_transparent.png" alt="Logo" class="brand-logo-img">
+        <div class="brand-texts">
+          <h2>Antigravity Enhance Tools</h2>
+          <p>界面 UI 深度美化与便捷模型切换系统 · 核心体验专项展示</p>
+        </div>
+      </div>
+      <div class="top-badge">
+        ✨ 极致交互手感 · 双手不离当前思路
+      </div>
+    </header>
+
+    <main class="showcase-row">
+      
+      <!-- Left Column -->
+      <div class="info-col">
+        <span class="feature-tag-badge">🎨 交互体验升级核心</span>
+        <h1 class="feature-title">
+          工欲善其事，必先利其器<br>
+          <span class="gradient-purple">界面 UI 深度美化</span><br>
+          模型切换更加便捷顺手
+        </h1>
+        <p class="feature-desc">
+          “做这个项目的核心初衷，就是为了让日常交互更方便。” 摒弃传统层层折叠的生硬菜单，重塑清爽通透的毛玻璃排版与悬浮秒切面板，让开发思路丝滑不被打断。
+        </p>
+
+        <div class="key-points-list">
+          <div class="point-card">
+            <div class="point-icon">🔮</div>
+            <div class="point-texts">
+              <h4>悬浮模型秒切面板</h4>
+              <p>快捷键一键唤出，Claude、Gemini、GPT 与 DeepSeek 随心即点即换，告别冗长菜单寻找。</p>
+            </div>
+          </div>
+          <div class="point-card">
+            <div class="point-icon">✨</div>
+            <div class="point-texts">
+              <h4>现代微质感毛玻璃排版</h4>
+              <p>精心调整字阶、行高与留白间距，消除视觉噪点，为长时间沉浸编码提供最护眼的工作区。</p>
+            </div>
+          </div>
+          <div class="point-card">
+            <div class="point-icon">👨‍💻</div>
+            <div class="point-texts">
+              <h4>专注前端展示与交互设计</h4>
+              <p>以极致的人机交互体验为灵魂，每个微交互动效均经过深度打磨，手感顺手 10 倍。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Super Clear UI Mockup -->
+      <div class="mockup-col">
+        <div class="mockup-header-bar">
+          <div class="mockup-title">
+            <span>🎨 悬浮模型切换快捷浮岛</span>
+          </div>
+          <div style="font-size: 13.5px; color: #8b5cf6; font-weight: 700; background: rgba(139, 92, 246, 0.15); padding: 4px 12px; border-radius: 999px;">
+            <span>快捷键: Alt + M 呼出</span>
+          </div>
+        </div>
+
+        <div class="model-box-list">
+          <!-- Model 1 -->
+          <div class="model-card-item selected">
+            <div class="model-item-left">
+              <div class="model-avatar-badge" style="background: rgba(139, 92, 246, 0.2); color: #8b5cf6;">⚡</div>
+              <div class="model-meta">
+                <h5>Claude 3.5 Sonnet (主力推理模型)</h5>
+                <p>200K 上下文 · 复杂代码重构与架构设计首选</p>
+              </div>
+            </div>
+            <div class="model-status-right" style="color: #8b5cf6;">
+              <span>当前使用中 ✓</span>
+            </div>
+          </div>
+
+          <!-- Model 2 -->
+          <div class="model-card-item">
+            <div class="model-item-left">
+              <div class="model-avatar-badge" style="background: rgba(6, 182, 212, 0.15); color: #0284c7;">🌐</div>
+              <div class="model-meta">
+                <h5>Gemini 1.5 Pro (超长上下文旗舰)</h5>
+                <p>2M 超巨型上下文 · 全库文档与跨文件深度理解</p>
+              </div>
+            </div>
+            <div class="model-status-right" style="color: var(--text-sub);">
+              <span>一键切换 →</span>
+            </div>
+          </div>
+
+          <!-- Model 3 -->
+          <div class="model-card-item">
+            <div class="model-item-left">
+              <div class="model-avatar-badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">🚀</div>
+              <div class="model-meta">
+                <h5>DeepSeek R1 (深度强化思考)</h5>
+                <p>高阶思维链模式 · 疑难算法与底层诊断攻坚</p>
+              </div>
+            </div>
+            <div class="model-status-right" style="color: var(--text-sub);">
+              <span>一键切换 →</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="telemetry-row">
+          <div class="telem-cell">
+            <h6>交互延迟测试</h6>
+            <p style="color: #10b981;">&lt; 16ms 极速响应</p>
+          </div>
+          <div class="telem-cell">
+            <h6>渲染视觉体系</h6>
+            <p>毛玻璃微质感 (Glassmorphism)</p>
+          </div>
+          <div class="telem-cell">
+            <h6>支持快速模型数</h6>
+            <p>全系高阶模型覆盖</p>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+    <footer class="bottom-bar">
+      <div class="channels-left">
+        <span>🌐 官网：<strong>antigravity-enhance-tools.github.io</strong></span>
+        <span>💻 GitHub 搜索项目名：<strong>Antigravity-Enhance-Pack-Tools</strong></span>
+        <span>💬 Discord：<strong>discord.gg/QRsPcNrSB</strong></span>
+      </div>
+      <div style="font-size: 15px; font-weight: 800; color: #8b5cf6;">
+        ✨ 专注于软件前端视觉展示与极致人机交互体验
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const theme = params.get('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', theme);
+  </script>
+</body>
+</html>

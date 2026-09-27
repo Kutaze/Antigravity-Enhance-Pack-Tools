@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <title>02_多账号与实时额度_3比4_浅色</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+
+    :root, [data-theme="light"] {
+      --bg: #f8fafc;
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --card-border: rgba(203, 213, 225, 0.9);
+      --mockup-bg: #ffffff;
+      --mockup-border: rgba(226, 232, 240, 0.95);
+      --text-main: #0f172a;
+      --text-sub: #475569;
+      --text-bold: #020617;
+      --chip-bg: rgba(0, 0, 0, 0.04);
+      --shadow: 0 14px 30px rgba(0, 0, 0, 0.08);
+      --footer-bg: rgba(255, 255, 255, 0.96);
+      --grid-line: rgba(0, 0, 0, 0.035);
+      --blob-opacity: 0.12;
+      --theme: #0284c7;
+      --theme-light: rgba(2, 132, 199, 0.12);
+      --theme-border: rgba(2, 132, 199, 0.3);
+    }
+
+    body {
+      width: 1200px; height: 1600px; overflow: hidden; background: var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--text-main); position: relative;
+    }
+
+    /* Background */
+    .bg-lights { position: absolute; inset: 0; overflow: hidden; z-index: 0; pointer-events: none; }
+    .light-blob { position: absolute; border-radius: 50%; filter: blur(140px); opacity: var(--blob-opacity); }
+    .blob-1 { width: 700px; height: 700px; background: radial-gradient(circle, #0284c7 0%, #0369a1 70%); top: -120px; left: -5%; }
+    .blob-2 { width: 600px; height: 600px; background: radial-gradient(circle, #6366f1 0%, #4338ca 70%); bottom: -80px; right: -5%; }
+
+    .grid-overlay {
+      position: absolute; inset: 0;
+      background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+      background-size: 40px 40px; z-index: 1; pointer-events: none;
+    }
+
+    /* Layout */
+    .poster {
+      position: relative; z-index: 2; width: 1200px; height: 1600px;
+      padding: 40px 50px 36px; display: flex; flex-direction: column;
+    }
+
+    /* Header */
+    .header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-bottom: 18px; border-bottom: 1.5px solid var(--card-border); margin-bottom: 28px; flex-shrink: 0;
+    }
+    .header-left { display: flex; align-items: center; gap: 14px; }
+    .brand { font-size: 26px; font-weight: 900; color: var(--text-bold); letter-spacing: -0.5px; }
+    .version-pill {
+      background: var(--theme-light); border: 1.5px solid var(--theme-border);
+      color: var(--theme); font-size: 14px; font-weight: 800; padding: 5px 14px; border-radius: 999px;
+    }
+    .brand-sub { font-size: 13px; color: var(--text-sub); font-weight: 600; margin-left: 6px; }
+    .page-num { font-size: 20px; font-weight: 900; color: var(--text-sub); }
+
+    /* Hero */
+    .hero { margin-bottom: 24px; flex-shrink: 0; }
+    .catchy-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--card-bg); border: 1.5px solid var(--card-border);
+      font-size: 15px; font-weight: 800; padding: 7px 20px; border-radius: 999px;
+      color: var(--text-bold); box-shadow: var(--shadow); margin-bottom: 16px;
+    }
+    .hero h1 {
+      font-size: 48px; font-weight: 900; line-height: 1.15; letter-spacing: -0.03em;
+      color: var(--text-bold); margin-bottom: 14px;
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #0284c7 0%, #38bdf8 50%, #818cf8 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero-desc {
+      font-size: 17px; color: var(--text-sub); line-height: 1.65; font-weight: 500; max-width: 920px;
+    }
+
+    /* Key Points — horizontal row of 3 */
+    .points-row {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+      margin-bottom: 24px; flex-shrink: 0;
+    }
+    .point-card {
+      background: var(--card-bg); border: 1.5px solid var(--card-border);
+      border-radius: 16px; padding: 18px 16px; box-shadow: var(--shadow);
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .point-card .icon-row { display: flex; align-items: center; gap: 10px; }
+    .point-card .p-icon {
+      width: 40px; height: 40px; border-radius: 12px;
+      background: var(--theme-light); border: 1px solid var(--theme-border);
+      display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;
+    }
+    .point-card h4 { font-size: 17px; font-weight: 800; color: var(--text-bold); }
+    .point-card p { font-size: 13.5px; color: var(--text-sub); line-height: 1.5; }
+
+    /* Screenshot — full width */
+    .screenshot-section {
+      flex: 1; display: flex; flex-direction: column; gap: 14px; min-height: 0; margin-bottom: 18px;
+    }
+    .mockup-frame {
+      flex: 1; background: var(--mockup-bg); border: 1.5px solid var(--mockup-border);
+      border-radius: 20px; box-shadow: var(--shadow); display: flex; flex-direction: column;
+      overflow: hidden; min-height: 0;
+    }
+    .mockup-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 20px; border-bottom: 1.5px solid var(--mockup-border); flex-shrink: 0;
+    }
+    .mockup-bar .title { font-size: 16px; font-weight: 800; color: var(--text-bold); }
+    .mockup-bar .badge {
+      font-size: 13px; font-weight: 700; color: #16a34a;
+      background: rgba(22, 163, 74, 0.1); border: 1px solid rgba(22, 163, 74, 0.3);
+      padding: 3px 10px; border-radius: 999px;
+    }
+    .mockup-body {
+      flex: 1; padding: 12px; display: flex; align-items: center; justify-content: center;
+      min-height: 0; overflow: hidden;
+    }
+    .mockup-body img {
+      width: 100%; height: 100%; object-fit: contain; border-radius: 10px;
+    }
+
+    /* Telemetry */
+    .telemetry {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; flex-shrink: 0;
+    }
+    .t-cell {
+      background: var(--card-bg); border: 1.5px solid var(--card-border);
+      border-radius: 14px; padding: 14px 12px; text-align: center; box-shadow: var(--shadow);
+    }
+    .t-cell h6 { font-size: 12px; color: var(--text-sub); font-weight: 700; margin-bottom: 4px; }
+    .t-cell p { font-size: 16px; font-weight: 900; }
+
+    /* Footer */
+    .footer {
+      background: var(--footer-bg); border: 1.5px solid var(--card-border);
+      border-radius: 18px; padding: 16px 24px; box-shadow: var(--shadow);
+      display: flex; align-items: center; justify-content: center;
+      margin-top: 18px; flex-shrink: 0;
+    }
+    .footer-inner {
+      display: flex; align-items: center; gap: 18px; flex-wrap: wrap; justify-content: center;
+      font-size: 13.5px; color: var(--text-sub); font-weight: 700;
+    }
+    .footer-inner strong { color: var(--text-bold); }
+    .sep { color: var(--card-border); }
+  </style>
+</head>
+<body>
+  <div class="bg-lights">
+    <div class="light-blob blob-1"></div>
+    <div class="light-blob blob-2"></div>
+  </div>
+  <div class="grid-overlay"></div>
+
+  <div class="poster">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <span class="brand">Antigravity</span>
+        <span class="version-pill">v0.1.5</span>
+        <span class="brand-sub">多账号功能切换与实时配额监控系统 · 客户端实机实测专项展示</span>
+      </div>
+      <span class="page-num">02 / 10</span>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="catchy-tag">✨ 彻底消除额度焦虑 · 毫秒级热切换</div>
+      <h1>告别额度盲盒！<br><span class="gradient-text">支持多账号功能切换</span><br>实时显示账户额度</h1>
+      <p class="hero-desc">原生 Antigravity 在账号耗尽时必须退出重登，极易打断开发心流。本套件将多账号统一集成至底栏面板，随时感知真实余量，点击即可完成无缝秒切。</p>
+    </section>
+
+    <!-- 3 Key Points Row -->
+    <div class="points-row">
+      <div class="point-card">
+        <div class="icon-row">
+          <div class="p-icon">⚡</div>
+          <h4>毫秒级免重启热切换</h4>
+        </div>
+        <p>底栏头像点击即开，多工作/私人账号随心轮换，不重启客户端、不丢失当前会话上下文。</p>
+      </div>
+      <div class="point-card">
+        <div class="icon-row">
+          <div class="p-icon">📊</div>
+          <h4>实时配额与倒计时同步</h4>
+        </div>
+        <p>毫秒级同步官方剩余调用百分比与重置倒计时，每一次复杂任务调用心中有数。</p>
+      </div>
+      <div class="point-card">
+        <div class="icon-row">
+          <div class="p-icon">🛡️</div>
+          <h4>本地凭据隔离存储</h4>
+        </div>
+        <p>所有 Token 与配置 100% 留存在用户本地加密目录，绝对不经过任何第三方云端代理。</p>
+      </div>
+    </div>
+
+    <!-- Full-width Screenshot -->
+    <div class="screenshot-section">
+      <div class="mockup-frame">
+        <div class="mockup-bar">
+          <span class="title">👥 客户端内真实界面：多账号额度管理与快捷切换</span>
+          <span class="badge">● 软件内真实截图</span>
+        </div>
+        <div class="mockup-body">
+          <img src="../../../docs/assets/verified_account_switcher_live.png" alt="多账号管理与配额实测截图">
+        </div>
+      </div>
+
+      <!-- Telemetry -->
+      <div class="telemetry">
+        <div class="t-cell">
+          <h6>官方端点并发同步</h6>
+          <p style="color: #16a34a;">秒级自动对齐</p>
+        </div>
+        <div class="t-cell">
+          <h6>多凭证安全存储</h6>
+          <p style="color: #0284c7;">本地 DPAPI 加密</p>
+        </div>
+        <div class="t-cell">
+          <h6>切换操作成本</h6>
+          <p style="color: #818cf8;">1 键热生效免重登</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-inner">
+        <span>🌐 官网：<strong>antigravity-enhance-tools.github.io</strong></span>
+        <span class="sep">|</span>
+        <span>💻 GitHub 搜索项目名：<strong>Antigravity-Enhance-Pack-Tools</strong></span>
+        <span class="sep">|</span>
+        <span>💬 Discord：<strong>discord.gg/QRsPcNrSB</strong></span>
+        <span class="sep">|</span>
+        <span style="color: var(--theme);">✨ 专注于软件前端视觉展示与极致人机交互体验</span>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

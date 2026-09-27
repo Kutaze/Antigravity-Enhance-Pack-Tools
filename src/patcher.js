@@ -247,6 +247,46 @@ const injectAntigravityI18n = (wc) => {
                 } catch(e) {}
             }
 
+            // Auto-enrich profiles with real name & avatar from account tokens
+            let metaNeedsSave = false;
+            bootstrap.profiles.forEach(p => {
+                if (!p || !p.email) return;
+                const safeKey = encodeURIComponent(p.email).replace(/%/g, '_');
+                const accDir = _path.join(homeDir, '.gemini', 'account_profiles', safeKey);
+                const oauthF = _path.join(accDir, 'oauth_creds.json');
+                const credF = _path.join(accDir, 'credential_payload.json');
+                const tryExtract = (f) => {
+                    try {
+                        if (_fs.existsSync(f)) {
+                            const o = JSON.parse(_fs.readFileSync(f, 'utf8'));
+                            const idTok = o.id_token || (o.token && o.token.id_token);
+                            if (idTok && typeof idTok === 'string') {
+                                const parts = idTok.split('.');
+                                if (parts.length >= 2) {
+                                    const b64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+                                    return JSON.parse(Buffer.from(b64, 'base64').toString('utf8'));
+                                }
+                            }
+                        }
+                    } catch(e) {}
+                    return null;
+                };
+                const tokenClaims = tryExtract(oauthF) || tryExtract(credF);
+                if (tokenClaims) {
+                    if ((!p.name || /^\d+$/.test(p.name) || p.name === p.email.split('@')[0]) && tokenClaims.name) {
+                        p.name = tokenClaims.name;
+                        metaNeedsSave = true;
+                    }
+                    if (!p.avatar && tokenClaims.picture) {
+                        p.avatar = tokenClaims.picture;
+                        metaNeedsSave = true;
+                    }
+                }
+            });
+            if (metaNeedsSave) {
+                try { _fs.writeFileSync(metaFile, JSON.stringify(bootstrap, null, 2), 'utf8'); } catch(e) {}
+            }
+
             const headerJs = 'window.__ANTIGRAVITY_I18N_DATA__ = ' + dataStr + '; window.__AGY_BOOTSTRAP_PROFILES__ = ' + JSON.stringify(bootstrap) + ';';
             wc.executeJavaScript(headerJs + runnerCode).catch(() => {});
         }
@@ -402,20 +442,24 @@ try {
                 if (!targetId || targetId === 'active_chat' || targetId === 'unknown') {
                     if (_fs.existsSync(brainDir)) {
                         const entries = _fs.readdirSync(brainDir, { withFileTypes: true });
-                        let latestTime = 0;
-                        let latestFolder = '';
+                        const candidates = [];
                         for (const ent of entries) {
                             if (ent.isDirectory() && ent.name !== 'tempmediaStorage') {
                                 try {
-                                    const stat = _fs.statSync(_path.join(brainDir, ent.name));
-                                    if (stat.mtimeMs > latestTime) {
-                                        latestTime = stat.mtimeMs;
-                                        latestFolder = ent.name;
+                                    const cDir = _path.join(brainDir, ent.name);
+                                    const lPath = _path.join(cDir, '.system_generated', 'logs', 'transcript.jsonl');
+                                    if (_fs.existsSync(lPath)) {
+                                        const stat = _fs.statSync(lPath);
+                                        candidates.push({ id: ent.name, mtime: stat.mtimeMs, size: stat.size });
                                     }
                                 } catch(e) {}
                             }
                         }
-                        if (latestFolder) targetId = latestFolder;
+                        candidates.sort((a, b) => b.mtime - a.mtime);
+                        if (candidates.length > 0) {
+                            const mainCandidate = candidates.find(c => c.size > 2048) || candidates[0];
+                            targetId = mainCandidate.id;
+                        }
                     }
                 }
                 if (!targetId) return { success: false, turns: [] };
@@ -446,32 +490,61 @@ try {
                         const obj = JSON.parse(line);
                         const isUser = (obj.type === 'USER_INPUT' || obj.source === 'USER_EXPLICIT');
                         if (isUser) {
-                            turnCounter++;
-                            let text = obj.content || '';
-                            const m = text.match(/<USER_REQUEST>([\\s\\S]*?)<\\/USER_REQUEST>/);
-                            if (m) text = m[1].trim();
-                            else {
-                                text = text.replace(/<[^>]+>/g, '').trim();
+                            let rawContent = obj.content || '';
+                            if (typeof rawContent !== 'string') rawContent = JSON.stringify(rawContent);
+
+                            let cleaned = rawContent.replace(/<CONTEXT_SUMMARY>[\\s\\S]*?<\\/CONTEXT_SUMMARY>/gi, '').trim();
+
+                            const userReqRegex = /<USER_REQUEST>([\\s\\S]*?)<\\/USER_REQUEST>/gi;
+                            let m, lastRequest = null;
+                            while ((m = userReqRegex.exec(cleaned)) !== null) {
+                                lastRequest = m[1];
                             }
-                            const snippet = text.replace(/\\s+/g, ' ').substring(0, 90);
+                            if (lastRequest) {
+                                cleaned = lastRequest.trim();
+                            }
+
+                            cleaned = cleaned.replace(/<ADDITIONAL_METADATA>[\\s\\S]*?<\\/ADDITIONAL_METADATA>/gi, '');
+                            cleaned = cleaned.replace(/<USER_SETTINGS_CHANGE>[\\s\\S]*?<\\/USER_SETTINGS_CHANGE>/gi, '');
+                            cleaned = cleaned.replace(/<[^>]+>/g, '').trim();
+                            cleaned = cleaned.replace(/[\\r\\n\\t]+/g, ' ').replace(/\\s+/g, ' ').trim();
+
+                            if (!cleaned || cleaned.length < 1) continue;
+
+                            if (lastUserTurn && lastUserTurn.fullPrompt === cleaned && (obj.step_index == null || Math.abs(obj.step_index - lastUserTurn.stepIndex) <= 2)) {
+                                continue;
+                            }
+
+                            turnCounter++;
                             lastUserTurn = {
                                 turn: turnCounter,
                                 stepIndex: obj.step_index != null ? obj.step_index : (turnCounter - 1),
-                                userPrompt: snippet || ('第 ' + turnCounter + ' 轮 · 用户提问'),
+                                userPrompt: cleaned.substring(0, 110),
+                                fullPrompt: cleaned,
                                 aiSnippet: '',
+                                fullAiResponse: '',
+                                createdAt: obj.created_at || '',
                                 stepId: 'conv_step_' + (obj.step_index != null ? obj.step_index : turnCounter)
                             };
                             turns.push(lastUserTurn);
-                        } else if (lastUserTurn && !lastUserTurn.aiSnippet) {
+                        } else if (lastUserTurn && (!lastUserTurn.aiSnippet || lastUserTurn.aiSnippet.length < 10)) {
                             let aiText = '';
                             if (typeof obj.content === 'string') {
                                 aiText = obj.content;
                             } else if (typeof obj.thinking === 'string') {
                                 aiText = obj.thinking;
                             }
-                            aiText = (aiText || '').replace(/<[^>]+>/g, '').replace(/\\s+/g, ' ').trim();
+                            aiText = (aiText || '')
+                                .replace(/The following is a not actually sent by the user[\\s\\S]*?\\.\\s*/gi, '')
+                                .replace(/The user reports[\\s\\S]*?\\.\\s*/gi, '')
+                                .replace(/\\x60{3}[\\s\\S]*?\\x60{3}/g, '')
+                                .replace(/<[^>]+>/g, '')
+                                .replace(/[\\r\\n\\t]+/g, ' ')
+                                .replace(/\\s+/g, ' ')
+                                .trim();
                             if (aiText && aiText.length > 5) {
-                                lastUserTurn.aiSnippet = aiText.substring(0, 110);
+                                lastUserTurn.aiSnippet = aiText.substring(0, 130);
+                                lastUserTurn.fullAiResponse = aiText.substring(0, 1500);
                             }
                         }
                     } catch(e) {}
@@ -600,7 +673,7 @@ try {
             return d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + h + ':' + m;
         }
 
-        function _getEmailFromPayload(payload) {
+        function _getClaimsFromPayload(payload) {
             if (!payload) return null;
             try {
                 const idToken = (typeof payload === 'object' && payload.id_token) || 
@@ -609,14 +682,16 @@ try {
                     const parts = idToken.split('.');
                     if (parts.length >= 2) {
                         const b64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
-                        const claims = JSON.parse(Buffer.from(b64, 'base64').toString('utf8'));
-                        if (claims && claims.email && typeof claims.email === 'string') {
-                            return claims.email.trim().toLowerCase();
-                        }
+                        return JSON.parse(Buffer.from(b64, 'base64').toString('utf8'));
                     }
                 }
             } catch(e) {}
             return null;
+        }
+
+        function _getEmailFromPayload(payload) {
+            const claims = _getClaimsFromPayload(payload);
+            return (claims && claims.email && typeof claims.email === 'string') ? claims.email.trim().toLowerCase() : null;
         }
 
         function _readKeyringPayload() {
@@ -898,16 +973,33 @@ try {
 
                     let existing = meta.profiles.find(p => p.email && p.email.toLowerCase() === activeEmail.toLowerCase());
                     const nowStr = _formatDateNow();
+                    let tokenClaims = null;
+                    const bOauthJson = _readJsonSafe(bOauth, null);
+                    if (bOauthJson) tokenClaims = _getClaimsFromPayload(bOauthJson);
+                    if (!tokenClaims) {
+                        const bKrJson = _readJsonSafe(_path.join(accDir, 'credential_payload.json'), null);
+                        if (bKrJson) tokenClaims = _getClaimsFromPayload(bKrJson);
+                    }
+                    const resolvedName = (tokenClaims && tokenClaims.name) || activeEmail.split('@')[0];
+                    const resolvedAvatar = (tokenClaims && tokenClaims.picture) || '';
+
                     if (!existing) {
                         existing = {
                             email: activeEmail,
-                            name: activeEmail.split('@')[0],
-                            avatar: '',
+                            name: resolvedName,
+                            avatar: resolvedAvatar,
                             tier: 'PRO',
                             lastUsed: nowStr,
                             quota: null
                         };
                         meta.profiles.unshift(existing);
+                    } else {
+                        if ((!existing.name || /^\d+$/.test(existing.name) || existing.name === activeEmail.split('@')[0]) && resolvedName && resolvedName !== activeEmail.split('@')[0]) {
+                            existing.name = resolvedName;
+                        }
+                        if (!existing.avatar && resolvedAvatar) {
+                            existing.avatar = resolvedAvatar;
+                        }
                     }
                     meta.active = activeEmail;
                     _writeJsonSafe(_metaFile, meta);
@@ -957,20 +1049,31 @@ try {
 
                 let existing = meta.profiles.find(p => p.email && p.email.toLowerCase() === activeEmail.toLowerCase());
                 const nowStr = _formatDateNow();
+                let tokenClaims = null;
+                const bOauthJson = _readJsonSafe(_path.join(accDir, 'oauth_creds.json'), null);
+                if (bOauthJson) tokenClaims = _getClaimsFromPayload(bOauthJson);
+                if (!tokenClaims) {
+                    const bKrJson = _readJsonSafe(_path.join(accDir, 'credential_payload.json'), null);
+                    if (bKrJson) tokenClaims = _getClaimsFromPayload(bKrJson);
+                }
+                const resolvedName = (data && data.name && !/^\d+$/.test(data.name)) ? data.name : ((tokenClaims && tokenClaims.name) || activeEmail.split('@')[0]);
+                const resolvedAvatar = (data && data.avatar) || (tokenClaims && tokenClaims.picture) || '';
 
                 if (!existing) {
                     existing = {
                         email: activeEmail,
-                        name: (data && data.name) || activeEmail.split('@')[0],
-                        avatar: (data && data.avatar) || '',
+                        name: resolvedName,
+                        avatar: resolvedAvatar,
                         tier: (data && data.tier) || 'PRO',
                         lastUsed: nowStr,
                         quota: (data && data.quota) || null
                     };
                     meta.profiles.unshift(existing);
                 } else {
-                    if (data && data.name) existing.name = data.name;
+                    if (data && data.name && !/^\d+$/.test(data.name)) existing.name = data.name;
+                    else if ((!existing.name || /^\d+$/.test(existing.name)) && resolvedName && resolvedName !== activeEmail.split('@')[0]) existing.name = resolvedName;
                     if (data && data.avatar) existing.avatar = data.avatar;
+                    else if (!existing.avatar && resolvedAvatar) existing.avatar = resolvedAvatar;
                     if (data && data.tier) existing.tier = data.tier;
                     if (data && data.quota) existing.quota = data.quota;
                     existing.lastUsed = nowStr;

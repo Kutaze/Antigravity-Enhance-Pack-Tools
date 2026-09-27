@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <title>09_真实上下文五段式遥测与防卡死 - Antigravity Enhance Tools</title>
+  <style>
+    * {
+      margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased;
+    }
+
+    :root, [data-theme="dark"] {
+      --bg: #06110e;
+      --card-bg: rgba(10, 28, 22, 0.85);
+      --card-border: rgba(16, 185, 129, 0.22);
+      --mockup-bg: rgba(8, 22, 17, 0.95);
+      --mockup-border: rgba(16, 185, 129, 0.28);
+      --text-main: #ecfdf5;
+      --text-sub: #6ee7b7;
+      --text-bold: #ffffff;
+      --chip-bg: rgba(255, 255, 255, 0.05);
+      --shadow: 0 20px 45px rgba(0, 0, 0, 0.65);
+      --footer-bg: rgba(10, 28, 22, 0.88);
+      --grid-line: rgba(16, 185, 129, 0.04);
+      --blob-opacity: 0.38;
+      --accent: #10b981;
+      --accent-glow: rgba(16, 185, 129, 0.45);
+    }
+
+    [data-theme="light"] {
+      --bg: #f0fdf4;
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --card-border: rgba(187, 247, 208, 0.95);
+      --mockup-bg: #ffffff;
+      --mockup-border: rgba(110, 231, 183, 0.5);
+      --text-main: #064e3b;
+      --text-sub: #047857;
+      --text-bold: #022c22;
+      --chip-bg: rgba(0, 0, 0, 0.04);
+      --shadow: 0 16px 36px rgba(0, 0, 0, 0.08);
+      --footer-bg: rgba(255, 255, 255, 0.95);
+      --grid-line: rgba(16, 185, 129, 0.035);
+      --blob-opacity: 0.12;
+      --accent: #059669;
+      --accent-glow: rgba(5, 150, 105, 0.2);
+    }
+
+    body {
+      width: 1920px; height: 1080px; overflow: hidden; background-color: var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--text-main); position: relative;
+    }
+
+    .bg-lights {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 0; pointer-events: none;
+    }
+    .light-blob {
+      position: absolute; border-radius: 50%; filter: blur(140px); opacity: var(--blob-opacity);
+    }
+    .blob-1 { width: 750px; height: 750px; background: radial-gradient(circle, #10b981 0%, #047857 70%); top: -140px; right: 20%; }
+    .blob-2 { width: 650px; height: 650px; background: radial-gradient(circle, #06b6d4 0%, #0891b2 70%); bottom: -120px; left: 10%; }
+
+    .grid-overlay {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background-image: 
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+      background-size: 48px 48px; z-index: 1; pointer-events: none;
+    }
+
+    .board-container {
+      position: relative; z-index: 2; width: 1920px; height: 1080px;
+      padding: 38px 56px 30px; display: flex; flex-direction: column; justify-content: space-between;
+    }
+
+    /* Header */
+    .top-header {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .brand-left {
+      display: flex; align-items: center; gap: 16px;
+    }
+    .brand-logo-img {
+      width: 52px; height: 52px; object-fit: contain; filter: drop-shadow(0 4px 16px var(--accent-glow));
+    }
+    .brand-texts h2 {
+      font-size: 26px; font-weight: 900; color: var(--text-bold);
+    }
+    .brand-texts p {
+      font-size: 13.5px; color: var(--text-sub); font-weight: 600;
+    }
+    .top-badge {
+      background: rgba(16, 185, 129, 0.16); border: 1.5px solid rgba(16, 185, 129, 0.45);
+      color: #10b981; font-size: 14px; font-weight: 800; padding: 6px 18px; border-radius: 999px;
+    }
+
+    /* Main Showcase 2-Columns */
+    .showcase-row {
+      display: grid; grid-template-columns: 0.95fr 1.35fr; gap: 42px; align-items: center; flex: 1; margin: 16px 0;
+    }
+
+    /* Left Info Column */
+    .info-col {
+      display: flex; flex-direction: column; gap: 18px;
+    }
+    .feature-tag-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(16, 185, 129, 0.15); border: 1.5px solid rgba(16, 185, 129, 0.4);
+      color: #10b981; font-size: 15px; font-weight: 800; padding: 6px 18px; border-radius: 999px; align-self: flex-start;
+    }
+    .feature-title {
+      font-size: 46px; font-weight: 900; line-height: 1.15; color: var(--text-bold); letter-spacing: -0.02em;
+    }
+    .gradient-emerald {
+      background: linear-gradient(135deg, #10b981 0%, #34d399 50%, #06b6d4 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .feature-desc {
+      font-size: 17.5px; color: var(--text-sub); line-height: 1.6; font-weight: 500;
+    }
+
+    .key-points-list {
+      display: flex; flex-direction: column; gap: 12px; margin-top: 4px;
+    }
+    .point-card {
+      background: var(--card-bg); border: 1.5px solid var(--card-border);
+      border-radius: 14px; padding: 14px 18px; display: flex; align-items: center; gap: 16px; box-shadow: var(--shadow);
+    }
+    .point-icon {
+      width: 44px; height: 44px; border-radius: 12px; background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.35); color: #10b981; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
+    }
+    .point-texts h4 {
+      font-size: 17px; font-weight: 800; color: var(--text-bold); margin-bottom: 3px;
+    }
+    .point-texts p {
+      font-size: 14px; color: var(--text-sub); line-height: 1.4;
+    }
+
+    /* Right Real Software Screenshot Frame */
+    .mockup-col {
+      background: var(--mockup-bg); border: 1.5px solid var(--mockup-border);
+      border-radius: 22px; padding: 20px 22px 16px; box-shadow: var(--shadow); position: relative;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .mockup-header-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-bottom: 12px; border-bottom: 1.5px solid var(--mockup-border);
+    }
+    .mockup-title {
+      font-size: 19px; font-weight: 900; color: var(--text-bold); display: flex; align-items: center; gap: 10px;
+    }
+    .mockup-sync-status {
+      display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: #10b981; font-weight: 800;
+      background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); padding: 4px 12px; border-radius: 999px;
+    }
+
+    .real-screenshot-container {
+      width: 100%; border-radius: 14px; overflow: hidden;
+      border: 1px solid var(--card-border); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+      background: #000;
+    }
+    .real-screenshot-container img {
+      width: 100%; height: auto; display: block;
+    }
+
+    /* Bottom Telemetry Bar */
+    .telemetry-row {
+      background: var(--chip-bg); border: 1px solid var(--mockup-border);
+      border-radius: 12px; padding: 12px 18px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; text-align: center;
+    }
+    .telem-cell h6 {
+      font-size: 12px; color: var(--text-sub); font-weight: 700; margin-bottom: 3px;
+    }
+    .telem-cell p {
+      font-size: 16px; font-weight: 900; color: var(--text-bold);
+    }
+
+    /* Footer */
+    .bottom-bar {
+      background: var(--footer-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1.5px solid var(--card-border); border-radius: 18px; padding: 16px 30px;
+      display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow);
+    }
+    .channels-left {
+      display: flex; align-items: center; gap: 32px; font-size: 15px; color: var(--text-sub); font-weight: 600;
+    }
+    .channels-left strong { color: var(--text-bold); font-weight: 800; }
+  </style>
+</head>
+<body>
+
+  <div class="bg-lights">
+    <div class="light-blob blob-1"></div>
+    <div class="light-blob blob-2"></div>
+  </div>
+
+  <div class="grid-overlay"></div>
+
+  <div class="board-container">
+
+    <header class="top-header">
+      <div class="brand-left">
+        <img src="../../docs/assets/logo_glyph_transparent.png" alt="Logo" class="brand-logo-img">
+        <div class="brand-texts">
+          <h2>Antigravity Enhance Tools</h2>
+          <p>真实上下文五段式深度遥测与防卡死系统 · 客户端实机实测专项展示</p>
+        </div>
+      </div>
+      <div class="top-badge">
+        🛡️ 精准遥测分层消耗 · 彻底根绝长上下文卡死
+      </div>
+    </header>
+
+    <main class="showcase-row">
+      
+      <!-- Left Column -->
+      <div class="info-col">
+        <span class="feature-tag-badge">🛡️ 深度遥测与防冻机制</span>
+        <h1 class="feature-title">
+          拒绝黑盒消耗！<br>
+          <span class="gradient-emerald">真实上下文五段式遥测</span><br>
+          防卡死与一键压缩
+        </h1>
+        <p class="feature-desc">
+          长会话卡顿甚至崩溃？底栏常驻高灵敏遥测胶囊，悬停秒出五段式真实 Token 占比分析（缓存/输入工具/思维/生成），配合 /compact 一键压缩，长程代码任务永不冻结。
+        </p>
+
+        <div class="key-points-list">
+          <div class="point-card">
+            <div class="point-icon">🔬</div>
+            <div class="point-texts">
+              <h4>五段式精细化占比透视</h4>
+              <p>区分已缓存上下文、输入载荷、思考推理与回复生成，清晰掌握每一次交互的 Token 去向。</p>
+            </div>
+          </div>
+          <div class="point-card">
+            <div class="point-icon">⚡</div>
+            <div class="point-texts">
+              <h4>底栏常驻胶囊与健康度看板</h4>
+              <p>底栏实时显示百分比胶囊，绿色健康/黄色预警/红色拥堵三态告警，毫秒级响应。</p>
+            </div>
+          </div>
+          <div class="point-card">
+            <div class="point-icon">🗜️</div>
+            <div class="point-texts">
+              <h4>/compact 一键智能安全压缩</h4>
+              <p>一键提炼前序上下文核心精华，瞬时释放 70%+ 上下文空间，保持对话敏捷不遗忘核心信息。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: REAL Software Screenshot -->
+      <div class="mockup-col">
+        <div class="mockup-header-bar">
+          <div class="mockup-title">
+            <span>🛡️ 客户端内真实界面：上下文五段式占比卡片与状态监控</span>
+          </div>
+          <div class="mockup-sync-status">
+            <span>● 软件内真实截图</span>
+          </div>
+        </div>
+
+        <div class="real-screenshot-container">
+          <img src="../../docs/assets/verified_anti_freeze_live.png" alt="上下文五段式遥测实测截图">
+        </div>
+
+        <div class="telemetry-row">
+          <div class="telem-cell">
+            <h6>遥测颗粒度</h6>
+            <p style="color: #10b981;">五段分层精细分析</p>
+          </div>
+          <div class="telem-cell">
+            <h6>状态告警机制</h6>
+            <p>底栏绿/黄/红三态胶囊</p>
+          </div>
+          <div class="telem-cell">
+            <h6>空间释放快捷指令</h6>
+            <p>/compact 一键压缩</p>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+    <footer class="bottom-bar">
+      <div class="channels-left">
+        <span>🌐 官网：<strong>antigravity-enhance-tools.github.io</strong></span>
+        <span>💻 GitHub 搜索项目名：<strong>Antigravity-Enhance-Pack-Tools</strong></span>
+        <span>💬 Discord：<strong>discord.gg/QRsPcNrSB</strong></span>
+      </div>
+      <div style="font-size: 15px; font-weight: 800; color: #10b981;">
+        ✨ 深度遥测与防冻防护网，护航十万行级别超长代码项目开发
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const theme = params.get('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', theme);
+  </script>
+</body>
+</html>
