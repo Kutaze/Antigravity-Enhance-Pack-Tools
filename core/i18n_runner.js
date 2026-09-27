@@ -9174,26 +9174,43 @@
             return '';
         };
 
+        // 动态获取当前客户端内最新的模型名称 (自适应 Gemini 3.8 Flash / Pro 及 Claude 3.7 Sonnet)
+        let geminiDisplayName = 'Gemini 3.8 Flash';
+        let claudeDisplayName = 'Claude 3.7 Sonnet';
+        try {
+            const trigger = document.querySelector('[data-testid="model-selector-trigger"]');
+            const txt = trigger ? (trigger.innerText || '').trim() : '';
+            if (txt) {
+                if (txt.includes('Gemini')) {
+                    const match = txt.match(/Gemini\s+[\d\.]+(?:\s+(?:Flash|Pro|Ultra))?/i);
+                    if (match) geminiDisplayName = match[0];
+                } else if (txt.includes('Claude')) {
+                    const match = txt.match(/Claude\s+[\d\.]+(?:\s+(?:Sonnet|Opus|Haiku))?/i);
+                    if (match) claudeDisplayName = match[0];
+                }
+            }
+        } catch (e) {}
+
         return `
             <div class="agy-as-quotas-box">
-                <div class="agy-as-bar-track" title="Gemini 3.1 Pro / Flash (5小时周期)">
+                <div class="agy-as-bar-track" title="${geminiDisplayName} (5小时周期)">
                     <div class="agy-as-bar-fill gemini ${getStatusClass(g5hPct)}" style="width: ${Math.max(0, Math.min(100, g5hPct))}%;"></div>
                     <div class="agy-as-bar-content gemini ${getStatusClass(g5hPct)}">
-                        <span>✦ Gemini 3.1 Pro (5h) ⏱ ${g5hReset}</span>
+                        <span>✦ ${geminiDisplayName} (5h) ⏱ ${g5hReset}</span>
                         <b>${g5hPct}%</b>
                     </div>
                 </div>
-                <div class="agy-as-bar-track" title="Gemini 3.1 系列 (周周期)">
+                <div class="agy-as-bar-track" title="Gemini 3.8 系列 (周周期)">
                     <div class="agy-as-bar-fill gemini ${getStatusClass(gWkPct)}" style="width: ${Math.max(0, Math.min(100, gWkPct))}%;"></div>
                     <div class="agy-as-bar-content gemini ${getStatusClass(gWkPct)}">
                         <span>✦ Gemini (周配额) ⏱ ${gWkReset}</span>
                         <b>${gWkPct}%</b>
                     </div>
                 </div>
-                <div class="agy-as-bar-track" title="Claude 3.7 / GPT 系列 (5小时周期)">
+                <div class="agy-as-bar-track" title="${claudeDisplayName} (5小时周期)">
                     <div class="agy-as-bar-fill claude ${getStatusClass(c5hPct)}" style="width: ${Math.max(0, Math.min(100, c5hPct))}%;"></div>
                     <div class="agy-as-bar-content claude ${getStatusClass(c5hPct)}">
-                        <span>✳ Claude Sonnet (5h) ⏱ ${c5hReset}</span>
+                        <span>✳ ${claudeDisplayName} (5h) ⏱ ${c5hReset}</span>
                         <b>${c5hPct}%</b>
                     </div>
                 </div>
