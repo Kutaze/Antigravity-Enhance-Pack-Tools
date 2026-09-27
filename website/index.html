@@ -1501,6 +1501,28 @@
       color: var(--text-main);
     }
 
+    .sponsor-page-cta-wrap {
+      text-align: center;
+      margin-top: 2.2rem;
+      padding: 0 1rem;
+    }
+    .sponsor-page-cta-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.85rem 2.2rem;
+      font-size: 0.98rem;
+      border-radius: 999px;
+      text-decoration: none;
+      max-width: 100%;
+      box-sizing: border-box;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+    }
+    .sponsor-cta-text-short {
+      display: none;
+    }
+
     @media (max-width: 768px) {
       .sponsor-grid {
         grid-template-columns: 1fr;
@@ -1587,17 +1609,14 @@
         display: inline-flex !important; /* 移动端显示汉堡侧边栏按钮 */
       }
       .discord-nav-btn {
-        display: none; /* 收进侧边栏内 */
-      }
-      .github-nav-btn span {
-        display: none;
+        display: none !important; /* 侧边栏内已完整包含 */
       }
       .github-nav-btn {
-        padding: 0 0.65rem;
+        display: none !important; /* 移动端隐藏顶部 GitHub 按钮，消除空框幽灵按钮（抽屉内已完整提供） */
       }
       .hero-title-full { display: none; }
       .hero-title-short { display: inline; }
-      .hero-title { font-size: 2.6rem; }
+      .hero-title { font-size: 2.5rem; }
       .metrics-bar { grid-template-columns: repeat(2, 1fr); }
       .why-grid { grid-template-columns: 1fr; }
       .feature-showcase-row, .feature-showcase-row.reverse {
@@ -1620,21 +1639,178 @@
     }
 
     @media (max-width: 768px) {
-      .hero-title { font-size: 2.1rem; }
-      .hero-desc { font-size: 1.05rem; }
+      .section-container {
+        padding: 3.5rem 1.25rem;
+      }
+      .hero-section {
+        padding: 2.8rem 1.25rem 3rem;
+      }
+      .hero-title { font-size: 2.1rem; line-height: 1.25; }
+      .hero-desc { font-size: 1rem; line-height: 1.6; }
       .metrics-bar { grid-template-columns: 1fr; }
       .installer-dual-grid { grid-template-columns: 1fr; }
+      .community-box {
+        margin: 1.5rem 1rem 2.5rem;
+        padding: 2.2rem 1.4rem;
+        border-radius: 18px;
+        gap: 1.5rem;
+      }
+      .community-text h3 {
+        font-size: 1.5rem;
+        line-height: 1.3;
+        margin-bottom: 0.6rem;
+      }
+      .community-text p {
+        font-size: 0.92rem;
+        line-height: 1.65;
+        margin: 0 auto;
+      }
+      .community-btn-wrapper {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+      }
+      .discord-official-btn {
+        width: 100%;
+        max-width: 320px;
+        justify-content: center;
+        height: 46px;
+        font-size: 0.95rem;
+      }
+      footer {
+        padding: 2.2rem 1.25rem 2.5rem;
+      }
       .footer-content {
         flex-direction: column;
+        align-items: center;
         justify-content: center;
+        gap: 1.25rem;
+      }
+      .footer-left {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 0.5rem;
+        font-size: 0.86rem;
+        line-height: 1.55;
+      }
+      .footer-links {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 0.75rem 1.4rem;
+        padding: 0;
+        margin: 0;
+        width: 100%;
+      }
+      .footer-links li {
+        list-style: none;
+      }
+      .footer-links li a {
+        white-space: nowrap;
+        font-size: 0.88rem;
+        display: inline-block;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .version-tag { display: none !important; }
+      .nav-container { padding: 0.65rem 0.85rem; }
+      .nav-actions { gap: 0.45rem; }
+      .theme-toggle-btn, .menu-toggle-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 9px;
+      }
+      .download-nav-btn {
+        height: 36px;
+        padding: 0 0.75rem;
+        font-size: 0.82rem;
+        gap: 0.35rem;
+        border-radius: 9px;
+      }
+      .download-icon {
+        width: 15px;
+        height: 15px;
+      }
+      .hero-btns {
+        flex-direction: column;
+        width: 100%;
+        max-width: 320px;
+        margin: 0 auto 2.2rem;
+        gap: 0.75rem;
+      }
+      .hero-btns .hero-cta {
+        width: 100%;
+        justify-content: center;
+        padding: 0.85rem 1.2rem;
+        font-size: 0.95rem;
+        white-space: nowrap;
+      }
+      .section-container {
+        padding: 3rem 1rem;
+      }
+      .section-header h2 {
+        font-size: 1.85rem;
+      }
+      .feature-content h3 {
+        font-size: 1.55rem;
+        line-height: 1.3;
+      }
+      .feature-content p {
+        font-size: 0.95rem;
+        line-height: 1.65;
+      }
+      .feature-showcase-row {
+        margin-bottom: 3.5rem;
+        gap: 1.5rem;
+      }
+      .why-card {
+        padding: 1.5rem 1.25rem;
+      }
+      .why-card-title {
+        font-size: 1.25rem;
+      }
+      .sponsor-card {
+        padding: 1.6rem 1.2rem;
+      }
+      .sponsor-page-cta-wrap {
+        margin-top: 1.6rem;
+      }
+      .sponsor-page-cta-btn {
+        width: 100%;
+        padding: 0.8rem 1rem;
+        font-size: 0.9rem;
+      }
+      .sponsor-cta-text-full {
+        display: none;
+      }
+      .sponsor-cta-text-short {
+        display: inline;
       }
     }
 
     @media (max-width: 480px) {
-      .version-tag { display: none; }
       .logo-area { gap: 0.45rem; }
-      .nav-container { padding: 0.65rem 0.85rem; }
-      .nav-actions { gap: 0.5rem; }
+      .hero-title {
+        font-size: 1.85rem;
+      }
+      .section-header h2 {
+        font-size: 1.65rem;
+      }
+      .feature-content h3 {
+        font-size: 1.4rem;
+      }
+      .author-card {
+        padding: 1.8rem 1.2rem;
+      }
+      .footer-links {
+        gap: 0.65rem 1.1rem;
+      }
+      .footer-links li a {
+        font-size: 0.84rem;
+      }
     }
   </style>
 </head>
@@ -2328,9 +2504,10 @@
         </div>
       </div>
 
-      <div style="text-align: center; margin-top: 2.2rem;">
-        <a href="sponsor.html" class="hero-cta hero-cta-secondary" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.8rem 2rem; font-size: 1rem; border-radius: 999px; text-decoration: none;">
-          <span>🌐 进入专属赞助页面 (查看大图二维码与完整特权指南) →</span>
+      <div class="sponsor-page-cta-wrap">
+        <a href="sponsor.html" class="hero-cta hero-cta-secondary sponsor-page-cta-btn">
+          <span class="sponsor-cta-text-full">🌐 进入专属赞助页面 (查看大图二维码与完整特权指南) →</span>
+          <span class="sponsor-cta-text-short">🌐 进入专属赞助页面 (特权指南) →</span>
         </a>
       </div>
     </section>
