@@ -1,7 +1,10 @@
 # 🚀 Antigravity Enhance Tools 版本发布规则速览 (快捷入口)
 
-> 本项目的全套权威版本更新规范、密钥资产库 (GitHub / Discord Bot Token) 与 5 步 SOP 流水线已放置于上级目录：
-> **[查看父级完整规则文件](../UPDATE_WORKFLOW_RULES.md)** (`D:\desk\Antigravity\UPDATE_WORKFLOW_RULES.md`)
+> 🌟 **核心技术宪章与项目全景大纲**已放置于父级目录：
+> **[查看全局全景架构大纲与跨 Agent 标准 SOP](../ANTIGRAVITY_ENHANCE_MASTER_SOP.md)** (`D:\desk\Antigravity\ANTIGRAVITY_ENHANCE_MASTER_SOP.md`)
+>
+> 🚀 **版本发布流程与密钥资产库**：
+> **[查看父级版本更新规程](../UPDATE_WORKFLOW_RULES.md)** (`D:\desk\Antigravity\UPDATE_WORKFLOW_RULES.md`)
 
 ---
 
