@@ -187,12 +187,17 @@ export default {
     if (url.pathname === '/test') {
       const testResult = await sendDiscordBroadcast(env, {
         out_trade_no: 'TEST_' + Date.now(),
-        title: '测试赞助方案',
+        title: '极客能量包 (免付费一键测试)',
         total_amount: '12.00',
-        remark: '测试备注 Discord: Kutaze'
+        remark: '测试备注：来自 Cloudflare Edge Worker 的免赞助联调测试！'
       });
-      return new Response(JSON.stringify({ success: testResult }), {
-        headers: { 'Content-Type': 'application/json' }
+      return new Response(JSON.stringify({
+        success: testResult,
+        message: '✅ 测试赞助广播已成功推送到 Discord「💖 · 爱发电赞助鸣谢」子频道！',
+        target_thread: '1553841999575261234',
+        timestamp: new Date().toISOString()
+      }, null, 2), {
+        headers: { 'Content-Type': 'application/json; charset=utf-8' }
       });
     }
 
@@ -280,9 +285,16 @@ async function checkAndMarkOrderProcessed(env, outTradeNo) {
  * 在 Discord 频道发送富文本赞助广播卡片
  */
 async function sendDiscordBroadcast(env, order) {
-  // 默认使用您之前已配置在项目中并经过验证的 Discord Webhook
+  // 默认使用官方 Discord Webhook
   const defaultWebhook = 'https://discord.com/api/webhooks/1552329570957529110/t53NF1st_oEqpgnJpRT6CUKWyozRfv9D0CFPKe7UpK7mm7Ye9c7OFr5Kcy5A05MxCnxu';
-  const webhookUrl = (env && env.DISCORD_WEBHOOK_URL) || defaultWebhook;
+  let webhookUrl = (env && env.DISCORD_WEBHOOK_URL) || defaultWebhook;
+
+  // 默认直接发送至专属子频道：💖 · 爱发电赞助鸣谢 (Thread ID: 1553841999575261234)
+  const defaultThreadId = '1553841999575261234';
+  const threadId = (env && env.DISCORD_THREAD_ID) || defaultThreadId;
+  if (threadId && !webhookUrl.includes('thread_id=')) {
+    webhookUrl += (webhookUrl.includes('?') ? '&' : '?') + `thread_id=${encodeURIComponent(threadId)}`;
+  }
 
   const { title, total_amount, remark, out_trade_no } = order;
 
@@ -336,11 +348,11 @@ async function sendDiscordBroadcast(env, order) {
  * 自动识别备注中的 Discord 用户并分配身份组 (Role)
  */
 async function grantDiscordRoleIfMatched(env, order) {
-  const botToken = env.DISCORD_BOT_TOKEN;
-  const guildId = env.DISCORD_GUILD_ID;
+  const botToken = env && env.DISCORD_BOT_TOKEN;
+  const guildId = (env && env.DISCORD_GUILD_ID) || '1552041753631129801';
 
   if (!botToken || !guildId) {
-    console.warn('[Role Grant] 未配置 DISCORD_BOT_TOKEN 或 DISCORD_GUILD_ID，跳过身份组发放');
+    console.warn('[Role Grant] 未配置 DISCORD_BOT_TOKEN，跳过身份组发放（广播不受影响）');
     return;
   }
 
