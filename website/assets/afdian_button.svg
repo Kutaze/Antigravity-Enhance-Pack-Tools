@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="260" height="42" viewBox="0 0 260 42" fill="none">
+  <defs>
+    <linearGradient id="afdian-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#946ce6" />
+      <stop offset="100%" stop-color="#7232e0" />
+    </linearGradient>
+    <filter id="afdian-shadow" x="-5%" y="-15%" width="110%" height="140%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#7232e0" flood-opacity="0.38" />
+    </filter>
+  </defs>
+
+  <g filter="url(#afdian-shadow)">
+    <!-- Main pill background -->
+    <rect x="1" y="1" width="258" height="40" rx="20" fill="url(#afdian-grad)" stroke="rgba(255, 255, 255, 0.25)" stroke-width="1.2" />
+
+    <!-- Lightning / Energy Bolt Logo -->
+    <g transform="translate(18, 11)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFFFFF">
+        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+      </svg>
+    </g>
+
+    <!-- Text -->
+    <text x="46" y="25" fill="#FFFFFF" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif" font-size="13.5" font-weight="600" letter-spacing="0.4">在爱发电上赞助支持</text>
+
+    <!-- Right Arrow Icon -->
+    <g transform="translate(226, 14)">
+      <path d="M1 6.5h11M7.5 2l4.5 4.5L7.5 11" stroke="#FFFFFF" stroke-opacity="0.85" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </g>
+</svg>
