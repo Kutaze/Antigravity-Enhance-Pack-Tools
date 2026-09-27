@@ -238,11 +238,118 @@
       max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
     }
 
-    @media (max-width: 900px) {
-      .sponsor-main-grid { grid-template-columns: 1fr; }
-      .perks-grid { grid-template-columns: 1fr; }
-      .claim-guide { flex-direction: column; text-align: center; }
-      .nav-links { display: none; }
+    /* 官方爱发电同款横幅卡片样式 */
+    .afdian-banner-card {
+      width: 100%;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+      border: 1.5px solid var(--border-color);
+      background: var(--bg-card);
+      transition: all 0.3s ease;
+      margin-top: 1.5rem;
+    }
+    .afdian-banner-card:hover {
+      box-shadow: 0 12px 28px rgba(148, 108, 230, 0.18);
+      border-color: rgba(148, 108, 230, 0.5);
+    }
+    .afdian-banner-img-box {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 4 / 1;
+      overflow: hidden;
+      background: #0f172a;
+    }
+    .afdian-banner-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .afdian-banner-bottom {
+      padding: 1.1rem 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: var(--bg-card);
+    }
+    .afdian-banner-avatar-wrap {
+      flex-shrink: 0;
+    }
+    .afdian-banner-avatar {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      border: 2.5px solid #ffffff;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      display: block;
+      object-fit: cover;
+    }
+    .afdian-banner-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .afdian-banner-name-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.2rem;
+    }
+    .afdian-banner-name {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+    .afdian-tag-pill {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(148, 108, 230, 0.12);
+      color: #946ce6;
+    }
+    .afdian-banner-desc {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .afdian-banner-action-btn {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: #946ce6;
+      color: #ffffff;
+      padding: 0.55rem 1.15rem;
+      border-radius: 999px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: 0 4px 12px rgba(148, 108, 230, 0.35);
+      transition: all 0.25s ease;
+    }
+    .afdian-banner-action-btn:hover {
+      background: #8054d9;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(148, 108, 230, 0.45);
+    }
+    @media (max-width: 640px) {
+      .afdian-banner-bottom {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.85rem;
+      }
+      .afdian-banner-desc {
+        white-space: normal;
+      }
+      .afdian-banner-action-btn {
+        width: 100%;
+        justify-content: center;
+      }
     }
   </style>
 </head>
@@ -362,9 +469,27 @@
           <span>立即前往爱发电赞助 (afdian.com/a/Kutaze) →</span>
         </a>
 
-        <!-- Afdian Official Leaflet/Widget Embed (前端嵌入官方即时组件) -->
-        <div style="margin-top: 1.5rem; width: 100%; border-radius: 18px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.06); border: 1px solid var(--border-color); background: #ffffff;">
-          <iframe src="https://afdian.com/leaflet?slug=Kutaze" width="100%" scrolling="no" height="200" frameborder="0" style="display: block; border: none; width: 100%;"></iframe>
+        <!-- 官方爱发电主页同款直通卡片 (100% 对齐官方主页横幅与创作者卡片) -->
+        <div class="afdian-banner-card">
+          <div class="afdian-banner-img-box">
+            <img src="assets/afdian_banner_1440x360.png" alt="爱发电官方主页横幅" class="afdian-banner-img">
+          </div>
+          <div class="afdian-banner-bottom">
+            <div class="afdian-banner-avatar-wrap">
+              <img src="assets/author_avatar.png" alt="Kutaze" class="afdian-banner-avatar">
+            </div>
+            <div class="afdian-banner-info">
+              <div class="afdian-banner-name-row">
+                <span class="afdian-banner-name">[未认证]Kutaze</span>
+                <span class="afdian-tag-pill">创作者</span>
+              </div>
+              <p class="afdian-banner-desc">正在创作 专注于软件前端视觉展示与交互设计，为 Google Antigravity 打造极致顺手的增强套件。</p>
+            </div>
+            <a href="https://afdian.com/a/Kutaze" target="_blank" rel="noopener noreferrer" class="afdian-banner-action-btn">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              <span>为 TA 发电</span>
+            </a>
+          </div>
         </div>
       </div>
 

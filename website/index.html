@@ -1022,20 +1022,150 @@
       list-style: none;
       display: flex;
       flex-direction: column;
-      gap: 0.85rem;
+      gap: 1rem;
     }
     .feature-bullets li {
       display: flex;
       align-items: flex-start;
-      gap: 0.75rem;
-      font-size: 0.95rem;
-      color: var(--text-main);
+      gap: 0.85rem;
+      font-size: 0.98rem;
+      line-height: 1.65;
+      color: var(--text-muted);
     }
     .feature-bullets li span.check {
-      color: var(--accent-emerald);
-      font-weight: 900;
+      color: #10b981;
+      background: rgba(16, 185, 129, 0.12);
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
       flex-shrink: 0;
-      margin-top: 1px;
+      margin-top: 2px;
+    }
+    .feature-bullets li .bullet-text {
+      flex: 1;
+    }
+    .feature-bullets li strong {
+      color: var(--text-main);
+      font-weight: 700;
+    }
+
+    /* 官方爱发电同款横幅卡片样式 */
+    .afdian-banner-card {
+      width: 100%;
+      max-width: 780px;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+      border: 1.5px solid var(--border-color);
+      background: var(--bg-card-solid);
+      transition: all 0.3s ease;
+    }
+    .afdian-banner-card:hover {
+      box-shadow: 0 16px 36px rgba(148, 108, 230, 0.18);
+      border-color: rgba(148, 108, 230, 0.5);
+    }
+    .afdian-banner-img-box {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 4 / 1;
+      overflow: hidden;
+      background: #0f172a;
+    }
+    .afdian-banner-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .afdian-banner-bottom {
+      padding: 1.25rem 1.6rem;
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      background: var(--bg-card-solid);
+    }
+    .afdian-banner-avatar-wrap {
+      flex-shrink: 0;
+    }
+    .afdian-banner-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: 3px solid #ffffff;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+      display: block;
+      object-fit: cover;
+    }
+    .afdian-banner-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .afdian-banner-name-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.3rem;
+    }
+    .afdian-banner-name {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+    .afdian-tag-pill {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(148, 108, 230, 0.12);
+      color: #946ce6;
+    }
+    .afdian-banner-desc {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .afdian-banner-action-btn {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #946ce6;
+      color: #ffffff;
+      padding: 0.65rem 1.4rem;
+      border-radius: 999px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(148, 108, 230, 0.35);
+      transition: all 0.25s ease;
+    }
+    .afdian-banner-action-btn:hover {
+      background: #8054d9;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(148, 108, 230, 0.45);
+    }
+    @media (max-width: 640px) {
+      .afdian-banner-bottom {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.85rem;
+      }
+      .afdian-banner-desc {
+        white-space: normal;
+      }
+      .afdian-banner-action-btn {
+        width: 100%;
+        justify-content: center;
+      }
     }
 
     /* Dual Theme Installer Comparison Grid */
@@ -1855,10 +1985,22 @@
             告别外部独立工具的繁琐调用，底栏头像与切换功能彻底合二为一。微光深色毛玻璃悬浮窗让当前状态一目了然。
           </p>
           <ul class="feature-bullets">
-            <li><span class="check">✔</span> <strong>快捷多账号功能切换</strong>：点击底栏头像一键快速切换不同账号，支持即时搜索与分组标签；</li>
-            <li><span class="check">✔</span> <strong>实时显示账户额度</strong>：自动向 Google 端点并发同步最新配额与重置时间，到期自动恢复为 100%；</li>
-            <li><span class="check">✔</span> <strong>本地物理防污染隔离</strong>：每组凭证在本地安全目录物理隔离，彻底杜绝串号；</li>
-            <li><span class="check">✔</span> <strong>深度注销二次确认</strong>：一键擦除 Windows Credential / Keychain 凭据。</li>
+            <li>
+              <span class="check">✔</span>
+              <div class="bullet-text"><strong>快捷多账号功能切换</strong>：点击底栏头像一键快速切换不同账号，支持即时搜索与分组标签；</div>
+            </li>
+            <li>
+              <span class="check">✔</span>
+              <div class="bullet-text"><strong>实时显示账户额度</strong>：自动向 Google 端点并发同步最新配额与重置时间，到期自动恢复为 100%；</div>
+            </li>
+            <li>
+              <span class="check">✔</span>
+              <div class="bullet-text"><strong>本地物理防污染隔离</strong>：每组凭证在本地安全目录物理隔离，彻底杜绝串号；</div>
+            </li>
+            <li>
+              <span class="check">✔</span>
+              <div class="bullet-text"><strong>深度注销二次确认</strong>：一键擦除 Windows Credential / Keychain 凭据。</div>
+            </li>
           </ul>
         </div>
       </div>
@@ -1875,19 +2017,30 @@
             深度重塑客户端视觉质感，将快捷模型切换与优雅状态感知原生嵌合，微光毛玻璃面板呼之即出，双手不离当前代码思路。
           </p>
           <ul class="feature-bullets">
-            <li><span class="check">✔</span> <strong>毛玻璃视觉体系重构</strong>：微光圆角卡片、柔和渐变阴影与高质感磨砂微透明面板；</li>
-            <li><span class="check">✔</span> <strong>ClearType 高清抗锯齿</strong>：护眼字阶排版系统，长时间阅读代码不疲劳；</li>
-            <li><span class="check">✔</span> <strong>实时状态动态感知</strong>：底栏彩色胶囊毫秒级遥测上下文，操作反馈更即时；</li>
-            <li><span class="check">✔</span> <strong>独创 DOM 缓存守卫</strong>：指纹校验彻底杜绝单页应用死循环卡死与假死。</li>
+            <li>
+              <span class="check">✔</span>
+              <div class="bullet-text"><strong>毛玻璃视觉体系重构</strong>：微光圆角卡片、柔和渐变阴影与高质感磨砂微透明面板；</div>
+            </li>
+            <li>
+              <span class="check">✔</span>
+              <div class="bullet-text"><strong>ClearType 高清抗锯齿</strong>：护眼字阶排版系统，长时间阅读代码不疲劳；</div>
+            </li>
+            <li>
+              <span class="check">✔</span>
+              <div class="bullet-text"><strong>实时状态动态感知</strong>：底栏彩色胶囊毫秒级遥测上下文，操作反馈更即时；</div>
+            </li>
+            <li>
+              <span class="check">✔</span>
+              <div class="bullet-text"><strong>独创 DOM 缓存守卫</strong>：指纹校验彻底杜绝单页应用死循环卡死与假死。</div>
+            </li>
           </ul>
         </div>
       </div>
 
       <!-- Feature 2.1: Timeline Navigation & Instant Search (v0.1.6 New) -->
       <div class="feature-showcase-row" id="timeline-nav">
-        <div class="feature-media" style="display: flex; gap: 14px; align-items: stretch; justify-content: center;">
-          <img src="assets/verified_timeline_progressbar_live.png" alt="垂直时空刻度导航进度条" style="width: auto; height: 380px; object-fit: contain; border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow);">
-          <img src="assets/verified_timeline_viewer_live.png" alt="会话轮次即时搜索与快速直达弹窗" style="flex: 1; min-width: 0; height: 380px; object-fit: cover; object-position: left center; border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow);">
+        <div class="feature-media">
+          <img src="assets/verified_timeline_viewer_live.png" alt="会话轮次即时搜索与快速直达弹窗">
         </div>
         <div class="feature-content">
           <span class="feature-badge-mini badge-cyan">v0.1.6 交互核心重构</span>
@@ -1896,10 +2049,22 @@
             针对超长长程会话中反复拉扯滚动条、历史提问无法快速索引等深层痛点，独创垂直动态刻度进度条与即时搜索直达弹窗体系。
           </p>
           <ul class="feature-bullets">
-            <li><span class="check">✔</span> <strong>垂直时空刻度导航进度条 (图三实测)</strong>：居左垂直长轴标尺，细粒度动态采样 18~65 档里程碑，随光标与滚动产生流体余弦放大波浪，黑体指针实时指示浏览深度；</li>
-            <li><span class="check">✔</span> <strong>会话轮次即时搜索直达弹窗 (图二实测)</strong>：点击底部 <code>≡</code> 按钮即时呼出，支持按轮次编号或提问关键词毫秒级过滤，翡翠绿高亮聚焦当前轮次，一键跳转直达历史节点；</li>
-            <li><span class="check">✔</span> <strong>850ms 防反冲单向锁定</strong>：用户点击刻度轴或搜索结果执行导航时，激活单向抑制窗口，彻底切断视口滚动反向监听反馈环，根治上下往复疯狂抖动；</li>
-            <li><span class="check">✔</span> <strong>100% 严密隐私脱敏保护</strong>：侧边栏历史会话、项目列表、用户名及历史聊天记录全量深度打码脱敏，离线纯本地运行无泄露。</li>
+            <li>
+              <span class="check">✔</span>
+              <div class="bullet-text"><strong>垂直时空刻度导航进度条</strong>：居左垂直长轴标尺，细粒度动态采样 18~65 档里程碑，随光标与滚动产生流体余弦放大波浪，黑体指针实时指示浏览深度；</div>
+            </li>
+            <li>
+              <span class="check">✔</span>
+              <div class="bullet-text"><strong>会话轮次即时搜索直达弹窗</strong>：点击底部 <code>≡</code> 按钮即时呼出，支持按轮次编号或提问关键词毫秒级过滤，翡翠绿高亮聚焦当前轮次，一键跳转直达历史节点；</div>
+            </li>
+            <li>
+              <span class="check">✔</span>
+              <div class="bullet-text"><strong>850ms 防反冲单向锁定</strong>：用户点击刻度轴或搜索结果执行导航时，激活单向抑制窗口，彻底切断视口滚动反向监听反馈环，根治上下往复疯狂抖动；</div>
+            </li>
+            <li>
+              <span class="check">✔</span>
+              <div class="bullet-text"><strong>100% 严密隐私脱敏保护</strong>：侧边栏历史会话、项目列表、用户名及历史聊天记录全量深度打码脱敏，离线纯本地运行无泄露。</div>
+            </li>
           </ul>
         </div>
       </div>
@@ -1916,10 +2081,22 @@
             针对长程对话中目标轮次超出当前页面虚拟切片渲染池（已被 DOM 虚拟滚动物理卸载）的痛点，创新研发浮动快照回放卡片。
           </p>
           <ul class="feature-bullets">
-            <li><span class="check">✔</span> <strong>轻量级毛玻璃历史快照浮层 (agy-historical-viewer)</strong>：自动平滑滚动至可见边缘并优雅呼出浮动卡片，不破坏当前界面布局；</li>
-            <li><span class="check">✔</span> <strong>穿透直读本地权威日志</strong>：IPC 原生直读本地 <code>transcript.jsonl</code>，彻底剥离模型压缩总结脏数据，权威还原真实问答；</li>
-            <li><span class="check">✔</span> <strong>完整重现问答与一键独立复制</strong>：清晰呈现用户原始提问与 AI 关键解答摘要，支持各模块一键独立复制至剪贴板；</li>
-            <li><span class="check">✔</span> <strong>翡翠绿脉冲光环定位</strong>：TreeWalker 文本特征穿透引擎精准锁定真实消息节点，呈现双层脉冲光环。</li>
+            <li>
+              <span class="check">✔</span>
+              <div class="bullet-text"><strong>轻量级毛玻璃历史快照浮层 (agy-historical-viewer)</strong>：自动平滑滚动至可见边缘并优雅呼出浮动卡片，不破坏当前界面布局；</div>
+            </li>
+            <li>
+              <span class="check">✔</span>
+              <div class="bullet-text"><strong>穿透直读本地权威日志</strong>：IPC 原生直读本地 <code>transcript.jsonl</code>，彻底剥离模型压缩总结脏数据，权威还原真实问答；</div>
+            </li>
+            <li>
+              <span class="check">✔</span>
+              <div class="bullet-text"><strong>完整重现问答与一键独立复制</strong>：清晰呈现用户原始提问与 AI 关键解答摘要，支持各模块一键独立复制至剪贴板；</div>
+            </li>
+            <li>
+              <span class="check">✔</span>
+              <div class="bullet-text"><strong>翡翠绿脉冲光环定位</strong>：TreeWalker 文本特征穿透引擎精准锁定真实消息节点，呈现双层脉冲光环。</div>
+            </li>
           </ul>
         </div>
       </div>
@@ -1936,16 +2113,28 @@
             独创模型能力自适应判定管道，不同模型各得其所。底层直通本地磁盘真实日志，为搜索弹窗打造 100% 纯净权威索引。
           </p>
           <ul class="feature-bullets">
-            <li><span class="check">✔</span> <strong>Gemini 独占 4 挡调节滑块</strong>：关闭 / 8k / 16k / 24k 自由调节，最高挡尊享紫粉渐变流光动效；</li>
-            <li><span class="check">✔</span> <strong>Claude 智能识别为「内置思考」</strong>：隐藏非法交互滑轨，展示平台原生自动推理，彻底杜绝强行拖动引发的逻辑报错；</li>
-            <li><span class="check">✔</span> <strong>防穿透事件门禁与防闪退机制</strong>：阻断菜单刚展开时的模拟点击事件穿透，彻底修复点击模型菜单瞬间闪退的 Bug；</li>
-            <li><span class="check">✔</span> <strong>穿透直读本地真实日志</strong>：IPC 直读 transcript.jsonl，彻底剥离 &lt;CONTEXT_SUMMARY&gt; 压缩脏数据，搜索直达不偏不倚。</li>
+            <li>
+              <span class="check">✔</span>
+              <div class="bullet-text"><strong>Gemini 独占 4 挡调节滑块</strong>：关闭 / 8k / 16k / 24k 自由调节，最高挡尊享紫粉渐变流光动效；</div>
+            </li>
+            <li>
+              <span class="check">✔</span>
+              <div class="bullet-text"><strong>Claude 智能识别为「内置思考」</strong>：隐藏非法交互滑轨，展示平台原生自动推理，彻底杜绝强行拖动引发的逻辑报错；</div>
+            </li>
+            <li>
+              <span class="check">✔</span>
+              <div class="bullet-text"><strong>防穿透事件门禁与防闪退机制</strong>：阻断菜单刚展开时的模拟点击事件穿透，彻底修复点击模型菜单瞬间闪退的 Bug；</div>
+            </li>
+            <li>
+              <span class="check">✔</span>
+              <div class="bullet-text"><strong>穿透直读本地真实日志</strong>：IPC 直读 transcript.jsonl，彻底剥离 &lt;CONTEXT_SUMMARY&gt; 压缩脏数据，搜索直达不偏不倚。</div>
+            </li>
           </ul>
         </div>
       </div>
 
       <!-- Feature 3: Skills Hub -->
-      <div class="feature-showcase-row" id="skills">
+      <div class="feature-showcase-row reverse" id="skills">
         <div class="feature-media">
           <img src="assets/verified_skills_hub_live.png" alt="可视化技能中心">
         </div>
@@ -1956,15 +2145,24 @@
             输入框上方工具栏一键呼出，内置 35+ 款官方与生态顶级技能，告别手工查找提示词文件的繁琐。
           </p>
           <ul class="feature-bullets">
-            <li><span class="check">✔</span> <strong>6 大技能分类 Tab</strong>：代码设计、UI交互、数据文档、调试测试、兜底分类；</li>
-            <li><span class="check">✔</span> <strong>双维度来源标签</strong>：清晰标明「原生自带」与「用户添加」；</li>
-            <li><span class="check">✔</span> <strong>一键 GitHub 自动安装</strong>：粘贴 GitHub 技能链接，AI 自动解析部署至本地。</li>
+            <li>
+              <span class="check">✔</span>
+              <div class="bullet-text"><strong>6 大技能分类 Tab</strong>：代码设计、UI交互、数据文档、调试测试、兜底分类；</div>
+            </li>
+            <li>
+              <span class="check">✔</span>
+              <div class="bullet-text"><strong>双维度来源标签</strong>：清晰标明「原生自带」与「用户添加」；</div>
+            </li>
+            <li>
+              <span class="check">✔</span>
+              <div class="bullet-text"><strong>一键 GitHub 自动安装</strong>：粘贴 GitHub 技能链接，AI 自动解析部署至本地。</div>
+            </li>
           </ul>
         </div>
       </div>
 
       <!-- Feature 4: Dual-Theme GUI Installer -->
-      <div class="feature-showcase-row reverse" id="installer">
+      <div class="feature-showcase-row" id="installer">
         <div class="installer-dual-grid">
           <div class="installer-theme-box">
             <img src="assets/gui_installer_light_preview.png" alt="浅色明亮主题">
@@ -1982,9 +2180,18 @@
             单文件独立免安装程序，体积轻巧。支持自动检测客户端路径、ClearType 高清文字排版与一键无缝切换深色/浅色主题。
           </p>
           <ul class="feature-bullets">
-            <li><span class="check">✔</span> <strong>一键注入 / 无损还原</strong>：安全备份官方原版，支持一键复原；</li>
-            <li><span class="check">✔</span> <strong>跨平台支持</strong>：全面支持 Windows、macOS (M系列/Intel) 与 Linux；</li>
-            <li><span class="check">✔</span> <strong>零隐私泄露</strong>：纯本地运行，不上传任何代码与凭证。</li>
+            <li>
+              <span class="check">✔</span>
+              <div class="bullet-text"><strong>一键注入 / 无损还原</strong>：安全备份官方原版，支持一键复原；</div>
+            </li>
+            <li>
+              <span class="check">✔</span>
+              <div class="bullet-text"><strong>跨平台支持</strong>：全面支持 Windows、macOS (M系列/Intel) 与 Linux；</div>
+            </li>
+            <li>
+              <span class="check">✔</span>
+              <div class="bullet-text"><strong>零隐私泄露</strong>：纯本地运行，不上传任何代码与凭证。</div>
+            </li>
           </ul>
           <div style="margin-top: 1.35rem;">
             <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases" target="_blank" rel="noopener noreferrer" class="hero-cta hero-cta-primary" style="padding: 0.65rem 1.4rem; font-size: 0.92rem; display: inline-flex;">
@@ -2093,13 +2300,31 @@
         </div>
       </div>
 
-      <!-- Afdian Official Leaflet/Widget Embed (前端嵌入官方即时组件) -->
-      <div class="afdian-leaflet-wrapper" style="margin-top: 2.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;">
+      <!-- 官方爱发电主页同款直通卡片 (100% 对齐官方主页横幅与创作者卡片) -->
+      <div class="afdian-custom-card-wrapper" style="margin-top: 2.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;">
         <div style="font-size: 0.95rem; font-weight: 700; color: var(--text-dim); margin-bottom: 0.8rem; display: flex; align-items: center; gap: 6px;">
-          <span>⚡ 爱发电官方即时赞助组件 (实时同步最新发电动态与月度人次)</span>
+          <span>⚡ 爱发电官方主页直通卡片 (实时对齐官方主页横幅与创作者卡片)</span>
         </div>
-        <div style="width: 100%; max-width: 640px; border-radius: 18px; overflow: hidden; box-shadow: var(--shadow); border: 1px solid var(--border-color); background: #ffffff;">
-          <iframe src="https://afdian.com/leaflet?slug=Kutaze" width="100%" scrolling="no" height="200" frameborder="0" style="display: block; border: none; width: 100%; max-width: 640px;"></iframe>
+        <div class="afdian-banner-card">
+          <div class="afdian-banner-img-box">
+            <img src="assets/afdian_banner_1440x360.png" alt="爱发电官方主页横幅" class="afdian-banner-img">
+          </div>
+          <div class="afdian-banner-bottom">
+            <div class="afdian-banner-avatar-wrap">
+              <img src="assets/author_avatar.png" alt="Kutaze" class="afdian-banner-avatar">
+            </div>
+            <div class="afdian-banner-info">
+              <div class="afdian-banner-name-row">
+                <span class="afdian-banner-name">[未认证]Kutaze</span>
+                <span class="afdian-tag-pill">创作者</span>
+              </div>
+              <p class="afdian-banner-desc">正在创作 专注于软件前端视觉展示与交互设计，为 Google Antigravity 打造极致顺手的增强套件。</p>
+            </div>
+            <a href="https://afdian.com/a/Kutaze" target="_blank" rel="noopener noreferrer" class="afdian-banner-action-btn">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              <span>为 TA 发电</span>
+            </a>
+          </div>
         </div>
       </div>
 
