@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "rewrites": [
+    { "source": "/", "destination": "/docs/index.html" },
+    { "source": "/sponsor", "destination": "/docs/sponsor.html" },
+    { "source": "/sponsor.html", "destination": "/docs/sponsor.html" },
+    { "source": "/assets/(.*)", "destination": "/docs/assets/$1" },
+    { "source": "/favicon.png", "destination": "/docs/favicon.png" }
+  ]
+}

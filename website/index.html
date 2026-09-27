@@ -5,6 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Antigravity Enhance Tools - 官方产品首页</title>
   <meta name="description" content="专为 Google Antigravity 官方桌面客户端打造的全界面原生深度汉化、多账号管理与交互增强套件。">
+  <link rel="canonical" href="https://antigravity-enhance-tools.github.io/">
+  <script>
+    // 强制使用官方独立域名，停用旧二级目录并自动秒级无损跳转
+    if (window.location.hostname.indexOf('kutaze.github.io') !== -1) {
+      window.location.replace('https://antigravity-enhance-tools.github.io/' + window.location.hash);
+    }
+  </script>
   <!-- Favicon / 标签页 Logo -->
   <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
   <link rel="icon" type="image/png" sizes="16x16" href="favicon.png">
@@ -1225,6 +1232,152 @@
     }
 
     /* ========================================================
+       SPONSOR & DONATION SECTION (爱发电与微信赞赏)
+       ======================================================== */
+    .sponsor-section {
+      max-width: 1100px;
+      margin: 4.5rem auto 2rem;
+      padding: 0 1rem;
+    }
+    .sponsor-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    .sponsor-header h2 {
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: var(--text-main);
+      margin-bottom: 0.8rem;
+    }
+    .sponsor-header p {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      max-width: 680px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    .sponsor-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+    .sponsor-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 22px;
+      padding: 2.2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      box-shadow: var(--shadow-card);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .sponsor-card:hover {
+      border-color: var(--border-hover);
+      box-shadow: var(--shadow-glow), var(--shadow-card);
+      transform: translateY(-3px);
+    }
+    .sponsor-card-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 14px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      margin-bottom: 1.2rem;
+    }
+    .tag-wechat {
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--accent-emerald);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .tag-afdian {
+      background: rgba(148, 108, 230, 0.12);
+      color: #946ce6;
+      border: 1px solid rgba(148, 108, 230, 0.35);
+    }
+    .sponsor-qr-box {
+      background: #ffffff;
+      padding: 12px;
+      border-radius: 18px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+      margin-bottom: 1.2rem;
+      display: inline-block;
+    }
+    .sponsor-qr-img {
+      width: 220px;
+      height: 220px;
+      object-fit: contain;
+      display: block;
+      border-radius: 12px;
+    }
+    .sponsor-card-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 0.5rem;
+    }
+    .sponsor-card-desc {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 1.2rem;
+    }
+    .afdian-official-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      height: 48px;
+      padding: 0 1.8rem;
+      border-radius: 24px;
+      background: linear-gradient(135deg, #946ce6 0%, #7232e0 100%);
+      color: #ffffff !important;
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: 700;
+      box-shadow: 0 4px 18px rgba(114, 50, 224, 0.4);
+      transition: all 0.25s ease;
+      margin-top: 1rem;
+    }
+    .afdian-official-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(114, 50, 224, 0.55);
+      filter: brightness(1.08);
+    }
+    .afdian-tiers-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      text-align: left;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 1rem 1.2rem;
+      margin-top: 0.5rem;
+    }
+    .afdian-tier-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+    .afdian-tier-row strong {
+      color: var(--text-main);
+    }
+
+    @media (max-width: 768px) {
+      .sponsor-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ========================================================
        FOOTER
        ======================================================== */
     footer {
@@ -1369,7 +1522,7 @@
   <aside class="mobile-sidebar-drawer" id="mobile-sidebar" aria-label="移动端快速导航">
     <div class="drawer-header">
       <div class="drawer-logo">
-        <img src="../assets/logo_glyph_transparent.png" alt="Logo" class="drawer-logo-img">
+        <img src="assets/logo_glyph_transparent.png" alt="Logo" class="drawer-logo-img">
         <div class="drawer-logo-texts">
           <span class="drawer-logo-title">Antigravity Enhance</span>
           <span class="drawer-version">v0.1.6 · 增强套件</span>
@@ -1444,6 +1597,15 @@
             </div>
           </a>
         </li>
+        <li>
+          <a href="sponsor.html" class="drawer-link" onclick="closeSidebar()">
+            <span class="drawer-link-icon">💖</span>
+            <div class="drawer-link-text">
+              <span class="drawer-link-name">赞助与支持</span>
+              <span class="drawer-link-desc">爱发电与微信赞赏 · 专属页面</span>
+            </div>
+          </a>
+        </li>
       </ul>
     </div>
 
@@ -1452,6 +1614,9 @@
         📥 客户端下载 (v0.1.6)
       </a>
       <div class="drawer-community-row">
+        <a href="https://afdian.com/a/Kutaze" target="_blank" class="drawer-mini-btn" style="color: #a855f7; border-color: rgba(168, 85, 247, 0.4);">
+          ⚡ 爱发电
+        </a>
         <a href="https://discord.gg/QRsPcNrSB" target="_blank" class="drawer-mini-btn">
           💬 Discord
         </a>
@@ -1467,7 +1632,7 @@
     <div class="nav-container">
       <!-- Logo -->
       <a href="#" class="logo-area">
-        <img src="../assets/logo_glyph_transparent.png" alt="Logo" class="logo-img">
+        <img src="assets/logo_glyph_transparent.png" alt="Logo" class="logo-img">
         <span class="logo-text">
           <span class="logo-text-full">Antigravity Enhance Tools</span>
           <span class="logo-text-short">AG Enhance</span>
@@ -1484,6 +1649,7 @@
         <li><a href="#skills"><span class="nav-title-full">技能中心</span><span class="nav-title-short">技能</span></a></li>
         <li><a href="#installer"><span class="nav-title-full">下载安装</span><span class="nav-title-short">下载</span></a></li>
         <li><a href="#author"><span class="nav-title-full">关于作者</span><span class="nav-title-short">作者</span></a></li>
+        <li><a href="sponsor.html" style="color: #ec4899; font-weight: 700;"><span class="nav-title-full">💖 赞助支持</span><span class="nav-title-short">赞助</span></a></li>
       </ul>
 
       <!-- Right Action Cluster -->
@@ -1538,7 +1704,7 @@
         </div>
         <!-- Author Info in Hero -->
         <a href="#author" class="author-hero-pill">
-          <img src="../assets/author_avatar.png" alt="Kutaze 头像" class="author-avatar-xs">
+          <img src="assets/author_avatar.png" alt="Kutaze 头像" class="author-avatar-xs">
           <span>Crafted by <strong>Kutaze</strong></span>
         </a>
       </div>
@@ -1564,6 +1730,9 @@
             <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .079.01c.12.098.246.198.373.292a.077.077 0 0 1-.007.128 12.299 12.299 0 0 1-1.873.891.077.077 0 0 0-.04.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.418 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.332-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.418 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.332-.946 2.418-2.157 2.418z"/>
           </svg>
           <span>加入 Discord 社区</span>
+        </a>
+        <a href="sponsor.html" class="hero-cta" style="background: rgba(236, 72, 153, 0.12); color: #ec4899; border: 1.5px solid rgba(236, 72, 153, 0.38); font-weight: 700; box-shadow: 0 4px 15px rgba(236, 72, 153, 0.2);">
+          💖 赞赏支持 (爱发电 / 微信)
         </a>
       </div>
 
@@ -1597,7 +1766,7 @@
             <span class="mockup-tab-title">Antigravity Enhance Tools - 客户端内嵌实测展示</span>
           </div>
           <div class="mockup-img-container">
-            <img src="../assets/verified_account_switcher_live.png" alt="多账号管理实测截图" class="mockup-img">
+            <img src="assets/verified_account_switcher_live.png" alt="多账号管理实测截图" class="mockup-img">
           </div>
         </div>
       </div>
@@ -1677,7 +1846,7 @@
       <!-- Feature 1: Multi-Account System -->
       <div class="feature-showcase-row" id="multi-account">
         <div class="feature-media">
-          <img src="../assets/verified_bottom_profile_tooltip_live.png" alt="底栏悬浮窗与多账号切换">
+          <img src="assets/verified_bottom_profile_tooltip_live.png" alt="底栏悬浮窗与多账号切换">
         </div>
         <div class="feature-content">
           <span class="feature-badge-mini badge-purple">v0.1.5 重磅架构</span>
@@ -1697,7 +1866,7 @@
       <!-- Feature 2: UI Beautification & Interaction Upgrade -->
       <div class="feature-showcase-row reverse" id="ui-interaction">
         <div class="feature-media">
-          <img src="../assets/verified_model_slider_live.png" alt="界面UI美化与模型切换">
+          <img src="assets/verified_model_slider_live.png" alt="界面UI美化与模型切换">
         </div>
         <div class="feature-content">
           <span class="feature-badge-mini badge-cyan">交互体验升级</span>
@@ -1717,8 +1886,8 @@
       <!-- Feature 2.1: Timeline Navigation & Instant Search (v0.1.6 New) -->
       <div class="feature-showcase-row" id="timeline-nav">
         <div class="feature-media" style="display: flex; gap: 14px; align-items: stretch; justify-content: center;">
-          <img src="../assets/verified_timeline_progressbar_live.png" alt="垂直时空刻度导航进度条" style="width: auto; height: 380px; object-fit: contain; border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow);">
-          <img src="../assets/verified_timeline_viewer_live.png" alt="会话轮次即时搜索与快速直达弹窗" style="flex: 1; min-width: 0; height: 380px; object-fit: cover; object-position: left center; border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow);">
+          <img src="assets/verified_timeline_progressbar_live.png" alt="垂直时空刻度导航进度条" style="width: auto; height: 380px; object-fit: contain; border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow);">
+          <img src="assets/verified_timeline_viewer_live.png" alt="会话轮次即时搜索与快速直达弹窗" style="flex: 1; min-width: 0; height: 380px; object-fit: cover; object-position: left center; border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow);">
         </div>
         <div class="feature-content">
           <span class="feature-badge-mini badge-cyan">v0.1.6 交互核心重构</span>
@@ -1738,7 +1907,7 @@
       <!-- Feature 2.2: Historical Viewer Snapshot Card (v0.1.6 New) -->
       <div class="feature-showcase-row reverse" id="historical-snapshot">
         <div class="feature-media">
-          <img src="../assets/verified_historical_snapshot_live.png" alt="超长会话毛玻璃历史快照卡片">
+          <img src="assets/verified_historical_snapshot_live.png" alt="超长会话毛玻璃历史快照卡片">
         </div>
         <div class="feature-content">
           <span class="feature-badge-mini badge-emerald">v0.1.6 权威快照引擎</span>
@@ -1758,7 +1927,7 @@
       <!-- Feature 2.3: Model Adaptive Thinking & Disk Indexing (v0.1.6 New) -->
       <div class="feature-showcase-row" id="model-adaptive">
         <div class="feature-media">
-          <img src="../assets/verified_adaptive_thinking_live.png" alt="模型思考能力动态自适应与纯净本地索引">
+          <img src="assets/verified_adaptive_thinking_live.png" alt="模型思考能力动态自适应与纯净本地索引">
         </div>
         <div class="feature-content">
           <span class="feature-badge-mini badge-purple">v0.1.6 架构重大演进</span>
@@ -1778,7 +1947,7 @@
       <!-- Feature 3: Skills Hub -->
       <div class="feature-showcase-row" id="skills">
         <div class="feature-media">
-          <img src="../assets/verified_skills_hub_live.png" alt="可视化技能中心">
+          <img src="assets/verified_skills_hub_live.png" alt="可视化技能中心">
         </div>
         <div class="feature-content">
           <span class="feature-badge-mini badge-emerald">生产力飞跃</span>
@@ -1798,11 +1967,11 @@
       <div class="feature-showcase-row reverse" id="installer">
         <div class="installer-dual-grid">
           <div class="installer-theme-box">
-            <img src="../assets/gui_installer_light_preview.png" alt="浅色明亮主题">
+            <img src="assets/gui_installer_light_preview.png" alt="浅色明亮主题">
             <div class="installer-theme-label">☀️ 浅色明亮模式 (默认)</div>
           </div>
           <div class="installer-theme-box">
-            <img src="../assets/gui_installer_dark_preview.png" alt="深色极夜主题">
+            <img src="assets/gui_installer_dark_preview.png" alt="深色极夜主题">
             <div class="installer-theme-label">🌙 深色极夜模式 (一键切换)</div>
           </div>
         </div>
@@ -1832,7 +2001,7 @@
     <section class="author-section" id="author">
       <div class="author-card">
         <div class="author-avatar-wrap">
-          <img src="../assets/author_avatar.png" alt="Kutaze" class="author-avatar-lg">
+          <img src="assets/author_avatar.png" alt="Kutaze" class="author-avatar-lg">
           <span class="author-online-badge" title="Developer Active"></span>
         </div>
         <div class="author-details">
@@ -1861,6 +2030,86 @@
       </div>
     </section>
 
+    <!-- ========================================================
+         SPONSOR & DONATION SECTION (赞助与支持)
+         ======================================================== -->
+    <section class="sponsor-section" id="sponsor">
+      <div class="sponsor-header">
+        <span class="feature-badge-mini badge-amber" style="margin-bottom: 0.6rem; display: inline-block;">💖 开源守护 · 纯净相伴</span>
+        <h2>赞助与支持 (Sponsors)</h2>
+        <p>
+          本项目承诺核心功能 <strong>永远 100% 开源免费、零广告、纯本地运行</strong>。由作者在业余时间独立逆向适配与架构维护。如果工具确实改善了您的协同效率，欢迎随心投喂，支持项目长久迭代！
+        </p>
+      </div>
+
+      <div class="sponsor-grid">
+        <!-- WeChat Pay Card -->
+        <div class="sponsor-card">
+          <span class="sponsor-card-tag tag-wechat">💚 微信扫码 · 随心赞赏</span>
+          <div class="sponsor-qr-box">
+            <img src="assets/wechat_sponsor.png" alt="微信赞赏码" class="sponsor-qr-img">
+          </div>
+          <h4 class="sponsor-card-title">微信赞赏码</h4>
+          <p class="sponsor-card-desc">“一分钱也是爱 ❤️❤️ · 乐禾泽”<br>支持任意金额随心打赏，即扫即付</p>
+          <div style="font-size: 0.85rem; color: var(--text-dim);">
+            💡 赞赏后可在 Discord 社区私信 Kutaze 登记鸣谢
+          </div>
+        </div>
+
+        <!-- Afdian Card -->
+        <div class="sponsor-card">
+          <span class="sponsor-card-tag tag-afdian">⚡ 爱发电会员 · 专属权益</span>
+          <div style="width: 80px; height: 80px; border-radius: 20px; background: rgba(148, 108, 230, 0.15); display: flex; align-items: center; justify-content: center; font-size: 42px; margin: 10px 0 16px;">
+            ⚡
+          </div>
+          <h4 class="sponsor-card-title">爱发电主页赞助</h4>
+          <p class="sponsor-card-desc">支持按月订阅或自选金额，解锁专属社区身份组与需求排期</p>
+          
+          <div class="afdian-tiers-list">
+            <div class="afdian-tier-row">
+              <span>☕ <strong>¥6.66/月</strong> 请作者喝杯咖啡</span>
+              <span>Sponsors 鸣谢</span>
+            </div>
+            <div class="afdian-tier-row">
+              <span>⚡ <strong>¥12/月</strong> 极客能量包 (主力推荐)</span>
+              <span>Discord 专属彩色身份</span>
+            </div>
+            <div class="afdian-tier-row">
+              <span>🚀 <strong>¥29.9/月</strong> 深度共创官</span>
+              <span>需求优先评估排期</span>
+            </div>
+            <div class="afdian-tier-row">
+              <span>👑 <strong>¥99.9/月</strong> 荣誉守护者</span>
+              <span>首页大徽章 + 1V1支持</span>
+            </div>
+          </div>
+
+          <a href="https://afdian.com/a/Kutaze" target="_blank" rel="noopener noreferrer" class="afdian-official-btn">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+            </svg>
+            <span>前往爱发电赞助 (afdian.com/a/Kutaze)</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Afdian Official Leaflet/Widget Embed (前端嵌入官方即时组件) -->
+      <div class="afdian-leaflet-wrapper" style="margin-top: 2.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;">
+        <div style="font-size: 0.95rem; font-weight: 700; color: var(--text-dim); margin-bottom: 0.8rem; display: flex; align-items: center; gap: 6px;">
+          <span>⚡ 爱发电官方即时赞助组件 (实时同步最新发电动态与月度人次)</span>
+        </div>
+        <div style="width: 100%; max-width: 640px; border-radius: 18px; overflow: hidden; box-shadow: var(--shadow); border: 1px solid var(--border-color); background: #ffffff;">
+          <iframe src="https://afdian.com/leaflet?slug=Kutaze" width="100%" scrolling="no" height="200" frameborder="0" style="display: block; border: none; width: 100%; max-width: 640px;"></iframe>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin-top: 2.2rem;">
+        <a href="sponsor.html" class="hero-cta hero-cta-secondary" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.8rem 2rem; font-size: 1rem; border-radius: 999px; text-decoration: none;">
+          <span>🌐 进入专属赞助页面 (查看大图二维码与完整特权指南) →</span>
+        </a>
+      </div>
+    </section>
+
     <!-- Community CTA Box (Fixed Proportion Discord Button) -->
     <div class="community-box">
       <div class="community-text">
@@ -1884,13 +2133,14 @@
   <footer>
     <div class="footer-content">
       <div class="footer-left">
-        <img src="../assets/author_avatar.png" alt="Kutaze 头像" class="footer-avatar">
+        <img src="assets/author_avatar.png" alt="Kutaze 头像" class="footer-avatar">
         <span>Designed & Engineered with ❤️ by <a href="https://github.com/Kutaze" target="_blank" style="color:var(--primary); font-weight:700; text-decoration:none;">Kutaze</a> · Antigravity Enhance Tools</span>
       </div>
       <ul class="footer-links">
         <li><a href="https://github.com/Kutaze" target="_blank">作者主页</a></li>
         <li><a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools" target="_blank">GitHub 仓库</a></li>
         <li><a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases" target="_blank">版本发布</a></li>
+        <li><a href="https://afdian.com/a/Kutaze" target="_blank" style="color: #a855f7; font-weight: 700;">爱发电赞助</a></li>
         <li><a href="https://discord.gg/QRsPcNrSB" target="_blank">Discord 频道</a></li>
         <li><a href="#">回到顶部 ↑</a></li>
       </ul>

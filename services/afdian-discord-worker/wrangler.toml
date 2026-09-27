@@ -1,0 +1,18 @@
+name = "afdian-discord-sync"
+main = "worker.js"
+compatibility_date = "2024-09-01"
+
+# 环境变量示例 (建议在 Cloudflare 网页后台 Settings -> Variables 中添加加密 Secret)
+[vars]
+# 1. 必填：用于发送频道赞助广播通知的 Discord 频道 Webhook URL
+# DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/..."
+
+# 2. 身份组发放相关 (若需自动上角色则必填)
+# DISCORD_BOT_TOKEN = "MTA1..."
+# DISCORD_GUILD_ID = "123456789012345678"
+
+# 3. 对应赞助档位的 Discord 身份组 (Role ID)
+# ROLE_SPONSORS_ID = "..."       # 基础赞助者 (¥6.66/月)
+# ROLE_TIER_GEEK_ID = "..."      # 极客能量包专属彩色 (¥12/月)
+# ROLE_TIER_COCREATOR_ID = "..." # 深度共创官 (¥29.9/月)
+# ROLE_TIER_HONOR_ID = "..."     # 荣誉守护者 (¥99.9/月)
