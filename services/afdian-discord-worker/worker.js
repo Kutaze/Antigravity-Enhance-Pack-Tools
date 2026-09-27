@@ -193,8 +193,8 @@ export default {
       });
       return new Response(JSON.stringify({
         success: testResult,
-        message: '✅ 测试赞助广播已成功推送到 Discord「💖 · 爱发电赞助鸣谢」子频道！',
-        target_thread: '1553841999575261234',
+        message: '✅ 测试赞助广播已成功推送到 Discord「💖・爱发电赞助鸣谢」大频道！',
+        target_channel: '💖・爱发电赞助鸣谢 (1553848037950890026)',
         timestamp: new Date().toISOString()
       }, null, 2), {
         headers: { 'Content-Type': 'application/json; charset=utf-8' }
@@ -285,13 +285,12 @@ async function checkAndMarkOrderProcessed(env, outTradeNo) {
  * 在 Discord 频道发送富文本赞助广播卡片
  */
 async function sendDiscordBroadcast(env, order) {
-  // 默认使用官方 Discord Webhook
-  const defaultWebhook = 'https://discord.com/api/webhooks/1552329570957529110/t53NF1st_oEqpgnJpRT6CUKWyozRfv9D0CFPKe7UpK7mm7Ye9c7OFr5Kcy5A05MxCnxu';
+  // 默认使用「💖・爱发电赞助鸣谢」大频道的专属 Webhook
+  const defaultWebhook = 'https://discord.com/api/webhooks/1553848098478882976/gjk9-alTdzWq-FQdj-2lySawg9Egm2BXlFb2DzzC5KvBQCSG0XuS_ZM6YRfG0taHvBTg';
   let webhookUrl = (env && env.DISCORD_WEBHOOK_URL) || defaultWebhook;
 
-  // 默认直接发送至专属子频道：💖 · 爱发电赞助鸣谢 (Thread ID: 1553841999575261234)
-  const defaultThreadId = '1553841999575261234';
-  const threadId = (env && env.DISCORD_THREAD_ID) || defaultThreadId;
+  // 若外部有显式传入 thread_id 则追加，否则直接投递至当前大频道
+  const threadId = env && env.DISCORD_THREAD_ID;
   if (threadId && !webhookUrl.includes('thread_id=')) {
     webhookUrl += (webhookUrl.includes('?') ? '&' : '?') + `thread_id=${encodeURIComponent(threadId)}`;
   }

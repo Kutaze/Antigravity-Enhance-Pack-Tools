@@ -67,12 +67,12 @@ export default async function handler(req, res) {
  * 发送 Discord Webhook 富文本广播（支持独立频道与子频道/子区 Thread）
  */
 async function sendDiscordNotification(order, queryThreadId) {
-  const defaultWebhook = 'https://discord.com/api/webhooks/1552329570957529110/t53NF1st_oEqpgnJpRT6CUKWyozRfv9D0CFPKe7UpK7mm7Ye9c7OFr5Kcy5A05MxCnxu';
+  // 默认直接发送至官方公告下新增的独立大频道：💖・爱发电赞助鸣谢 (Channel ID: 1553848037950890026)
+  const defaultWebhook = 'https://discord.com/api/webhooks/1553848098478882976/gjk9-alTdzWq-FQdj-2lySawg9Egm2BXlFb2DzzC5KvBQCSG0XuS_ZM6YRfG0taHvBTg';
   let targetUrl = process.env.DISCORD_WEBHOOK_URL || defaultWebhook;
 
-  // 默认直接发送至新创建的子区：💖 · 爱发电赞助鸣谢 (Thread ID: 1553841999575261234)
-  const defaultThreadId = '1553841999575261234';
-  const threadId = queryThreadId || process.env.DISCORD_THREAD_ID || defaultThreadId;
+  // 若有额外传入 thread_id 则追加，否则直接发送至该大频道
+  const threadId = queryThreadId || process.env.DISCORD_THREAD_ID;
   if (threadId && !targetUrl.includes('thread_id=')) {
     targetUrl += (targetUrl.includes('?') ? '&' : '?') + `thread_id=${encodeURIComponent(threadId)}`;
   }
