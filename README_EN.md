@@ -91,6 +91,20 @@ Native "@ Plugins" hub in the left navigation sidebar, bridging OpenAI Codex loc
 | :---: |
 | <img src="assets/verified_plugin_center_live.png" width="750" /> |
 
+### 6. Timeline Anti-Jitter Navigation & Historical Viewer Snapshot (`agy-historical-viewer`) [New in v0.1.6]
+3x vertically elongated timeline navigation axis supporting fluid cosine wave tracking and 850ms anti-jitter programmatic lock; breaks through native virtual list unmounting limitations by auto-scrolling to visible boundaries and summoning a lightweight frosted-glass floating history card, allowing complete inspection and one-click copying even when DOM nodes are unmounted:
+
+| Timeline Navigation Axis · Emerald Green Pulse Glow · Frosted-Glass Historical Snapshot Card (Masked Privacy) |
+| :---: |
+| <img src="assets/verified_timeline_viewer_live.png" width="750" /> |
+
+### 7. Model-Adaptive Thinking Architecture & Pure Local Log Indexing [New in v0.1.6]
+Pioneering model capability detection pipeline: Gemini gets dedicated 4-level thinking slider (0k/8k/16k/24k), Claude dynamically maps to an amber-gold badge "Built-in Thinking (Fixed)", and GPT maps to "Fixed Reasoning (Med)"; Main process IPC penetrates directly into local `transcript.jsonl` to strip `<CONTEXT_SUMMARY>` dirty data and provide 100% pure turn indexing:
+
+| Model-Adaptive Thinking Architecture · Anti-Crash Gate · Local Log Indexing Live Test (Privacy Masked) |
+| :---: |
+| <img src="assets/verified_adaptive_thinking_live.png" width="750" /> |
+
 ---
 
 ## 🧠 Core Philosophy
@@ -169,6 +183,28 @@ Throughout the architectural conception and UX design of **Antigravity Enhance T
 | :---: |
 | <img src="assets/verified_plugin_center_live.png" width="750" /> |
 
+### Timeline Anti-Jitter Navigation & Historical Viewer Snapshot (`agy-historical-viewer`) [New in v0.1.6]
+- **3x Elongated Timeline Axis**: Extends maximum vertical axis height to ~80% of window height with 18~65 granular dynamic milestones; fluid cosine wave magnification tracks the cursor at 60/120fps.
+- **850ms Programmatic Navigation Lock**: Engages `isProgrammaticNavigating = true` cooldown lock when clicking markers or search turns, completely blocking viewport scroll event feedback loops and oscillation.
+- **Frosted-Glass Historical Snapshot Card (`agy-historical-viewer`)**: Automatically scrolls to the nearest visible boundary and summons a floating frosted-glass snapshot card if the target turn is outside the DOM virtualized viewport pool, providing full question & response inspection and one-click copying.
+- **True Message Node Centering & Pulse Glow**: TreeWalker text matching engine pinpoints the user message bubble and triggers an emerald green (`#10b981`) double-layer pulse glow.
+
+| Timeline Navigation Axis · Emerald Green Pulse Glow · Frosted-Glass Historical Snapshot Card (Masked Privacy) |
+| :---: |
+| <img src="assets/verified_timeline_viewer_live.png" width="750" /> |
+
+### Model-Adaptive Thinking Architecture & Pure Local Log Indexing [New in v0.1.6]
+- **Dynamic Thinking Capability Pipeline (`getModelThinkingCapabilities`)**:
+  - **Gemini Series**: Dedicated 4-level dynamic thinking slider (Off / 8k / 16k / 24k) with glowing accent on high reasoning;
+  - **Claude Series**: Dynamically identified and safely replaced with an amber-gold badge "Built-in Thinking (Fixed)", reflecting platform-level reasoning without illegal synthetic clicks or config corruption;
+  - **GPT Series**: Safely mapped to an emerald green badge "Fixed Reasoning (Med)";
+- **Event Interception Gate & Anti-Crash Mechanism**: Blocks synthetic clicks during menu popover mounting and adds `stopPropagation` event gates, completely resolving menu flash-crash issues.
+- **Local Disk Log Penetration (`transcript.jsonl`)**: Main process exposes `antigravity:get-conversation-turns` native IPC, reading local conversation files directly and stripping `<CONTEXT_SUMMARY>` dirty tokens to eliminate duplicate search entries.
+
+| Model-Adaptive Thinking Architecture · Anti-Crash Gate · Local Log Indexing Live Test (Privacy Masked) |
+| :---: |
+| <img src="assets/verified_adaptive_thinking_live.png" width="750" /> |
+
 ### Native Screenshot Integration
 - **"+" Context Menu Access**: Built-in screenshot item directly inside the "+" context menu (`Win+Shift+S`).
 - **Auto Clipboard Injection**: Automatically captures and injects new screenshots directly into the active prompt editor without saving to disk.
@@ -197,6 +233,13 @@ curl -fsSL https://raw.githubusercontent.com/Kutaze/Antigravity-Enhance-Pack-Too
 ---
 
 ## 📝 Changelog
+
+### [v0.1.6] - 2026-09-27 Deep Stability & Experience Overhaul
+- **Sidebar Anti-Jitter Navigation Guard**: Introduced `isProgrammaticNavigating` state machine with 850ms cooldown lock, completely resolving violent scroll oscillation and infinite loops during timeline jumping;
+- **Historical Snapshot Card (`agy-historical-viewer`)**: Automatically summons a floating frosted-glass snapshot preview card when navigating beyond the virtualized DOM render pool, enabling inspection and copying of unmounted historical turns;
+- **Local Disk Transcript Indexing**: Added `antigravity:get-conversation-turns` native IPC in main process, reading `transcript.jsonl` directly and regex-stripping `<CONTEXT_SUMMARY>` dirty data to eliminate duplicated search entries;
+- **Fixed Model Selector Flash-Crash**: Blocked synthetic click interception during Radix UI Popover opening, adding event stopPropagation gates so model menus open smoothly on the first click;
+- **Model-Adaptive Thinking Architecture**: Gemini gets exclusive 4-level slider, Claude displays `Built-in Thinking (Fixed)` badge, GPT displays `Fixed Reasoning (Med)`, completely eliminating cross-model state pollution.
 
 ### [v0.1.5] - 2026-09-23
 - **Dynamic Multi-Account System (Major Overhaul vs v0.1.4)**:
