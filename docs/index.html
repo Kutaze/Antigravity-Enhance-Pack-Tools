@@ -1883,28 +1883,49 @@
         </div>
       </div>
 
-      <!-- Feature 2.1: Timeline Navigation & Historical Viewer (v0.1.6 New) -->
+      <!-- Feature 2.1: Timeline Navigation & Instant Search (v0.1.6 New) -->
       <div class="feature-showcase-row" id="timeline-nav">
-        <div class="feature-media">
-          <img src="assets/verified_timeline_viewer_live.png" alt="时空刻度导航轴与超长历史快照卡片">
+        <div class="feature-media" style="display: flex; gap: 14px; align-items: stretch; justify-content: center;">
+          <img src="assets/verified_timeline_progressbar_live.png" alt="垂直时空刻度导航进度条" style="width: auto; height: 380px; object-fit: contain; border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow);">
+          <img src="assets/verified_timeline_viewer_live.png" alt="会话轮次即时搜索与快速直达弹窗" style="flex: 1; min-width: 0; height: 380px; object-fit: cover; object-position: left center; border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow);">
         </div>
         <div class="feature-content">
           <span class="feature-badge-mini badge-cyan">v0.1.6 交互核心重构</span>
-          <h3>时空刻度导航轴 · 防震荡平滑居中 · 毛玻璃历史快照</h3>
+          <h3>时空刻度导航进度条 · 会话轮次即时搜索直达</h3>
           <p>
-            针对超长对话反复拉扯滚动条、虚拟列表回收导致无法跳转早期会话的深层痛点，全链路重塑导航与快照调度系统。
+            针对超长长程会话中反复拉扯滚动条、历史提问无法快速索引等深层痛点，独创垂直动态刻度进度条与即时搜索直达弹窗体系。
           </p>
           <ul class="feature-bullets">
-            <li><span class="check">✔</span> <strong>3倍加长时空刻度导航轴</strong>：覆盖屏幕 ~80% 视野，细粒度动态采样 18~65 档里程碑，流体余弦波浪实时跟手；</li>
-            <li><span class="check">✔</span> <strong>850ms 防反冲单向锁定</strong>：切断视口滚动反向监听反馈环，彻底根治会话跳转时上下往复疯狂抖动的死循环；</li>
-            <li><span class="check">✔</span> <strong>毛玻璃历史快照卡片 (agy-historical-viewer)</strong>：超出当前视口渲染池时自动呼出浮层，完整呈现问答并支持一键独立复制；</li>
-            <li><span class="check">✔</span> <strong>100% 严密隐私脱敏</strong>：所有敏感凭据与本地账户路径严密脱敏打码，离线纯本地运行无泄露。</li>
+            <li><span class="check">✔</span> <strong>垂直时空刻度导航进度条 (图三实测)</strong>：居左垂直长轴标尺，细粒度动态采样 18~65 档里程碑，随光标与滚动产生流体余弦放大波浪，黑体指针实时指示浏览深度；</li>
+            <li><span class="check">✔</span> <strong>会话轮次即时搜索直达弹窗 (图二实测)</strong>：点击底部 <code>≡</code> 按钮即时呼出，支持按轮次编号或提问关键词毫秒级过滤，翡翠绿高亮聚焦当前轮次，一键跳转直达历史节点；</li>
+            <li><span class="check">✔</span> <strong>850ms 防反冲单向锁定</strong>：用户点击刻度轴或搜索结果执行导航时，激活单向抑制窗口，彻底切断视口滚动反向监听反馈环，根治上下往复疯狂抖动；</li>
+            <li><span class="check">✔</span> <strong>100% 严密隐私脱敏保护</strong>：侧边栏历史会话、项目列表、用户名及历史聊天记录全量深度打码脱敏，离线纯本地运行无泄露。</li>
           </ul>
         </div>
       </div>
 
-      <!-- Feature 2.2: Model Adaptive Thinking & Disk Indexing (v0.1.6 New) -->
-      <div class="feature-showcase-row reverse" id="model-adaptive">
+      <!-- Feature 2.2: Historical Viewer Snapshot Card (v0.1.6 New) -->
+      <div class="feature-showcase-row reverse" id="historical-snapshot">
+        <div class="feature-media">
+          <img src="assets/verified_historical_snapshot_live.png" alt="超长会话毛玻璃历史快照卡片">
+        </div>
+        <div class="feature-content">
+          <span class="feature-badge-mini badge-emerald">v0.1.6 权威快照引擎</span>
+          <h3>超长会话毛玻璃历史快照 · 本地权威日志穿透索引</h3>
+          <p>
+            针对长程对话中目标轮次超出当前页面虚拟切片渲染池（已被 DOM 虚拟滚动物理卸载）的痛点，创新研发浮动快照回放卡片。
+          </p>
+          <ul class="feature-bullets">
+            <li><span class="check">✔</span> <strong>轻量级毛玻璃历史快照浮层 (agy-historical-viewer)</strong>：自动平滑滚动至可见边缘并优雅呼出浮动卡片，不破坏当前界面布局；</li>
+            <li><span class="check">✔</span> <strong>穿透直读本地权威日志</strong>：IPC 原生直读本地 <code>transcript.jsonl</code>，彻底剥离模型压缩总结脏数据，权威还原真实问答；</li>
+            <li><span class="check">✔</span> <strong>完整重现问答与一键独立复制</strong>：清晰呈现用户原始提问与 AI 关键解答摘要，支持各模块一键独立复制至剪贴板；</li>
+            <li><span class="check">✔</span> <strong>翡翠绿脉冲光环定位</strong>：TreeWalker 文本特征穿透引擎精准锁定真实消息节点，呈现双层脉冲光环。</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Feature 2.3: Model Adaptive Thinking & Disk Indexing (v0.1.6 New) -->
+      <div class="feature-showcase-row" id="model-adaptive">
         <div class="feature-media">
           <img src="assets/verified_adaptive_thinking_live.png" alt="模型思考能力动态自适应与纯净本地索引">
         </div>

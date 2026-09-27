@@ -91,12 +91,29 @@ Native "@ Plugins" hub in the left navigation sidebar, bridging OpenAI Codex loc
 | :---: |
 | <img src="assets/verified_plugin_center_live.png" width="750" /> |
 
-### 6. Timeline Anti-Jitter Navigation & Historical Viewer Snapshot (`agy-historical-viewer`) [New in v0.1.6]
-3x vertically elongated timeline navigation axis supporting fluid cosine wave tracking and 850ms anti-jitter programmatic lock; breaks through native virtual list unmounting limitations by auto-scrolling to visible boundaries and summoning a lightweight frosted-glass floating history card, allowing complete inspection and one-click copying even when DOM nodes are unmounted:
+### 6. Timeline Milestone Progress Bar & Turn Instant Search Modal [Core Feature in v0.1.6]
+Built specifically to eliminate three major friction points in ultra-long sessions: scrollbar friction, lack of turn-level indexing, and DOM virtual unmounting:
 
-| Timeline Navigation Axis · Emerald Green Pulse Glow · Frosted-Glass Historical Snapshot Card (Masked Privacy) |
+1. **Timeline Milestone Progress Bar (Live Test - Image 3)**:
+   - Left-docked vertical milestone scale spanning ~80% viewport height, dynamically sampling 18~65 milestone ticks;
+   - Generates 60/120fps fluid cosine wave magnification on hover and scrolling; pointer indicates current browsing depth in real-time;
+   - Dedicated quick-access search button `≡` docked at the bottom of the track.
+2. **Turn Instant Search & Jump Modal (Live Test - Image 2)**:
+   - Click the bottom `≡` button on the progress bar to instantly invoke a floating search popover;
+   - Millisecond-level filtering by turn number or query keywords to jump directly to historical milestones;
+   - Active turn highlighted with an emerald green (`#10b981`) focus indicator;
+   - Smooth auto-scrolls to the target node, locked by an **850ms programmatic cooldown window** to eliminate jitter loops.
+3. **Frosted-Glass Historical Snapshot Card (`agy-historical-viewer`)**:
+   - For ancient turns physically unmounted by Electron virtual DOM recycling, summons a floating card right above the chat viewport;
+   - IPC penetrates local disk logs directly, reconstructing 100% authentic user questions and AI answer summaries with one-click independent copying.
+
+| Timeline Milestone Progress Bar (Live Crop) | Turn Instant Search Modal (Live Test · Privacy Masked) |
+| :---: | :---: |
+| <img src="assets/verified_timeline_progressbar_live.png" height="420" /> | <img src="assets/verified_timeline_viewer_live.png" height="420" /> |
+
+| Frosted-Glass Historical Snapshot Card (`agy-historical-viewer` Live Test · 100% Local) |
 | :---: |
-| <img src="assets/verified_timeline_viewer_live.png" width="750" /> |
+| <img src="assets/verified_historical_snapshot_live.png" width="750" /> |
 
 ### 7. Model-Adaptive Thinking Architecture & Pure Local Log Indexing [New in v0.1.6]
 Pioneering model capability detection pipeline: Gemini gets dedicated 4-level thinking slider (0k/8k/16k/24k), Claude dynamically maps to an amber-gold badge "Built-in Thinking (Fixed)", and GPT maps to "Fixed Reasoning (Med)"; Main process IPC penetrates directly into local `transcript.jsonl` to strip `<CONTEXT_SUMMARY>` dirty data and provide 100% pure turn indexing:
