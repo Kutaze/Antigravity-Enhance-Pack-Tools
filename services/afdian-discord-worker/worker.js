@@ -359,23 +359,18 @@ async function grantDiscordRoleIfMatched(env, order) {
   const totalAmount = parseFloat(order.total_amount) || 0;
   const planId = order.plan_id || '';
 
-  // 1. 根据金额或方案 ID 匹配目标身份组 (默认即为 ⚡ 赞助者 / Sponsor)
-  let targetRoleId = (env && env.ROLE_SPONSORS_ID) || '1553851450688536596';
+  // 金额阶梯判定 (零环境变量默认开箱即用)
+  const roleHonorId = (env && env.ROLE_TIER_HONOR_ID) || '1553853128846217358'; // 👑 荣誉赞助官 (¥99.99/月)
+  const roleSponsorId = (env && env.ROLE_SPONSORS_ID) || '1553851450688536596'; // ⚡ 赞助者 / Sponsor (¥12.00/月)
 
-  if (env.PLAN_ROLE_MAP_JSON) {
+  let targetRoleId = roleSponsorId;
+  if (totalAmount >= 90) {
+    targetRoleId = roleHonorId;
+  } else if (env && env.PLAN_ROLE_MAP_JSON) {
     try {
       const map = JSON.parse(env.PLAN_ROLE_MAP_JSON);
       if (map[planId]) targetRoleId = map[planId];
     } catch (e) {}
-  }
-
-  // 金额阶梯兜底判定
-  if (totalAmount >= 99 && env.ROLE_TIER_HONOR_ID) {
-    targetRoleId = env.ROLE_TIER_HONOR_ID; // 荣誉守护者
-  } else if (totalAmount >= 29 && env.ROLE_TIER_COCREATOR_ID) {
-    targetRoleId = env.ROLE_TIER_COCREATOR_ID; // 深度共创官
-  } else if (totalAmount >= 12 && env.ROLE_TIER_GEEK_ID) {
-    targetRoleId = env.ROLE_TIER_GEEK_ID; // 极客能量包 (专属彩色)
   }
 
   if (!targetRoleId) {
