@@ -82,7 +82,7 @@ async function sendDiscordNotification(order, queryThreadId) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       username: '爱发电赞助提醒',
-      avatar_url: 'https://pic1.afdiancdn.com/static/img/logo/logo.png',
+      avatar_url: 'https://pic1.afdiancdn.com/default/avatar/avatar-purple.png',
       embeds: [{
         title: '💖 收到一笔新的爱发电赞助！',
         description: '感谢慷慨支持！每一份赞助都是开源持续打磨与长久维护的核心动力！',
@@ -94,7 +94,7 @@ async function sendDiscordNotification(order, queryThreadId) {
         ],
         footer: {
           text: `订单号: ${order.out_trade_no} · Antigravity Enhance Tools`,
-          icon_url: 'https://pic1.afdiancdn.com/static/img/logo/logo.png'
+          icon_url: 'https://pic1.afdiancdn.com/default/avatar/avatar-purple.png'
         },
         timestamp: new Date().toISOString()
       }]

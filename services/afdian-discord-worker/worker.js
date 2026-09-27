@@ -320,7 +320,7 @@ async function sendDiscordBroadcast(env, order) {
     ],
     footer: {
       text: `订单号: ${out_trade_no} · Antigravity Enhance Tools`,
-      icon_url: 'https://pic1.afdiancdn.com/static/img/logo/logo.png'
+      icon_url: 'https://pic1.afdiancdn.com/default/avatar/avatar-purple.png'
     },
     timestamp: new Date().toISOString()
   };
@@ -331,7 +331,7 @@ async function sendDiscordBroadcast(env, order) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         username: '爱发电赞助提醒',
-        avatar_url: 'https://pic1.afdiancdn.com/static/img/logo/logo.png',
+        avatar_url: 'https://pic1.afdiancdn.com/default/avatar/avatar-purple.png',
         embeds: [embed]
       })
     });
