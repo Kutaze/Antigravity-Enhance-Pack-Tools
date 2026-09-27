@@ -70,8 +70,9 @@ async function sendDiscordNotification(order, queryThreadId) {
   const defaultWebhook = 'https://discord.com/api/webhooks/1552329570957529110/t53NF1st_oEqpgnJpRT6CUKWyozRfv9D0CFPKe7UpK7mm7Ye9c7OFr5Kcy5A05MxCnxu';
   let targetUrl = process.env.DISCORD_WEBHOOK_URL || defaultWebhook;
 
-  // 如果指定了子频道 (Thread ID)，自动挂载到 Webhook URL 查询参数
-  const threadId = queryThreadId || process.env.DISCORD_THREAD_ID;
+  // 默认直接发送至新创建的子区：💖 · 爱发电赞助鸣谢 (Thread ID: 1553841999575261234)
+  const defaultThreadId = '1553841999575261234';
+  const threadId = queryThreadId || process.env.DISCORD_THREAD_ID || defaultThreadId;
   if (threadId && !targetUrl.includes('thread_id=')) {
     targetUrl += (targetUrl.includes('?') ? '&' : '?') + `thread_id=${encodeURIComponent(threadId)}`;
   }
