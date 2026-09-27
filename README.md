@@ -411,7 +411,6 @@ window.__AGY_APPLY_THINKING_LEVEL__('high');
 - **本地日志权威穿透索引（Local Disk Transcript Indexing）**：主进程新增 `antigravity:get-conversation-turns` 原生 IPC 接口，穿透直读本地用户目录权威日志（`transcript.jsonl`），正则剥离 `<CONTEXT_SUMMARY>` 压缩摘要，彻底消除搜索列表重复显示问题；
 - **彻底修复模型切换菜单“频繁闪退/点不开需重复点击”**：阻断菜单展开时的被动模拟点击与 Radix UI Popover 关闭冲突，加上防穿透事件门禁，菜单秒开不闪退；
 - **模型思考能力自适应引擎（Model Adaptive Thinking Architecture）**：Gemini 专属 4 挡调节滑块，Claude 识别为 `内置思考 (不可调)` 优雅徽章，GPT 识别为 `固定推理 (中)`，切断全局配置交叉污染，从 Claude 切回 Gemini 永不崩溃；
-- **全套 3:4 竖屏浅色宣发展板完整交付 (10/10)**：交付 10 张 1200×1600 高品质展板，包含作者简介、项目网址与核心能力全景。
 
 ### [v0.1.5] - 2026-09-23
 - **多账号原生动态管理体系（对比 v0.1.4 深度重构）**：
