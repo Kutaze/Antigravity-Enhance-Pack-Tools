@@ -9,7 +9,7 @@
 
 <p align="center">
   <a href="https://antigravity-enhance-tools.github.io/"><img src="https://img.shields.io/badge/Website-Live-0284c7?style=flat-square&logo=google-chrome&logoColor=white" alt="Website" /></a>
-  <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases"><img src="https://img.shields.io/badge/Release-v0.1.5-6366f1?style=flat-square" alt="Release" /></a>
+  <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases"><img src="https://img.shields.io/badge/Release-v0.1.6-6366f1?style=flat-square" alt="Release" /></a>
   <a href="https://afdian.com/a/Kutaze"><img src="https://img.shields.io/badge/Afdian-爱发电赞助-946ce6?style=flat-square&logo=kofi&logoColor=white" alt="Afdian" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-10b981?style=flat-square" alt="License" /></a>
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools"><img src="https://img.shields.io/badge/Platform-Windows_%7C_macOS_%7C_Linux-0284c7?style=flat-square" alt="Platform" /></a>
@@ -404,6 +404,14 @@ window.__AGY_APPLY_THINKING_LEVEL__('high');
 ---
 
 ## 📝 更新日志
+
+### [v0.1.6] - 2026-09-27 深度修复与体验重构版
+- **侧边栏超长上下文防震荡精准定位（Anti-Jitter Lockout Guard）**：引入 `isProgrammaticNavigating` 状态机与 850ms 冷却保护，彻底解决跳转时上下往复剧烈抖动与死循环；
+- **超长会话历史快照预览卡片（`agy-historical-viewer`）**：超出虚拟列表渲染池时自动呼出毛玻璃浮动历史快照卡片，即使 DOM 节点已被虚拟化卸载也能完整查阅与一键复制；
+- **本地日志权威穿透索引（Local Disk Transcript Indexing）**：主进程新增 `antigravity:get-conversation-turns` 原生 IPC 接口，穿透直读本地用户目录权威日志（`transcript.jsonl`），正则剥离 `<CONTEXT_SUMMARY>` 压缩摘要，彻底消除搜索列表重复显示问题；
+- **彻底修复模型切换菜单“频繁闪退/点不开需重复点击”**：阻断菜单展开时的被动模拟点击与 Radix UI Popover 关闭冲突，加上防穿透事件门禁，菜单秒开不闪退；
+- **模型思考能力自适应引擎（Model Adaptive Thinking Architecture）**：Gemini 专属 4 挡调节滑块，Claude 识别为 `内置思考 (不可调)` 优雅徽章，GPT 识别为 `固定推理 (中)`，切断全局配置交叉污染，从 Claude 切回 Gemini 永不崩溃；
+- **全套 3:4 竖屏浅色宣发展板完整交付 (10/10)**：交付 10 张 1200×1600 高品质展板，包含作者简介、项目网址与核心能力全景。
 
 ### [v0.1.5] - 2026-09-23
 - **多账号原生动态管理体系（对比 v0.1.4 深度重构）**：

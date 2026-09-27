@@ -263,7 +263,7 @@ namespace AntigravityInstaller
             };
             verBadgeText = new TextBlock
             {
-                Text = "v0.1.5",
+                Text = "v0.1.6",
                 FontSize = 10.5,
                 FontWeight = FontWeights.Medium
             };
@@ -590,7 +590,7 @@ namespace AntigravityInstaller
             cardsGrid.Children.Add(cardAuthor);
 
             // Card 2: Software Model
-            cardModel = CreateFooterCard("🏷️", "软件型号 (Model)", "v0.1.5 Enhance Pro", Color.FromRgb(16, 185, 129), out lblModelTitle, out lblModelVal);
+            cardModel = CreateFooterCard("🏷️", "软件型号 (Model)", "v0.1.6 Enhance Pro", Color.FromRgb(16, 185, 129), out lblModelTitle, out lblModelVal);
             cardModel.Cursor = Cursors.Hand;
             cardModel.ToolTip = "Antigravity 原生深度增强与多账号管理套件 (点击查看关于信息)";
             cardModel.MouseLeftButtonUp += (s, e) => ShowAboutDialog();
@@ -1517,7 +1517,7 @@ namespace AntigravityInstaller
         {
             ShowModernModal(
                 "关于扩展增强工具",
-                "Antigravity Enhance Tools · v0.1.5 Enhance Pro",
+                "Antigravity Enhance Tools · v0.1.6 Enhance Pro",
                 new string[] {
                     "软件作者：Kutaze",
                     "开源地址：github.com/Kutaze/Antigravity-Enhance-Pack-Tools",

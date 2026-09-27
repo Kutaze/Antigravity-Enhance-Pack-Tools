@@ -4,7 +4,7 @@ All notable changes to the **Antigravity Enhance Tools** project will be documen
 
 ---
 
-## [v0.1.5] - 2026-09-27 深度修复与体验重构版
+## [v0.1.6] - 2026-09-27 深度修复与体验重构版
 
 ### 侧边栏超长上下文精准定位与防震荡、本地日志权威穿透索引、模型自适应与防闪退全面修复
 - **侧边栏超长上下文精准定位与防跳跃震荡（Anti-Jitter Navigation & Progressive Lock）**：
