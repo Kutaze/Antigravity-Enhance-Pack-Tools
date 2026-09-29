@@ -7663,33 +7663,78 @@
         panel.style.maxHeight = '440px';
 
         function getActiveModelInfo() {
-            const checkmarkPath = "M382-253.85L168.62-467.23";
+            const trigger = document.querySelector('[data-testid="model-selector-trigger"]');
+            const trigText = trigger ? (trigger.innerText || '').trim() : '';
             const allItems = Array.from(panel.querySelectorAll('[role="menuitem"]')).filter(i => !i.closest('#agy-thinking-slider-section'));
-            let activeItem = allItems.find(item => item.innerHTML.includes(checkmarkPath));
-            if (!activeItem) {
-                const trigger = document.querySelector('[data-testid="model-selector-trigger"]');
-                const trigText = trigger ? trigger.innerText : '';
-                activeItem = allItems.find(item => {
-                    const base = item.querySelector('[data-model-base]')?.getAttribute('data-model-base');
-                    return base && trigText.includes(base);
-                });
+            
+            // 1. 优先从打开的子菜单中检测是否有带 checkmark 的选定项
+            const checkmarkPath = "M382-253.85L168.62-467.23";
+            let checkedEffort = null;
+            const allSubMenus = document.querySelectorAll('[role="menu"], [data-radix-menu-content]');
+            for (const sm of allSubMenus) {
+                if (sm === panel) continue;
+                const subItems = Array.from(sm.querySelectorAll('[role="menuitem"]'));
+                const checkedItem = subItems.find(it => 
+                    it.innerHTML.includes(checkmarkPath) || 
+                    it.getAttribute('aria-checked') === 'true' || 
+                    it.getAttribute('data-state') === 'checked'
+                );
+                if (checkedItem) {
+                    checkedEffort = checkedItem.innerText.trim();
+                    break;
+                }
             }
-            if (!activeItem && allItems.length > 0) activeItem = allItems[0];
+
+            // 2. 根据底栏触发按钮上的真实文本，精准匹配主菜单中的活跃模型项
+            let activeItem = null;
+            if (trigText && allItems.length > 0) {
+                const trigClean = trigText.toLowerCase().replace(/\s+/g, ' ');
+                const tokens = [
+                    '3.8 flash', '3.7 flash', '3.6 flash', '3.1 pro',
+                    'claude 3.7 sonnet', 'claude 3.5 sonnet', 'claude sonnet',
+                    'claude opus', 'claude haiku',
+                    'gpt-oss', 'gpt-4o', 'gpt'
+                ];
+                for (const tok of tokens) {
+                    if (trigClean.includes(tok)) {
+                        activeItem = allItems.find(it => (it.innerText || '').toLowerCase().includes(tok));
+                        if (activeItem) break;
+                    }
+                }
+                if (!activeItem) {
+                    activeItem = allItems.find(it => {
+                        const itName = it.innerText.split('\n')[0].replace(/[>›→^]/g, '').trim().toLowerCase();
+                        return itName && (trigClean.includes(itName) || itName.includes(trigClean.split(' ')[0]));
+                    });
+                }
+            }
+            if (!activeItem && allItems.length > 0) {
+                activeItem = allItems.find(it => it.getAttribute('data-state') === 'open') || allItems[0];
+            }
             if (!activeItem) return null;
 
-            const baseEl = activeItem.querySelector('[data-model-base]');
-            const modelBase = baseEl ? baseEl.getAttribute('data-model-base') : (activeItem.getAttribute('data-model-label') || activeItem.innerText.split('\n')[0].trim());
-            const effortSpan = activeItem.querySelector('span.shrink-0.opacity-70') || 
-                               Array.from(activeItem.querySelectorAll('span')).find(s => ['高', '中', '低', '关闭', 'Ultra'].includes(s.innerText.trim()));
-            const effort = effortSpan ? effortSpan.innerText.trim() : null;
-            const hasEffortGroup = !!activeItem.querySelector('[data-testid="model-selector-effort-group"]');
+            const firstLine = activeItem.innerText.split('\n')[0].replace(/[>›→^]/g, '').trim();
+            const modelBase = firstLine.replace(/\s+(高|中|低|关闭|Ultra|High|Medium|Low|Off)\b/gi, '').trim();
+
+            let effort = checkedEffort;
+            if (!effort) {
+                const trigSpan = trigger ? (trigger.querySelector('span.opacity-70') || trigger.querySelector('span.shrink-0.opacity-70')) : null;
+                if (trigSpan && trigSpan.textContent.trim()) {
+                    effort = trigSpan.textContent.trim();
+                }
+            }
+            if (!effort) {
+                const effortSpan = activeItem.querySelector('span.shrink-0.opacity-70') || 
+                                   Array.from(activeItem.querySelectorAll('span')).find(s => ['高', '中', '低', '关闭', 'Ultra'].includes(s.innerText.trim()));
+                if (effortSpan) effort = effortSpan.innerText.trim();
+            }
+            if (effort === 'Ultra') effort = '高';
 
             return {
                 item: activeItem,
                 modelBase,
-                effortSpan,
-                effort,
-                hasEffortGroup
+                effort: effort || '高',
+                hasEffortGroup: !!activeItem.querySelector('[data-testid="model-selector-effort-group"]') || activeItem.innerHTML.includes('>') || !!activeItem.getAttribute('aria-haspopup')
             };
         }
 
@@ -7817,34 +7862,52 @@
         const badge = section.querySelector('#agy-slider-badge');
         const lblBtns = section.querySelectorAll('.agy-slider-lbl-btn');
 
-        // 仅在用户明确点击或拖拽时才触发底层菜单，严禁在初始挂载或后台同步时自动触发导致菜单闪退！
-        function trySelectSubmenuEffort(levelName) {
+        // 高可用异步重试驱动的子菜单选项触发器
+        function trySelectSubmenuEffort(levelName, targetItem) {
             try {
-                const curActive = getActiveModelInfo();
-                if (!curActive || !curActive.item) return;
+                const targetEl = targetItem || getActiveModelInfo()?.item;
+                if (!targetEl) return;
 
-                curActive.item.dispatchEvent(new PointerEvent('pointerenter', { bubbles: true }));
-                curActive.item.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+                // 派发完整的事件链，确保 Radix UI 唤出二级菜单
+                targetEl.dispatchEvent(new PointerEvent('pointermove', { bubbles: true, cancelable: true }));
+                targetEl.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true }));
+                targetEl.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true, cancelable: true }));
 
-                setTimeout(() => {
+                let attempts = 0;
+                const maxAttempts = 15;
+                const pollInterval = 30;
+
+                const checkAndClick = () => {
+                    attempts++;
                     const allSubMenus = document.querySelectorAll('[role="menu"], [data-radix-menu-content]');
                     for (const sm of allSubMenus) {
                         if (sm === panel) continue;
                         const subItems = Array.from(sm.querySelectorAll('[role="menuitem"]'));
-                        const match = subItems.find(it => {
-                            const t = it.innerText.trim();
-                            return t === levelName || 
-                                   (levelName === '高' && (t.includes('高') || t.toLowerCase().includes('high'))) ||
-                                   (levelName === '中' && (t.includes('中') || t.toLowerCase().includes('medium') || t.toLowerCase().includes('med'))) ||
-                                   (levelName === '低' && (t.includes('低') || t.toLowerCase().includes('low'))) ||
-                                   (levelName === '关闭' && (t.includes('关') || t.toLowerCase().includes('off')));
-                        });
-                        if (match) {
-                            match.click();
-                            break;
+                        if (subItems.length > 0) {
+                            const match = subItems.find(it => {
+                                const t = it.innerText.trim();
+                                return t === levelName || 
+                                       (levelName === '高' && (t.includes('高') || t.toLowerCase().includes('high'))) ||
+                                       (levelName === '中' && (t.includes('中') || t.toLowerCase().includes('medium') || t.toLowerCase().includes('med'))) ||
+                                       (levelName === '低' && (t.includes('低') || t.toLowerCase().includes('low'))) ||
+                                       (levelName === '关闭' && (t.includes('关') || t.toLowerCase().includes('off')));
+                            });
+                            if (match) {
+                                match.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true }));
+                                match.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true }));
+                                match.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, cancelable: true }));
+                                match.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, cancelable: true }));
+                                match.click();
+                                return;
+                            }
                         }
                     }
-                }, 35);
+                    if (attempts < maxAttempts) {
+                        setTimeout(checkAndClick, pollInterval);
+                    }
+                };
+
+                setTimeout(checkAndClick, 20);
             } catch(e) {}
         }
 
@@ -7889,17 +7952,15 @@
                 }
             });
 
-            // 更新活跃模型标签
-            if (curActive && curActive.effortSpan && curActive.effortSpan.innerText.trim() !== lvl.name) {
-                curActive.effortSpan.innerText = lvl.name;
-            }
-
-            // 更新底栏触发按钮上的文字
-            syncModelTriggerText(lvl.name, curActive ? curActive.modelBase : null);
-
-            // 关键：只有当用户显式点击或拖拽操作时，才尝试触发原生 React 菜单选择！彻底杜绝打开弹层即闪退！
-            if (isUserExplicitAction && cap.adjustable) {
-                trySelectSubmenuEffort(lvl.name);
+            // 关键：只有当用户明确点击或拖拽操作时，才修改 DOM 并向底层触发事件！
+            if (isUserExplicitAction) {
+                if (curActive && curActive.effortSpan && curActive.effortSpan.innerText.trim() !== lvl.name) {
+                    curActive.effortSpan.innerText = lvl.name;
+                }
+                syncModelTriggerText(lvl.name, curActive ? curActive.modelBase : null);
+                if (cap.adjustable) {
+                    trySelectSubmenuEffort(lvl.name);
+                }
             }
         }
 
@@ -7913,14 +7974,41 @@
             };
         });
 
-        // 监听面板内模型项点击切换
+        // 核心增强：拦截模型项点击，彻底解决带子菜单的模型点击无法直接切换的问题
         const menuItems = panel.querySelectorAll('[role="menuitem"]');
         menuItems.forEach(mi => {
             if (mi.id === 'agy-thinking-slider-section' || mi.closest('#agy-thinking-slider-section')) return;
-            mi.addEventListener('click', () => {
+            if (mi.__agy_listener_attached) return;
+            mi.__agy_listener_attached = true;
+
+            mi.addEventListener('click', (e) => {
+                const hasSubmenu = mi.getAttribute('aria-haspopup') === 'menu' || 
+                                   mi.innerHTML.includes('>') || 
+                                   mi.querySelector('svg path[d*="M9 18l6-6-6-6"]') ||
+                                   mi.querySelector('svg path[d*="m9 18 6-6-6-6"]');
+
+                if (hasSubmenu) {
+                    const rect = mi.getBoundingClientRect();
+                    const clickX = e.clientX;
+                    const isClickingRightArrow = (rect.right - clickX) < 36;
+
+                    // 如果点击的是模型项主体（而非最右侧微小箭头），用户意图是直接切换到此模型！
+                    if (!isClickingRightArrow) {
+                        const firstLine = mi.innerText.split('\n')[0].replace(/[>›→^]/g, '').trim();
+                        const mBase = firstLine.replace(/\s+(高|中|低|关闭|Ultra|High|Medium|Low|Off)\b/gi, '').trim();
+                        
+                        let targetEffort = localStorage.getItem('__AGY_EFFORT_' + mBase) || 
+                                           localStorage.getItem('__AGY_THINKING_LEVEL__') || 
+                                           '中';
+                        if (targetEffort === 'Ultra') targetEffort = '高';
+
+                        trySelectSubmenuEffort(targetEffort, mi);
+                    }
+                }
+
                 setTimeout(() => {
                     mountPanelThinkingSlider();
-                }, 50);
+                }, 60);
             });
         });
 
@@ -7958,12 +8046,6 @@
                     b.className = (i === bestIdx) ? 'agy-slider-lbl-btn active' : 'agy-slider-lbl-btn';
                     b.style.color = (i === bestIdx) ? lvl.color : '';
                 });
-
-                const curActive = getActiveModelInfo();
-                if (curActive && curActive.effortSpan) {
-                    curActive.effortSpan.innerText = lvl.name;
-                }
-                syncModelTriggerText(lvl.name, curActive ? curActive.modelBase : null);
             }
         }
 
@@ -8008,7 +8090,7 @@
             return;
         }
 
-        // Case A: 用户显式更改了挡位
+        // Case A: 只有当用户显式操作且传入有效 levelName 时才修改触发按钮文字
         if (levelName) {
             let name = levelName;
             if (name === 'Ultra') name = '高';
@@ -8022,7 +8104,7 @@
             return;
         }
 
-        // Case B: 被动同步读取 React 渲染的真实值
+        // Case B: 被动同步读取 React 渲染的真实值（严禁主动修改 span.textContent！）
         if (span && span.textContent && span.textContent.trim()) {
             const raw = span.textContent.trim();
             const valid = ['关闭', '低', '中', '高', 'off', 'low', 'med', 'medium', 'high'];
