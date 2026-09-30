@@ -7730,10 +7730,20 @@
             }
             if (effort === 'Ultra') effort = '高';
 
+            const curSec = document.getElementById('agy-thinking-slider-section');
+            if (curSec && curSec.__agyUserEffort && (Date.now() - (curSec.__agyUserEffortTime || 0)) < 15000) {
+                effort = curSec.__agyUserEffort;
+            }
+
+            const fallbackEffort = (curSec && curSec.__agyUserEffort) ||
+                                   localStorage.getItem('__AGY_EFFORT_' + modelBase) ||
+                                   localStorage.getItem('__AGY_THINKING_LEVEL__') ||
+                                   '中';
+
             return {
                 item: activeItem,
                 modelBase,
-                effort: effort || '高',
+                effort: effort || fallbackEffort,
                 hasEffortGroup: !!activeItem.querySelector('[data-testid="model-selector-effort-group"]') || activeItem.innerHTML.includes('>') || !!activeItem.getAttribute('aria-haspopup')
             };
         }
@@ -7799,8 +7809,11 @@
         }
 
         // 分流渲染 B：Gemini 4 挡动态调控滑块
-        let currentIdx = 3;
-        if (activeModel && activeModel.effort) {
+        let currentIdx = 2;
+        if (section.__agyUserEffort && (Date.now() - (section.__agyUserEffortTime || 0)) < 15000) {
+            const found = levels.findIndex(l => l.name === section.__agyUserEffort);
+            if (found !== -1) currentIdx = found;
+        } else if (activeModel && activeModel.effort) {
             const found = levels.findIndex(l => l.name === activeModel.effort);
             if (found !== -1) currentIdx = found;
         } else {
@@ -7811,7 +7824,7 @@
                 const found = levels.findIndex(l => l.name === trigEffort);
                 if (found !== -1) currentIdx = found;
             } else if (activeModel && activeModel.modelBase) {
-                const saved = localStorage.getItem('__AGY_EFFORT_' + activeModel.modelBase);
+                const saved = localStorage.getItem('__AGY_EFFORT_' + activeModel.modelBase) || localStorage.getItem('__AGY_THINKING_LEVEL__');
                 if (saved) {
                     const found = levels.findIndex(l => l.name === saved);
                     if (found !== -1) currentIdx = found;
@@ -7868,13 +7881,29 @@
                 const targetEl = targetItem || getActiveModelInfo()?.item;
                 if (!targetEl) return;
 
-                // 派发完整的事件链，确保 Radix UI 唤出二级菜单
-                targetEl.dispatchEvent(new PointerEvent('pointermove', { bubbles: true, cancelable: true }));
-                targetEl.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true }));
-                targetEl.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true, cancelable: true }));
+                if (section) {
+                    section.__agyUserEffort = levelName;
+                    section.__agyUserEffortTime = Date.now();
+                }
+
+                // 立即更新该模型 item 上的 effortSpan 标签
+                const effortSpan = targetEl.querySelector('span.shrink-0.opacity-70') || 
+                                   Array.from(targetEl.querySelectorAll('span')).find(s => ['高', '中', '低', '关闭', 'Ultra'].includes(s.innerText.trim()));
+                if (effortSpan && levelName) {
+                    effortSpan.innerText = levelName;
+                }
+
+                // 唤出 Radix UI 子菜单：聚焦 + ArrowRight 键 + 模拟真实鼠标指针
+                const rect = targetEl.getBoundingClientRect();
+                const mouseOpts = { bubbles: true, cancelable: true, pointerType: 'mouse', clientX: rect.left + rect.width / 2, clientY: rect.top + rect.height / 2 };
+                targetEl.focus();
+                targetEl.dispatchEvent(new PointerEvent('pointermove', mouseOpts));
+                targetEl.dispatchEvent(new PointerEvent('pointerdown', mouseOpts));
+                targetEl.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true, cancelable: true, clientX: mouseOpts.clientX, clientY: mouseOpts.clientY }));
+                targetEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', code: 'ArrowRight', keyCode: 39, bubbles: true, cancelable: true }));
 
                 let attempts = 0;
-                const maxAttempts = 15;
+                const maxAttempts = 20;
                 const pollInterval = 30;
 
                 const checkAndClick = () => {
@@ -7893,11 +7922,43 @@
                                        (levelName === '关闭' && (t.includes('关') || t.toLowerCase().includes('off')));
                             });
                             if (match) {
-                                match.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true }));
+                                // 1. 动态移动 checkmark 勾选图标，确保视觉上即时呈现
+                                const checkmarkSvg = sm.querySelector('svg path[d*="M382-253.85"]')?.closest('svg');
+                                subItems.forEach(it => {
+                                    it.removeAttribute('aria-checked');
+                                    it.setAttribute('data-state', 'unchecked');
+                                });
+                                match.setAttribute('aria-checked', 'true');
+                                match.setAttribute('data-state', 'checked');
+                                if (checkmarkSvg && !match.contains(checkmarkSvg)) {
+                                    match.prepend(checkmarkSvg);
+                                }
+
+                                // 2. 直接调用 React 内部 props 上的 onSelect / onClick 回调
+                                const reactPropsKey = Object.keys(match).find(k => k.startsWith('__reactProps'));
+                                if (reactPropsKey && match[reactPropsKey]) {
+                                    try {
+                                        if (typeof match[reactPropsKey].onSelect === 'function') {
+                                            match[reactPropsKey].onSelect({ defaultPrevented: false, preventDefault: () => {} });
+                                        }
+                                        if (typeof match[reactPropsKey].onClick === 'function') {
+                                            match[reactPropsKey].onClick({ defaultPrevented: false, preventDefault: () => {}, stopPropagation: () => {} });
+                                        }
+                                    } catch(e) {}
+                                }
+
+                                // 3. 补齐标准 DOM 事件链
+                                const matchRect = match.getBoundingClientRect();
+                                const pOpts = { bubbles: true, cancelable: true, pointerType: 'mouse', clientX: matchRect.left + matchRect.width / 2, clientY: matchRect.top + matchRect.height / 2 };
+                                match.dispatchEvent(new PointerEvent('pointerdown', pOpts));
                                 match.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true }));
-                                match.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, cancelable: true }));
+                                match.dispatchEvent(new PointerEvent('pointerup', pOpts));
                                 match.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, cancelable: true }));
                                 match.click();
+
+                                // 4. 同步更新底栏触发按钮上的文字与本地持久化
+                                const curInfo = getActiveModelInfo();
+                                syncModelTriggerText(levelName, curInfo ? curInfo.modelBase : null);
                                 return;
                             }
                         }
@@ -7912,7 +7973,13 @@
         }
 
         function setLevel(idx, animate = true, isUserExplicitAction = false) {
-            if (section) section.__agyLastIdx = idx;
+            if (section) {
+                section.__agyLastIdx = idx;
+                if (isUserExplicitAction) {
+                    section.__agyUserEffort = levels[idx].name;
+                    section.__agyUserEffortTime = Date.now();
+                }
+            }
             currentIdx = idx;
             const lvl = levels[idx];
 
@@ -7952,7 +8019,7 @@
                 }
             });
 
-            // 关键：只有当用户明确点击或拖拽操作时，才修改 DOM 并向底层触发事件！
+            // 关键：当用户明确点击或拖拽操作时，通知子菜单切换并同步
             if (isUserExplicitAction) {
                 if (curActive && curActive.effortSpan && curActive.effortSpan.innerText.trim() !== lvl.name) {
                     curActive.effortSpan.innerText = lvl.name;
@@ -7997,12 +8064,18 @@
                         const firstLine = mi.innerText.split('\n')[0].replace(/[>›→^]/g, '').trim();
                         const mBase = firstLine.replace(/\s+(高|中|低|关闭|Ultra|High|Medium|Low|Off)\b/gi, '').trim();
                         
-                        let targetEffort = localStorage.getItem('__AGY_EFFORT_' + mBase) || 
-                                           localStorage.getItem('__AGY_THINKING_LEVEL__') || 
-                                           '中';
-                        if (targetEffort === 'Ultra') targetEffort = '高';
+                        // 用户要求：切换模型时，跟随外面的滑条档位移动！
+                        const currentSliderEffort = (levels[currentIdx] && levels[currentIdx].name) ||
+                                                   (section && section.__agyUserEffort) ||
+                                                   localStorage.getItem('__AGY_THINKING_LEVEL__') ||
+                                                   '中';
+                        
+                        try {
+                            localStorage.setItem('__AGY_EFFORT_' + mBase, currentSliderEffort);
+                            localStorage.setItem('__AGY_THINKING_LEVEL__', currentSliderEffort);
+                        } catch(err) {}
 
-                        trySelectSubmenuEffort(targetEffort, mi);
+                        trySelectSubmenuEffort(currentSliderEffort, mi);
                     }
                 }
 
@@ -8124,6 +8197,9 @@
                 } catch(e) {}
 
                 const section = document.getElementById('agy-thinking-slider-section');
+                if (section && section.__agyUserEffortTime && (Date.now() - section.__agyUserEffortTime) < 5000) {
+                    return;
+                }
                 if (section && typeof section.__AGY_SET_LEVEL__ === 'function') {
                     const lIdx = ['关闭', '低', '中', '高'].indexOf(norm);
                     if (lIdx !== -1 && section.__agyLastIdx !== lIdx) {
