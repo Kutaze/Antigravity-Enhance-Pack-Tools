@@ -1793,7 +1793,11 @@
 
   // 3. UI Buttons Mount & Handling (Office Uploader + Screenshot)
   function attachUploadButton() {
-    const toolbar = document.querySelector('.flex.min-w-0.flex-1.items-center.gap-px');
+    const addContextBtn = document.querySelector('button[aria-label*="添加上下文"], button[aria-label*="context" i], button[aria-label*="Context"]');
+    const toolbar = (addContextBtn ? addContextBtn.parentElement : null) ||
+                    document.querySelector('.flex.min-w-0.flex-1.items-center.gap-0') ||
+                    document.querySelector('.flex.min-w-0.flex-1.items-center.gap-px') ||
+                    document.querySelector('[class*="flex"][class*="min-w-0"][class*="flex-1"][class*="items-center"]');
     if (!toolbar) return;
 
     // Create file input
@@ -1848,10 +1852,11 @@
         e.stopPropagation();
         fileInput.click();
       });
+    }
 
-      const contextBtn = toolbar.querySelector('button[aria-label*="上下文"], button[aria-label*="context"]');
-      if (contextBtn) {
-        contextBtn.insertAdjacentElement('afterend', btn);
+    if (btn.parentElement !== toolbar) {
+      if (addContextBtn && addContextBtn.parentElement === toolbar) {
+        addContextBtn.insertAdjacentElement('afterend', btn);
       } else {
         toolbar.appendChild(btn);
       }
@@ -1883,9 +1888,13 @@
         e.stopPropagation();
         toggleSkillsHubModal();
       });
+    }
 
-      if (btn && btn.parentElement) {
+    if (skillsBtn.parentElement !== toolbar) {
+      if (btn && btn.parentElement === toolbar) {
         btn.insertAdjacentElement('afterend', skillsBtn);
+      } else if (addContextBtn && addContextBtn.parentElement === toolbar) {
+        addContextBtn.insertAdjacentElement('afterend', skillsBtn);
       } else {
         toolbar.appendChild(skillsBtn);
       }
@@ -1997,6 +2006,7 @@
   }
 
   // 5. Lifecycle Watcher (React SPA DOM self-healing)
+  window.__AGY_ATTACH_UPLOAD_BUTTON__ = attachUploadButton;
   setInterval(attachUploadButton, 1000);
   attachUploadButton();
   setupDragAndDrop();
@@ -4416,15 +4426,20 @@
         });
 
         overlay.innerHTML = `
-            <!-- Header Row with Switcher and Close Button -->
+            <!-- Header Row with Switcher, Official Jump and Close Button -->
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
                 <div class="agy-pc-header-tabs">
                     <button class="agy-pc-header-tab ${isPluginTab ? 'active' : ''}" id="agy-pc-tab-plugins">插件</button>
                     <button class="agy-pc-header-tab ${!isPluginTab ? 'active' : ''}" id="agy-pc-tab-skills">技能 (${skillsCatalog.length})</button>
                 </div>
-                <button class="agy-pc-btn" id="agy-pc-btn-close" style="font-size: 12.5px; border-radius: 9999px; padding: 5px 14px; font-weight: 500;">
-                    ✕ 返回对话 (Esc)
-                </button>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <button class="agy-pc-btn" id="agy-pc-btn-official-custom" style="font-size: 12.5px; border-radius: 9999px; padding: 5px 14px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px;" title="跳转至 Antigravity 官方个性化定制">
+                        🌐 官方个性化定制
+                    </button>
+                    <button class="agy-pc-btn" id="agy-pc-btn-close" style="font-size: 12.5px; border-radius: 9999px; padding: 5px 14px; font-weight: 500;">
+                        ✕ 返回对话 (Esc)
+                    </button>
+                </div>
             </div>
 
             <!-- Hero Title -->
@@ -4689,6 +4704,22 @@
             };
         }
 
+        // Official Customizations Jump Button
+        const officialJumpBtn = document.getElementById('agy-pc-btn-official-custom');
+        if (officialJumpBtn) {
+            officialJumpBtn.onclick = (e) => {
+                e.stopPropagation();
+                closePluginCenter();
+                const officialCustomBtn = Array.from(document.querySelectorAll('button, a')).find(b => {
+                    const t = (b.innerText || '').trim();
+                    return t.includes('个性化定制') || t.includes('Customizations') || t.includes('Customization');
+                });
+                if (officialCustomBtn) {
+                    officialCustomBtn.click();
+                }
+            };
+        }
+
         // Toggles
         document.querySelectorAll('.agy-pc-toggle').forEach(t => {
             t.onchange = (e) => {
@@ -4846,44 +4877,61 @@
 
     // Sidebar Button Mounting
     function mountSidebarBtn() {
-        // 关键门禁：检测官方是否已原生内置“个性化定制 (Customizations)”导航项
         const officialCustomBtn = Array.from(document.querySelectorAll('button, a')).find(b => {
             const t = (b.innerText || '').trim();
             return t.includes('个性化定制') || t.includes('Customizations') || t.includes('Customization');
         });
-        if (officialCustomBtn) {
-            // 官方已内置个性化定制页面，清理独立侧边栏插件按钮，杜绝与官方生态冲突
-            const oldBtn = document.getElementById('agy-sidebar-plugins-btn');
-            if (oldBtn) oldBtn.remove();
-            return;
-        }
-
         const cronBtn = Array.from(document.querySelectorAll('button, a')).find(b => b.innerText.includes('定时任务') || b.innerText.includes('自动化任务'));
-        if (!cronBtn) return;
-        const parent = cronBtn.parentElement;
+        const refBtn = officialCustomBtn || cronBtn;
+        if (!refBtn) return;
+        const parent = refBtn.parentElement;
         if (!parent) return;
 
         let btn = document.getElementById('agy-sidebar-plugins-btn');
         if (!btn) {
             btn = document.createElement('button');
             btn.id = 'agy-sidebar-plugins-btn';
-            btn.className = cronBtn.className;
+            btn.className = refBtn.className;
             btn.style.marginTop = '1px';
             btn.innerHTML = `
                 <span style="font-family: ui-monospace, monospace; font-size: 14px; font-weight: bold; width: 16px; text-align: center;">@</span>
-                <span>插件</span>
+                <span>插件生态</span>
             `;
-
-            if (cronBtn.nextSibling) {
-                parent.insertBefore(btn, cronBtn.nextSibling);
-            } else {
-                parent.appendChild(btn);
-            }
-
             btn.onclick = (e) => {
                 e.stopPropagation();
                 togglePluginCenter();
             };
+        }
+
+        if (btn.parentElement !== parent) {
+            if (refBtn.nextSibling) {
+                parent.insertBefore(btn, refBtn.nextSibling);
+            } else {
+                parent.appendChild(btn);
+            }
+        }
+    }
+
+    // Official Customizations Integration: Inject ecosystem tab pill into nav tabs
+    function mountCustomizationsIntegration() {
+        const nav = document.querySelector('nav[data-testid="plugins-tabs"]');
+        if (!nav) return;
+
+        let btn = document.getElementById('agy-customizations-ecosystem-tab');
+        if (!btn) {
+            btn = document.createElement('button');
+            btn.id = 'agy-customizations-ecosystem-tab';
+            btn.type = 'button';
+            btn.className = 'inline-flex items-center justify-center h-full px-2.5 rounded-md text-sm shrink-0 whitespace-nowrap transition-colors cursor-pointer outline-none font-medium gap-1 text-primary hover:bg-primary/10';
+            btn.title = '打开 55+ 智能体技能中心与 Codex 插件生态';
+            btn.innerHTML = '<span style="font-size: 13px;">✨</span><span>高阶技能与插件生态 (55+)</span>';
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                openPluginCenter();
+            };
+        }
+        if (btn.parentElement !== nav) {
+            nav.appendChild(btn);
         }
     }
 
@@ -4959,6 +5007,7 @@
 
     // Expose hooks for the Master Coordinator (no individual observer)
     window.__AGY_MOUNT_SIDEBAR_PLUGINS_BTN__ = mountSidebarBtn;
+    window.__AGY_MOUNT_CUSTOMIZATIONS_INTEGRATION__ = mountCustomizationsIntegration;
     window.__AGY_ATTACH_PLUGIN_OVERLAY__ = attachOverlay;
 
     window.__AGY_OPEN_PLUGIN_CENTER__ = openPluginCenter;
@@ -10408,6 +10457,12 @@
             }
             if (typeof window.__AGY_MOUNT_SWITCH_ACCOUNT_BTN__ === 'function') {
                 window.__AGY_MOUNT_SWITCH_ACCOUNT_BTN__();
+            }
+            if (typeof window.__AGY_MOUNT_CUSTOMIZATIONS_INTEGRATION__ === 'function') {
+                window.__AGY_MOUNT_CUSTOMIZATIONS_INTEGRATION__();
+            }
+            if (typeof window.__AGY_ATTACH_UPLOAD_BUTTON__ === 'function') {
+                window.__AGY_ATTACH_UPLOAD_BUTTON__();
             }
             if (typeof window.__AGY_MOUNT_FISHEYE_TIMELINE__ === 'function') {
                 window.__AGY_MOUNT_FISHEYE_TIMELINE__();
