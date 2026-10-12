@@ -103,8 +103,8 @@
         var exactMap = window.__ANTIGRAVITY_EXACT__ || EXACT;
         var regexList = window.__ANTIGRAVITY_REGEX_RULES__ || REGEX_RULES;
 
-        // Exact match (with normalized CRLF support)
-        var normalized = trimmed.replace(/\r\n/g, '\n');
+        // Exact match (with normalized CRLF and non-breaking space support)
+        var normalized = trimmed.replace(/\r\n/g, '\n').replace(/\u00A0/g, ' ');
         if (exactMap[trimmed] || exactMap[normalized]) {
             var target = exactMap[trimmed] || exactMap[normalized];
             var leading = original.match(/^\s*/)[0];
@@ -4207,17 +4207,22 @@
 
     // Mount to layout
     function attachOverlay() {
-        const target = getMainContainer();
-        if (target) {
-            if (overlay.parentElement !== target) {
-                target.style.position = 'relative';
-                target.appendChild(overlay);
+        try {
+            if (!overlay) return;
+            const target = getMainContainer();
+            if (target) {
+                if (overlay.parentElement !== target) {
+                    target.style.position = 'relative';
+                    target.appendChild(overlay);
+                }
+            } else if (document.body && overlay.parentElement !== document.body) {
+                document.body.appendChild(overlay);
             }
-        } else if (overlay.parentElement !== document.body) {
-            document.body.appendChild(overlay);
-        }
+        } catch (e) {}
     }
-    attachOverlay();
+    if (document.body) {
+        attachOverlay();
+    }
 
     // Helper: Insert Text into Lexical or Standard Editor
     function insertTextIntoLexicalEditor(editor, promptText) {

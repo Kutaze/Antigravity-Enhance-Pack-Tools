@@ -1698,7 +1698,6 @@ try {
     getSkills: () => electron_1.ipcRenderer.invoke('antigravity:get-skills'),
     getConversationTurns: (convId) => electron_1.ipcRenderer.invoke('antigravity:get-conversation-turns', convId),
     openPath: (p) => electron_1.ipcRenderer.invoke('antigravity:open-path', p),
-    openExternal: (url) => electron_1.ipcRenderer.invoke('antigravity:open-external', url),
     getAccountProfiles: () => electron_1.ipcRenderer.invoke('antigravity:get-account-profiles'),
     saveCurrentProfile: (data) => electron_1.ipcRenderer.invoke('antigravity:save-current-profile', data),
     switchAccountProfile: (email) => electron_1.ipcRenderer.invoke('antigravity:switch-account-profile', email),
@@ -1789,7 +1788,21 @@ try {
             fs.writeFileSync(mainJs, mainContent, 'utf8');
         }
 
-        // 8. Re-pack asar
+        // 8.5 Patch updater.js to prevent background auto-overwrite
+        const updaterJs = path.join(distDir, 'updater.js');
+        if (fs.existsSync(updaterJs)) {
+            let updaterContent = fs.readFileSync(updaterJs, 'utf8');
+            if (updaterContent.includes('electron_updater_1.autoUpdater.autoInstallOnAppQuit = electron_1.app.isPackaged;')) {
+                updaterContent = updaterContent.replace(
+                    'electron_updater_1.autoUpdater.autoInstallOnAppQuit = electron_1.app.isPackaged;',
+                    'electron_updater_1.autoUpdater.autoInstallOnAppQuit = false;'
+                );
+                fs.writeFileSync(updaterJs, updaterContent, 'utf8');
+                console.log('  ✔ 成功优化更新机制 (禁用退出时后台静默覆盖 app.asar)');
+            }
+        }
+
+        // 9. Re-pack asar
         console.log('\n[5/6] 正在重新封包 app.asar...');
         if (fs.existsSync(tempOutAsar)) {
             fs.unlinkSync(tempOutAsar);
@@ -1805,7 +1818,7 @@ try {
             throw new Error('打包生成的 asar 文件体积异常 (' + newSize + ' bytes)');
         }
 
-        // 9. Deploy to resources/app.asar
+        // 10. Deploy to resources/app.asar
         console.log('\n[6/6] 正在部署增强包至客户端目录...');
         // Use rename-swap to bypass Windows file locking (Electron may have app.asar open)
         const oldAsarTmp = asarPath + '.old_deploy';
@@ -1821,10 +1834,28 @@ try {
             fs.copyFileSync(tempOutAsar, asarPath);
         }
 
-        // 10. Cleanup
+        // 11. Cleanup
         try {
             if (fs.existsSync(tempSandbox)) fs.rmSync(tempSandbox, { recursive: true, force: true });
             if (fs.existsSync(tempOutAsar)) fs.unlinkSync(tempOutAsar);
+        } catch(e) {}
+
+        // 11.5 Purge pending updater downloads to prevent silent rollback on relaunch
+        try {
+            const localAppData = process.env.LOCALAPPDATA;
+            if (localAppData) {
+                const pendingDir = path.join(localAppData, 'antigravity-updater', 'pending');
+                if (fs.existsSync(pendingDir)) {
+                    for (const f of fs.readdirSync(pendingDir)) {
+                        try { fs.unlinkSync(path.join(pendingDir, f)); } catch(e) {}
+                    }
+                }
+                const instExe = path.join(localAppData, 'antigravity-updater', 'installer.exe');
+                if (fs.existsSync(instExe)) {
+                    try { fs.unlinkSync(instExe); } catch(e) {}
+                }
+                console.log('  ✔ 成功清理后台更新下载缓存 (防回滚保护)');
+            }
         } catch(e) {}
 
         // 11. Clean any corrupted per_host_zoom_levels from Chromium Preferences
