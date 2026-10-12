@@ -4841,7 +4841,19 @@
 
     // Sidebar Button Mounting
     function mountSidebarBtn() {
-        const cronBtn = Array.from(document.querySelectorAll('button, a')).find(b => b.innerText.includes('定时任务'));
+        // 关键门禁：检测官方是否已原生内置“个性化定制 (Customizations)”导航项
+        const officialCustomBtn = Array.from(document.querySelectorAll('button, a')).find(b => {
+            const t = (b.innerText || '').trim();
+            return t.includes('个性化定制') || t.includes('Customizations') || t.includes('Customization');
+        });
+        if (officialCustomBtn) {
+            // 官方已内置个性化定制页面，清理独立侧边栏插件按钮，杜绝与官方生态冲突
+            const oldBtn = document.getElementById('agy-sidebar-plugins-btn');
+            if (oldBtn) oldBtn.remove();
+            return;
+        }
+
+        const cronBtn = Array.from(document.querySelectorAll('button, a')).find(b => b.innerText.includes('定时任务') || b.innerText.includes('自动化任务'));
         if (!cronBtn) return;
         const parent = cronBtn.parentElement;
         if (!parent) return;
@@ -4912,8 +4924,8 @@
         if (target.closest('#agy-pc-detail-modal')) return;
         if (target.closest('#agy-pc-modal')) return;
 
-        // If user clicks sidebar items (conversation, new chat, etc.), close
-        const sidebarNav = target.closest('nav, .bg-sidebar');
+        // If user clicks sidebar items (conversation, new chat, customization, etc.), close
+        const sidebarNav = target.closest('nav, .bg-sidebar, aside, [class*="sidebar"]');
         if (sidebarNav && overlay.style.display === 'flex') {
             closePluginCenter();
         }
