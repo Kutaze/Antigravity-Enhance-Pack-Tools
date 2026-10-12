@@ -4426,18 +4426,15 @@
         });
 
         overlay.innerHTML = `
-            <!-- Header Row with Switcher, Official Jump and Close Button -->
+            <!-- Header Row with Switcher and Close Button -->
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
                 <div class="agy-pc-header-tabs">
-                    <button class="agy-pc-header-tab ${isPluginTab ? 'active' : ''}" id="agy-pc-tab-plugins">插件</button>
-                    <button class="agy-pc-header-tab ${!isPluginTab ? 'active' : ''}" id="agy-pc-tab-skills">技能 (${skillsCatalog.length})</button>
+                    <button class="agy-pc-header-tab ${isPluginTab ? 'active' : ''}" id="agy-pc-tab-plugins">Codex 插件生态</button>
+                    <button class="agy-pc-header-tab ${!isPluginTab ? 'active' : ''}" id="agy-pc-tab-skills">智能体技能库 (${skillsCatalog.length})</button>
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px;">
-                    <button class="agy-pc-btn" id="agy-pc-btn-official-custom" style="font-size: 12.5px; border-radius: 9999px; padding: 5px 14px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px;" title="跳转至 Antigravity 官方个性化定制">
-                        🌐 官方个性化定制
-                    </button>
                     <button class="agy-pc-btn" id="agy-pc-btn-close" style="font-size: 12.5px; border-radius: 9999px; padding: 5px 14px; font-weight: 500;">
-                        ✕ 返回对话 (Esc)
+                        ✕ 返回个性化定制 (Esc)
                     </button>
                 </div>
             </div>
@@ -4875,82 +4872,54 @@
         }
     };
 
-    // Sidebar Button Mounting
+    // Sidebar Button Mounting (User request: remove independent sidebar button, collect into Customizations page)
     function mountSidebarBtn() {
-        const officialCustomBtn = Array.from(document.querySelectorAll('button, a')).find(b => {
-            const t = (b.innerText || '').trim();
-            return t.includes('个性化定制') || t.includes('Customizations') || t.includes('Customization');
-        });
-        const cronBtn = Array.from(document.querySelectorAll('button, a')).find(b => b.innerText.includes('定时任务') || b.innerText.includes('自动化任务'));
-        const refBtn = officialCustomBtn || cronBtn;
-        if (!refBtn) return;
-        const parent = refBtn.parentElement;
-        if (!parent) return;
-
-        let btn = document.getElementById('agy-sidebar-plugins-btn');
-        if (!btn) {
-            btn = document.createElement('button');
-            btn.id = 'agy-sidebar-plugins-btn';
-            btn.className = refBtn.className;
-            btn.style.marginTop = '1px';
-            btn.innerHTML = `
-                <span style="font-family: ui-monospace, monospace; font-size: 14px; font-weight: bold; width: 16px; text-align: center;">@</span>
-                <span>插件生态</span>
-            `;
-            btn.onclick = (e) => {
-                e.stopPropagation();
-                togglePluginCenter();
-            };
-        }
-
-        if (btn.parentElement !== parent) {
-            if (refBtn.nextSibling) {
-                parent.insertBefore(btn, refBtn.nextSibling);
-            } else {
-                parent.appendChild(btn);
-            }
-        }
+        const oldBtn = document.getElementById('agy-sidebar-plugins-btn');
+        if (oldBtn) oldBtn.remove();
     }
 
-    // Official Customizations Integration: Inject ecosystem tab pill into nav tabs
+    // Official Customizations Integration: Inject ecosystem tab pill (navigation purely via top-right tab)
     function mountCustomizationsIntegration() {
-        const nav = document.querySelector('nav[data-testid="plugins-tabs"]');
-        if (!nav) return;
+        // Clean up middle banner card if present (user requested removal)
+        const oldCard = document.getElementById('agy-customizations-ecosystem-card');
+        if (oldCard) oldCard.remove();
 
-        let btn = document.getElementById('agy-customizations-ecosystem-tab');
-        if (!btn) {
-            btn = document.createElement('button');
-            btn.id = 'agy-customizations-ecosystem-tab';
-            btn.type = 'button';
-            btn.className = 'inline-flex items-center justify-center h-full px-2.5 rounded-md text-sm shrink-0 whitespace-nowrap transition-colors cursor-pointer outline-none font-medium gap-1 text-primary hover:bg-primary/10';
-            btn.title = '打开 55+ 智能体技能中心与 Codex 插件生态';
-            btn.innerHTML = '<span style="font-size: 13px;">✨</span><span>高阶技能与插件生态 (55+)</span>';
-            btn.onclick = (e) => {
-                e.stopPropagation();
-                openPluginCenter();
-            };
-        }
-        if (btn.parentElement !== nav) {
-            nav.appendChild(btn);
+        // Top nav tab injection in nav[data-testid="plugins-tabs"]
+        const nav = document.querySelector('nav[data-testid="plugins-tabs"]');
+        if (nav) {
+            let btn = document.getElementById('agy-customizations-ecosystem-tab');
+            if (!btn) {
+                btn = document.createElement('button');
+                btn.id = 'agy-customizations-ecosystem-tab';
+                btn.type = 'button';
+                btn.className = 'inline-flex items-center justify-center h-full px-2.5 rounded-md text-sm shrink-0 whitespace-nowrap transition-colors cursor-pointer outline-none font-medium gap-1 text-primary hover:bg-primary/10';
+                btn.title = '打开 55+ 智能体技能中心与 Codex 插件生态';
+                btn.innerHTML = '<span style="font-size: 13px;">✨</span><span>高阶技能与插件生态 (55+)</span>';
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    openPluginCenter();
+                };
+            }
+            if (btn.parentElement !== nav) {
+                nav.appendChild(btn);
+            }
         }
     }
 
     function openPluginCenter() {
         attachOverlay();
-        const btn = document.getElementById('agy-sidebar-plugins-btn');
-        if (btn) {
-            btn.classList.add('bg-sidebar-muted', 'font-semibold', 'text-foreground');
-            btn.classList.remove('bg-transparent', 'text-secondary-foreground');
+        const tab = document.getElementById('agy-customizations-ecosystem-tab');
+        if (tab) {
+            tab.classList.add('bg-secondary', 'text-foreground');
         }
         overlay.style.display = 'flex';
         renderUI();
     }
 
     function closePluginCenter() {
-        const btn = document.getElementById('agy-sidebar-plugins-btn');
-        if (btn) {
-            btn.classList.remove('bg-sidebar-muted', 'font-semibold', 'text-foreground');
-            btn.classList.add('bg-transparent', 'text-secondary-foreground');
+        const tab = document.getElementById('agy-customizations-ecosystem-tab');
+        if (tab) {
+            tab.classList.remove('bg-secondary', 'text-foreground');
         }
         overlay.style.display = 'none';
         const detailModal = document.getElementById('agy-pc-detail-modal');
