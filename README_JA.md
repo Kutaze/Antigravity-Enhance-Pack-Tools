@@ -9,7 +9,7 @@
 
 <p align="center">
   <a href="https://antigravity-enhance-tools.github.io/"><img src="https://img.shields.io/badge/Website-Live-0284c7?style=flat-square&logo=google-chrome&logoColor=white" alt="Website" /></a>
-  <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases"><img src="https://img.shields.io/badge/Release-v0.1.6-6366f1?style=flat-square" alt="Release" /></a>
+  <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases"><img src="https://img.shields.io/badge/Release-v0.1.7-6366f1?style=flat-square" alt="Release" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-10b981?style=flat-square" alt="License" /></a>
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools"><img src="https://img.shields.io/badge/Platform-Windows_%7C_macOS_%7C_Linux-0284c7?style=flat-square" alt="Platform" /></a>
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools"><img src="https://img.shields.io/badge/UI-Dual_Theme_GUI-8b5cf6?style=flat-square" alt="UI" /></a>
@@ -245,6 +245,13 @@ curl -fsSL https://raw.githubusercontent.com/Kutaze/Antigravity-Enhance-Pack-Too
 ---
 
 ## 📝 更新履歴
+
+### [v0.1.7] - 2026-10-13 公式カスタマイズ統合＆クリーンUX版
+- **公式「カスタマイズ (/customizations)」画面とのシームレス統合**: 公式の新スキル画面と完全共存し、右上のタブバーに `[✨ 高度スキル＆プラグインエコシステム (55+)]` カプセルを配置。競合なく55+の高度スキルとCodex拡張をワンクリック展開；
+- **100% ネイティブクリーンレイアウト**: 不要な中央バナーやサイドバーボタンを排除し、公式ネイティブの洗練されたUIを完全維持；
+- **チャット入力欄ツールバーの完全復元**: 2.22.0+ の Tailwind クラス変更に対応し、入力欄左下の `[📄 ドキュメント添付]` と `[✨ スキルセンター]` アイコンを復元；
+- **全画面多言語ローカライズ強化**: Google Workspace、Gemini API、Chrome DevTools などの新パッケージを完全網羅；
+- **単一ポータブル GUI インストーラー更新**: `Antigravity Enhance Tools.exe` を再コンパイル、ワンクリック無損失バックアップ＆復元対応。
 
 ### [v0.1.6] - 2026-09-27 安定性強化・体験刷新版
 - **サイドバー長大コンテキスト振動防止ガード**: `isProgrammaticNavigating` 状態機と 850ms 冷却ロックを導入し、タイムライン移動時の画面激震と無限ループを根絶；
