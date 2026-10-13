@@ -9,7 +9,7 @@
 
 <p align="center">
   <a href="https://antigravity-enhance-tools.github.io/"><img src="https://img.shields.io/badge/Website-Live-0284c7?style=flat-square&logo=google-chrome&logoColor=white" alt="Website" /></a>
-  <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases"><img src="https://img.shields.io/badge/Release-v0.1.7-6366f1?style=flat-square" alt="Release" /></a>
+  <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases"><img src="https://img.shields.io/badge/Release-v0.1.7.1-6366f1?style=flat-square" alt="Release" /></a>
   <a href="https://afdian.com/a/Kutaze"><img src="https://img.shields.io/badge/Afdian-Sponsor-946ce6?style=flat-square&logo=kofi&logoColor=white" alt="Afdian" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-10b981?style=flat-square" alt="License" /></a>
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools"><img src="https://img.shields.io/badge/Platform-Windows_%7C_macOS_%7C_Linux-0284c7?style=flat-square" alt="Platform" /></a>
@@ -250,6 +250,13 @@ curl -fsSL https://raw.githubusercontent.com/Kutaze/Antigravity-Enhance-Pack-Too
 ---
 
 ## 📝 Changelog
+
+### [v0.1.7.1] - 2026-10-13 Antigravity 2.23.0 Compatibility & WSL/IDE Wizard Localization
+- **Antigravity 2.23.0 Architecture Compatibility**: Upgraded patching engine to detect 2.23.0 core structure changes, auto-backing up official runtime packages;
+- **Native IDE Install Wizard Localization**: Full Chinese translation for the newly decoupled IDE code editor installation wizard (`dist/ideInstall/wizardHtml.js`);
+- **Native WSL Menu Item Localization**: Localized new top menu items under File menu (`Connect to WSL` and `Reopen Locally`), as well as `New Window` and `Docs`;
+- **Expanded Dictionary & Context Menus**: Added missing keys such as `Pinned Actions`, ensuring 100% native localization across conversation context menus and project tabs;
+- **Portable Dual-Theme GUI Installer**: Rebuilt `Antigravity Enhance Tools.exe` (~706 KB) with one-click safe backup and zero-dependency offline patching.
 
 ### [v0.1.7] - 2026-10-13 Official Customizations Integration & Clean UX
 - **Deep Integration with Official Customizations Page**: Seamlessly adapts to Antigravity's latest `/customizations` page with zero entry conflict; embeds `[✨ Advanced Skills & Plugin Ecosystem (55+)]` pill in the top-right tab bar for instant one-click access;

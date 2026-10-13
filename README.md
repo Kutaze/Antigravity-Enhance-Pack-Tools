@@ -9,7 +9,7 @@
 
 <p align="center">
   <a href="https://antigravity-enhance-tools.github.io/"><img src="https://img.shields.io/badge/Website-Live-0284c7?style=flat-square&logo=google-chrome&logoColor=white" alt="Website" /></a>
-  <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases"><img src="https://img.shields.io/badge/Release-v0.1.7-6366f1?style=flat-square" alt="Release" /></a>
+  <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases"><img src="https://img.shields.io/badge/Release-v0.1.7.1-6366f1?style=flat-square" alt="Release" /></a>
   <a href="https://afdian.com/a/Kutaze"><img src="https://img.shields.io/badge/Afdian-爱发电赞助-946ce6?style=flat-square&logo=kofi&logoColor=white" alt="Afdian" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-10b981?style=flat-square" alt="License" /></a>
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools"><img src="https://img.shields.io/badge/Platform-Windows_%7C_macOS_%7C_Linux-0284c7?style=flat-square" alt="Platform" /></a>
@@ -462,6 +462,13 @@ window.__AGY_APPLY_THINKING_LEVEL__('high');
 ---
 
 ## 📝 更新日志
+
+### [v0.1.7.1] - 2026-10-13 官方客户端 2.23.0 深度兼容版
+- **适配官方全新 2.23.0 架构升级**：补丁引擎全自动识别 2.23.0 原生架构变化，支持内核安全注入与原生底包无损升级；
+- **全新 IDE 安装向导（IDE Install Wizard）母语汉化**：深度汉化 2.23.0 新增的代码编辑器独立分离安装弹窗，全流程中文引导；
+- **原生顶部菜单 WSL 集成深度汉化**：汉化官方 File 菜单中新增的 Linux 子系统操作项（`连接到 WSL (Connect to WSL)` 与 `在本地重新打开 (Reopen Locally)`），同步汉化 `新建窗口 (New Window)` 与 `官方文档 (Docs)`；
+- **词库扩充与上下文菜单细化**：补充 `Pinned Actions`（置顶操作）等新增词条，确保会话右键菜单、项目操作在 2.23.0 下保持 100% 母语汉化；
+- **绿色单文件 GUI 安装向导编译**：重新编译生成 `Antigravity Enhance Tools.exe`（~706 KB，零环境依赖），支持一键无损备份注入与秒级回退。
 
 ### [v0.1.7] - 2026-10-13 官方个性化定制融入与交互清爽版
 - **深度融入官方全新“个性化定制 (/customizations)”界面**：完美适配官方原生技能界面，无冲突共存；在官方右上角标签栏无缝挂载 `[✨ 高阶技能与插件生态 (55+)]` 胶囊入口，一键呼出 55+ 智能体技能库与 Codex 本地扩展；

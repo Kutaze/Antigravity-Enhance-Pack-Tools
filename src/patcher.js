@@ -1802,6 +1802,35 @@ try {
             }
         }
 
+        // 8.6 Patch menu.js for native menus (WSL, Docs, New Window)
+        const menuJs = path.join(distDir, 'menu.js');
+        if (fs.existsSync(menuJs)) {
+            let menuContent = fs.readFileSync(menuJs, 'utf8');
+            menuContent = menuContent.replace("label: 'New Window',", "label: '新建窗口 (New Window)',");
+            menuContent = menuContent.replace("label: 'Docs',", "label: '官方文档 (Docs)',");
+            menuContent = menuContent.replace("label: 'Connect to WSL',", "label: '连接到 WSL (Connect to WSL)',");
+            menuContent = menuContent.replace("label: 'Reopen Locally',", "label: '在本地重新打开 (Reopen Locally)',");
+            fs.writeFileSync(menuJs, menuContent, 'utf8');
+            console.log('  ✔ 成功汉化官方原生菜单 (WSL / Docs / New Window)');
+        }
+
+        // 8.7 Patch ideInstall/wizardHtml.js for 2.23.0+ IDE Install Wizard
+        const wizardHtmlJs = path.join(distDir, 'ideInstall', 'wizardHtml.js');
+        if (fs.existsSync(wizardHtmlJs)) {
+            let wizardContent = fs.readFileSync(wizardHtmlJs, 'utf8');
+            wizardContent = wizardContent.replace('<title>Welcome to Antigravity</title>', '<title>欢迎使用 Antigravity</title>');
+            wizardContent = wizardContent.replace('Setting up…', '正在准备就绪…');
+            wizardContent = wizardContent.replace('<h1>Welcome to the new Antigravity!</h1>', '<h1>欢迎体验全新的 Antigravity！</h1>');
+            wizardContent = wizardContent.replace(
+                "<p>Antigravity has been redesigned to put agents first with new capabilities. If you'd still like a code editor, you can download it as a separate app named <b>Antigravity IDE</b>.</p>",
+                '<p>Antigravity 现已全面重构，以智能体优先并带来全新高阶能力。如果您仍需要代码编辑器，可将其作为名为 <b>Antigravity IDE</b> 的独立应用下载。</p>'
+            );
+            wizardContent = wizardContent.replace('<span>Download the Antigravity IDE</span>', '<span>下载 Antigravity IDE 代码编辑器</span>');
+            wizardContent = wizardContent.replace('>Explore the new Antigravity</button>', '>开始探索全新 Antigravity</button>');
+            fs.writeFileSync(wizardHtmlJs, wizardContent, 'utf8');
+            console.log('  ✔ 成功汉化全新 IDE 安装向导 (Antigravity 2.23.0+)');
+        }
+
         // 9. Re-pack asar
         console.log('\n[5/6] 正在重新封包 app.asar...');
         if (fs.existsSync(tempOutAsar)) {

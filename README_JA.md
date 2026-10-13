@@ -9,7 +9,7 @@
 
 <p align="center">
   <a href="https://antigravity-enhance-tools.github.io/"><img src="https://img.shields.io/badge/Website-Live-0284c7?style=flat-square&logo=google-chrome&logoColor=white" alt="Website" /></a>
-  <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases"><img src="https://img.shields.io/badge/Release-v0.1.7-6366f1?style=flat-square" alt="Release" /></a>
+  <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases"><img src="https://img.shields.io/badge/Release-v0.1.7.1-6366f1?style=flat-square" alt="Release" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-10b981?style=flat-square" alt="License" /></a>
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools"><img src="https://img.shields.io/badge/Platform-Windows_%7C_macOS_%7C_Linux-0284c7?style=flat-square" alt="Platform" /></a>
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools"><img src="https://img.shields.io/badge/UI-Dual_Theme_GUI-8b5cf6?style=flat-square" alt="UI" /></a>
@@ -245,6 +245,13 @@ curl -fsSL https://raw.githubusercontent.com/Kutaze/Antigravity-Enhance-Pack-Too
 ---
 
 ## 📝 更新履歴
+
+### [v0.1.7.1] - 2026-10-13 公式クライアント 2.23.0 対応版
+- **公式 2.23.0 アーキテクチャの完全適応**: 2.23.0 のコア変更を自動検出、安全なパッチ注入とオリジナルバックアップを自動実行；
+- **新 IDE インストールウィザードの日本語化**: 新たに分離されたコードエディタ導入ポップアップ（`dist/ideInstall/wizardHtml.js`）を完全翻訳；
+- **公式デスクトップメニュー WSL 操作の日本語化**: File メニューの `Connect to WSL (WSL に接続)`、`Reopen Locally (ローカルで再度開く)`、`New Window`、`Docs` などを日本語化；
+- **辞書データの拡充とコンテキストメニューの最適化**: `Pinned Actions`（固定操作）などの新項目を網羅し、コンテキストメニューとプロジェクト操作の100%日本語化を維持；
+- **ポータブル GUI インストーラーの再ビルド**: 最新コアを組み込んだ `Antigravity Enhance Tools.exe`（~706 KB）を配布、ワンクリック安全適用＆復元に対応。
 
 ### [v0.1.7] - 2026-10-13 公式カスタマイズ統合＆クリーンUX版
 - **公式「カスタマイズ (/customizations)」画面とのシームレス統合**: 公式の新スキル画面と完全共存し、右上のタブバーに `[✨ 高度スキル＆プラグインエコシステム (55+)]` カプセルを配置。競合なく55+の高度スキルとCodex拡張をワンクリック展開；
