@@ -9,7 +9,7 @@
 
 <p align="center">
   <a href="https://antigravity-enhance-tools.github.io/"><img src="https://img.shields.io/badge/Website-Live-0284c7?style=flat-square&logo=google-chrome&logoColor=white" alt="Website" /></a>
-  <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases"><img src="https://img.shields.io/badge/Release-v0.1.7.1-6366f1?style=flat-square" alt="Release" /></a>
+  <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases"><img src="https://img.shields.io/badge/Release-v0.1.7.2-6366f1?style=flat-square" alt="Release" /></a>
   <a href="https://afdian.com/a/Kutaze"><img src="https://img.shields.io/badge/Afdian-Sponsor-946ce6?style=flat-square&logo=kofi&logoColor=white" alt="Afdian" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-10b981?style=flat-square" alt="License" /></a>
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools"><img src="https://img.shields.io/badge/Platform-Windows_%7C_macOS_%7C_Linux-0284c7?style=flat-square" alt="Platform" /></a>
@@ -250,6 +250,12 @@ curl -fsSL https://raw.githubusercontent.com/Kutaze/Antigravity-Enhance-Pack-Too
 ---
 
 ## 📝 Changelog
+
+### [v0.1.7.2] - 2026-10-17 Antigravity 2.24.0 Compatibility & Multi-Account OAuth Hardening
+- **Official Antigravity 2.24.0 Compatibility**: Patching engine detects 2.24.0 structure changes and adaptive language server ports, providing seamless safe hot-injection and untouched official backups;
+- **Hardened Multi-Account OAuth Flow**: Reinforced main-process OAuth 2.0 loopback server (port 51121) and renderer bridge status machines, resolving "Environment Not Ready" on new profile additions;
+- **Sustained IDE Install Wizard & WSL Localization**: Preserves complete Chinese translations for decoupled IDE install wizard and native WSL top menus;
+- **Portable Standalone Installer**: Recompiled `Antigravity Enhance Tools.exe` with zero third-party dependencies and instant one-click rollback.
 
 ### [v0.1.7.1] - 2026-10-13 Antigravity 2.23.0 Compatibility & WSL/IDE Wizard Localization
 - **Antigravity 2.23.0 Architecture Compatibility**: Upgraded patching engine to detect 2.23.0 core structure changes, auto-backing up official runtime packages;

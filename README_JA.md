@@ -9,7 +9,7 @@
 
 <p align="center">
   <a href="https://antigravity-enhance-tools.github.io/"><img src="https://img.shields.io/badge/Website-Live-0284c7?style=flat-square&logo=google-chrome&logoColor=white" alt="Website" /></a>
-  <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases"><img src="https://img.shields.io/badge/Release-v0.1.7.1-6366f1?style=flat-square" alt="Release" /></a>
+  <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools/releases"><img src="https://img.shields.io/badge/Release-v0.1.7.2-6366f1?style=flat-square" alt="Release" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-10b981?style=flat-square" alt="License" /></a>
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools"><img src="https://img.shields.io/badge/Platform-Windows_%7C_macOS_%7C_Linux-0284c7?style=flat-square" alt="Platform" /></a>
   <a href="https://github.com/Kutaze/Antigravity-Enhance-Pack-Tools"><img src="https://img.shields.io/badge/UI-Dual_Theme_GUI-8b5cf6?style=flat-square" alt="UI" /></a>
@@ -245,6 +245,12 @@ curl -fsSL https://raw.githubusercontent.com/Kutaze/Antigravity-Enhance-Pack-Too
 ---
 
 ## 📝 更新履歴
+
+### [v0.1.7.2] - 2026-10-17 公式クライアント 2.24.0 対応＆マルチアカウント認証強化版
+- **公式 2.24.0 アーキテクチャの完全適応**: 2.24.0 の言語サービス動的ポート適応と構造を完全サポート、安全なパッチ注入とオリジナルバックアップを自動実行；
+- **マルチアカウント認証パイプラインの強化**: メインプロセスの独立 OAuth 認証サーバー（ポート 51121）とレンダラーブリッジを強化し、新アカウント追加時の「環境未準備」問題を根本解消；
+- **新 IDE インストールウィザード＆WSL 操作の継続日本語化**: 分離されたエディタ導入ポップアップとトップメニューの WSL 操作の完全日本語化を維持；
+- **ポータブル GUI インストーラーの再ビルド**: 最新コアを組み込んだ `Antigravity Enhance Tools.exe` を再配布、ワンクリック安全適用＆復元に対応。
 
 ### [v0.1.7.1] - 2026-10-13 公式クライアント 2.23.0 対応版
 - **公式 2.23.0 アーキテクチャの完全適応**: 2.23.0 のコア変更を自動検出、安全なパッチ注入とオリジナルバックアップを自動実行；
